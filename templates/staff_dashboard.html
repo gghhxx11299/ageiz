@@ -8,25 +8,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050508; --surface: #0F0F1A; --primary: #10B981;
-            --primary-glow: rgba(16, 185, 129, 0.3); --border: rgba(255,255,255,0.08);
-            --text: #F8FAFC; --text-dim: #94A3B8; --glass: rgba(15,15,26,0.7);
+            --bg: #F4F1EA; --surface: rgba(255,255,255,0.82); --primary: #38422C;
+            --primary-glow: rgba(56, 66, 44, 0.18); --border: rgba(56,66,44,0.14);
+            --text: #38422C; --text-dim: #72682A; --glass: rgba(255,255,255,0.82);
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
-        .header { display:flex; justify-content:space-between; align-items:center; padding:16px 24px; background:var(--surface); border-bottom:1px solid var(--border); }
+        .header { display:flex; justify-content:space-between; align-items:center; padding:16px 24px; background:rgba(244,241,234,0.92); border-bottom:1px solid var(--border); }
         .header h1 { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; color:var(--primary); }
         .header .user-info { font-size:0.8rem; color:var(--text-dim); }
         .logout-link { color:var(--text-dim); text-decoration:none; font-size:0.8rem; margin-left:16px; }
-        .logout-link:hover { color:var(--primary); }
+        .logout-link:hover { color:var(--accent); }
         .container { max-width:960px; margin:0 auto; padding:24px; }
-        .hotel-banner { background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.02)); border:1px solid rgba(16,185,129,0.2); border-radius:16px; padding:20px; margin-bottom:24px; }
+        .hotel-banner { background:linear-gradient(135deg, rgba(186,146,64,0.10), rgba(56,66,44,0.04)); border:1px solid rgba(56,66,44,0.16); border-radius:16px; padding:20px; margin-bottom:24px; }
         .hotel-banner h2 { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; }
         .hotel-banner p { color:var(--text-dim); font-size:0.85rem; margin-top:4px; }
 
         .tabs { display:flex; gap:8px; margin-bottom:24px; }
-        .tab-btn { flex:1; padding:12px; text-align:center; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-dim); background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; transition:all 0.3s; }
-        .tab-btn.active { color:#FFF; background:var(--primary); border-color:var(--primary); box-shadow:0 4px 15px var(--primary-glow); }
+        .tab-btn { flex:1; padding:12px; text-align:center; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-dim); background:rgba(255,255,255,0.72); border:1px solid var(--border); border-radius:12px; transition:all 0.3s; }
+        .tab-btn.active { color:#F4F1EA; background:var(--primary); border-color:var(--primary); box-shadow:0 4px 15px var(--primary-glow); }
 
         .form-panel { display:none; animation:fadeIn 0.3s ease; }
         .form-panel.active { display:block; }
@@ -38,38 +38,38 @@
         .form-group { margin-bottom:20px; }
         .form-group label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-dim); margin-bottom:8px; }
         input[type="text"], input[type="number"], textarea {
-            width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid var(--border);
-            border-radius:10px; color:#FFF; font-family:inherit; font-size:0.9rem; transition:all 0.2s;
+            width:100%; padding:12px 16px; background:rgba(255,255,255,0.82); border:1px solid var(--border);
+            border-radius:10px; color:var(--text); font-family:inherit; font-size:0.9rem; transition:all 0.2s;
         }
-        input:focus, textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+        input:focus, textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(186,146,64,0.14); }
         textarea { resize:vertical; min-height:100px; }
 
         /* Slider inputs */
         .slider-group { margin-bottom:20px; }
         .slider-group label { display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:600; color:var(--text-dim); margin-bottom:8px; }
-        .slider-group label .slider-value { color:var(--primary); font-weight:700; font-size:0.9rem; }
-        input[type="range"] { width:100%; height:6px; -webkit-appearance:none; background:rgba(255,255,255,0.1); border-radius:3px; outline:none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; background:var(--primary); border-radius:50%; cursor:pointer; box-shadow:0 0 10px var(--primary-glow); }
+        .slider-group label .slider-value { color:var(--accent); font-weight:700; font-size:0.9rem; }
+        input[type="range"] { width:100%; height:6px; -webkit-appearance:none; background:rgba(56,66,44,0.16); border-radius:3px; outline:none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; background:var(--accent); border-radius:50%; cursor:pointer; box-shadow:0 0 10px rgba(186,146,64,0.16); }
 
-        .submit-btn { width:100%; padding:14px; background:var(--primary); color:#FFF; border:none; border-radius:12px; font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.3s; }
+        .submit-btn { width:100%; padding:14px; background:var(--primary); color:#F4F1EA; border:none; border-radius:12px; font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.3s; }
         .submit-btn:hover { transform:translateY(-2px); box-shadow:0 10px 25px var(--primary-glow); }
         .submit-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
 
-        .ai-preview { background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2); border-radius:12px; padding:16px; margin-top:16px; display:none; }
+        .ai-preview { background:rgba(186,146,64,0.08); border:1px solid rgba(56,66,44,0.14); border-radius:12px; padding:16px; margin-top:16px; display:none; }
         .ai-preview.visible { display:block; }
         .ai-preview h4 { font-size:0.8rem; color:var(--primary); margin-bottom:10px; }
         .ai-preview p { font-size:0.85rem; color:var(--text-dim); margin-bottom:6px; }
         .ai-preview .sentiment-badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
-        .sentiment-positive { background:rgba(34,197,94,0.2); color:#22C55E; }
-        .sentiment-negative { background:rgba(239,68,68,0.2); color:#EF4444; }
-        .sentiment-neutral { background:rgba(234,179,8,0.2); color:#EAB308; }
+        .sentiment-positive { background:rgba(56,66,44,0.12); color:var(--primary); }
+        .sentiment-negative { background:rgba(186,146,64,0.14); color:var(--accent); }
+        .sentiment-neutral { background:rgba(114,104,42,0.12); color:var(--secondary); }
 
-        .report-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; }
+        .report-card { background:rgba(255,255,255,0.72); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; }
         .report-card .meta { display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-dim); margin-bottom:8px; }
         .report-card .summary { font-size:0.85rem; color:var(--text); line-height:1.5; }
         .report-card .ai-insight { font-size:0.8rem; color:var(--primary); font-style:italic; margin-top:8px; }
         .empty-state { text-align:center; padding:40px; color:var(--text-dim); }
-        .spinner { width:20px; height:20px; border:2px solid rgba(255,255,255,0.1); border-top-color:var(--primary); border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; }
+        .spinner { width:20px; height:20px; border:2px solid rgba(56,66,44,0.14); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; }
         @keyframes spin { to{transform:rotate(360deg)} }
     </style>
 </head>

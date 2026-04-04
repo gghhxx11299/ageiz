@@ -9,18 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050508;
-            --surface: #0F0F1A;
-            --primary: #6366F1;
-            --primary-glow: rgba(99, 102, 241, 0.3);
-            --accent: #06B6D4;
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #F8FAFC;
-            --text-dim: #94A3B8;
-            --error: #EF4444;
-            --glass: rgba(15, 15, 26, 0.7);
-            --staff-color: #10B981;
-            --staff-glow: rgba(16, 185, 129, 0.3);
+            --bg: #F4F1EA;
+            --surface: rgba(255, 255, 255, 0.82);
+            --primary: #38422C;
+            --primary-glow: rgba(56, 66, 44, 0.18);
+            --accent: #BA9240;
+            --secondary: #72682A;
+            --border: rgba(56, 66, 44, 0.14);
+            --text: #38422C;
+            --text-dim: #72682A;
+            --error: #BA9240;
+            --glass: rgba(255, 255, 255, 0.82);
+            --staff-color: #BA9240;
+            --staff-glow: rgba(186, 146, 64, 0.22);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -43,8 +44,9 @@
             transform: translate(-50%, -50%);
             width: 100vw; height: 100vh;
             background:
-                radial-gradient(circle at 20% 20%, var(--primary-glow) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+                radial-gradient(circle at 18% 18%, rgba(56, 66, 44, 0.16) 0%, transparent 38%),
+                radial-gradient(circle at 82% 82%, rgba(186, 146, 64, 0.18) 0%, transparent 34%),
+                radial-gradient(circle at 50% 0%, rgba(244, 241, 234, 0.72) 0%, transparent 30%);
             z-index: -1;
             filter: blur(80px);
         }
@@ -65,7 +67,7 @@
             font-size: 2.5rem;
             font-weight: 700;
             letter-spacing: -1px;
-            background: linear-gradient(135deg, #FFF 0%, #6366F1 100%);
+            background: linear-gradient(135deg, #38422C 0%, #BA9240 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
@@ -90,7 +92,7 @@
 
         .tabs {
             display: flex;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(56, 66, 44, 0.06);
             padding: 6px;
             border-radius: 14px;
             margin-bottom: 32px;
@@ -112,7 +114,7 @@
         }
 
         .tab.active {
-            color: #FFF;
+            color: #F4F1EA;
             background: var(--primary);
             box-shadow: 0 4px 15px var(--primary-glow);
         }
@@ -132,7 +134,7 @@
             font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-dim);
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(244, 241, 234, 0.72);
             border: 1px solid var(--border);
             border-radius: 12px;
             transition: all 0.3s;
@@ -145,16 +147,16 @@
         }
 
         .role-btn.manager-active {
-            color: #FFF;
+            color: #F4F1EA;
             background: var(--primary);
             border-color: var(--primary);
             box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .role-btn.staff-active {
-            color: #FFF;
-            background: var(--staff-color);
-            border-color: var(--staff-color);
+            color: #F4F1EA;
+            background: var(--accent);
+            border-color: var(--accent);
             box-shadow: 0 4px 15px var(--staff-glow);
         }
 
@@ -174,10 +176,10 @@
         input {
             width: 100%;
             padding: 14px 18px;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.82);
             border: 1px solid var(--border);
             border-radius: 12px;
-            color: #FFF;
+            color: var(--text);
             font-family: inherit;
             font-size: 0.95rem;
             transition: all 0.2s;
@@ -186,7 +188,7 @@
         input:focus {
             outline: none;
             border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.05);
+            background: #FFF;
             box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
@@ -194,7 +196,7 @@
             width: 100%;
             padding: 16px;
             background: var(--primary);
-            color: #FFF;
+            color: #F4F1EA;
             border: none;
             border-radius: 12px;
             font-size: 0.95rem;

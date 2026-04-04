@@ -9,16 +9,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050508;
-            --surface: #0F0F1A;
-            --primary: #6366F1;
-            --primary-glow: rgba(99, 102, 241, 0.3);
-            --accent: #06B6D4;
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #F8FAFC;
-            --text-dim: #94A3B8;
-            --pos: #10B981;
-            --glass: rgba(15, 15, 26, 0.7);
+            --bg: #F4F1EA;
+            --surface: rgba(255, 255, 255, 0.82);
+            --primary: #38422C;
+            --primary-glow: rgba(56, 66, 44, 0.18);
+            --accent: #BA9240;
+            --secondary: #72682A;
+            --border: rgba(56, 66, 44, 0.14);
+            --text: #38422C;
+            --text-dim: #72682A;
+            --pos: #72682A;
+            --glass: rgba(255, 255, 255, 0.82);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,8 +37,9 @@
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             background:
-                radial-gradient(circle at 20% 20%, var(--primary-glow) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+                radial-gradient(circle at 18% 18%, rgba(56, 66, 44, 0.16) 0%, transparent 38%),
+                radial-gradient(circle at 82% 82%, rgba(186, 146, 64, 0.18) 0%, transparent 34%),
+                radial-gradient(circle at 50% 0%, rgba(244, 241, 234, 0.72) 0%, transparent 30%);
             z-index: -1;
             filter: blur(80px);
         }
@@ -51,7 +53,7 @@
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            background: rgba(5, 5, 8, 0.8);
+            background: rgba(244, 241, 234, 0.92);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
         }
@@ -60,7 +62,7 @@
             font-family: 'Space Grotesk', sans-serif;
             font-size: 1.8rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #FFF 0%, #6366F1 100%);
+            background: linear-gradient(135deg, #38422C 0%, #BA9240 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -91,13 +93,13 @@
 
         .btn-ghost:hover {
             border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.05);
+            background: rgba(108, 99, 255, 0.10);
         }
 
         .btn-primary {
             background: var(--primary);
             border: none;
-            color: #FFF;
+            color: #F4F1EA;
             box-shadow: 0 4px 15px var(--primary-glow);
         }
 
@@ -122,8 +124,8 @@
             align-items: center;
             gap: 8px;
             padding: 8px 20px;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            background: rgba(186, 146, 64, 0.08);
+            border: 1px solid rgba(186, 146, 64, 0.18);
             border-radius: 100px;
             font-size: 0.75rem;
             font-weight: 700;
@@ -179,7 +181,7 @@
             font-family: 'Space Grotesk', sans-serif;
             font-size: 2.5rem;
             font-weight: 700;
-            color: #FFF;
+            color: var(--primary);
         }
 
         .stat-label {
@@ -240,7 +242,7 @@
         .feature-icon {
             width: 56px;
             height: 56px;
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(108, 99, 255, 0.12);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -253,7 +255,7 @@
             font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 12px;
-            color: #FFF;
+            color: var(--primary);
         }
 
         .feature-card p {
@@ -294,7 +296,7 @@
             font-family: 'Space Grotesk', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
-            color: #FFF;
+            color: #F4F1EA;
             box-shadow: 0 8px 24px var(--primary-glow);
         }
 
@@ -303,7 +305,7 @@
             font-size: 1.4rem;
             font-weight: 700;
             margin-bottom: 8px;
-            color: #FFF;
+            color: var(--primary);
         }
 
         .step-content p {
