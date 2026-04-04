@@ -838,6 +838,32 @@
                         <!-- Populated by JS -->
                     </div>
                 </div>
+
+                <!-- Employee Management -->
+                <div class="hero-card" style="margin-top: 32px;">
+                    <span class="sector-name">👥 Employee Management</span>
+                    <p style="color: var(--text-dim); margin-bottom: 24px; font-size: 0.85rem;">
+                        Create staff accounts linked to your hotel. Staff can submit daily intelligence reports.
+                    </p>
+
+                    <!-- Add Employee Form -->
+                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px;">
+                        <input type="email" id="emp-email" placeholder="Employee email" style="flex:2;min-width:200px;">
+                        <input type="text" id="emp-password" placeholder="Password (min 4 chars)" style="flex:1;min-width:150px;">
+                        <select id="emp-role" style="flex:1;min-width:120px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px;font-size:0.85rem;">
+                            <option value="staff">Staff</option>
+                            <option value="manager">Manager</option>
+                        </select>
+                        <button onclick="createEmployee()" id="emp-add-btn" style="padding:12px 24px;background:var(--primary);border:none;color:#FFF;border-radius:12px;font-size:0.8rem;font-weight:700;cursor:pointer;">+ Add Employee</button>
+                    </div>
+                    <div id="emp-msg" style="font-size:0.85rem;margin-bottom:16px;"></div>
+
+                    <!-- Employee List -->
+                    <div id="employee-list" style="margin-top:16px;">
+                        <h4 style="font-size:0.85rem;color:var(--text-dim);margin-bottom:12px;">Current Employees</h4>
+                        <div id="emp-list-container"><!-- Populated by JS --></div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -1985,5 +2011,104 @@
     <style>
         #staff-intel-modal.open { display:flex !important; }
     </style>
+
+    <!-- Employee Management JS -->
+    <script>
+        async function createEmployee() {
+            const email = document.getElementById('emp-email').value.trim();
+            const password = document.getElementById('emp-password').value;
+            const role = document.getElementById('emp-role').value;
+            const msgEl = document.getElementById('emp-msg');
+
+            if (!email || !password) {
+                msgEl.innerHTML = '<span style="color:var(--neg);">Email and password required.</span>';
+                return;
+            }
+
+            const btn = document.getElementById('emp-add-btn');
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+            msgEl.innerHTML = '<span style="color:var(--text-dim);">Creating account...</span>';
+
+            try {
+                const resp = await fetch('/api/employee/create', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({email, password, role})
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    msgEl.innerHTML = `<span style="color:var(--pos);">✅ ${email} added as ${role}. They can login at /login.</span>`;
+                    document.getElementById('emp-email').value = '';
+                    document.getElementById('emp-password').value = '';
+                    loadEmployees();
+                } else {
+                    msgEl.innerHTML = `<span style="color:var(--neg);">❌ ${data.error}</span>`;
+                }
+            } catch (e) {
+                msgEl.innerHTML = `<span style="color:var(--neg);">❌ Network error.</span>`;
+            }
+            btn.disabled = false;
+            btn.textContent = '+ Add Employee';
+        }
+
+        async function loadEmployees() {
+            try {
+                const resp = await fetch('/api/employees');
+                const data = await resp.json();
+                const container = document.getElementById('emp-list-container');
+
+                if (!data.employees || data.employees.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:20px;">No employees linked to this hotel yet.</p>';
+                    return;
+                }
+
+                container.innerHTML = data.employees.map(emp => {
+                    const roleBadge = emp.role === 'manager' ? '📊 MGR' : '📝 STAFF';
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
+                        <div>
+                            <span style="font-size:0.75rem;background:rgba(99,102,241,0.15);color:var(--primary);padding:2px 8px;border-radius:6px;font-weight:700;">${roleBadge}</span>
+                            <span style="font-size:0.85rem;margin-left:8px;">${emp.email}</span>
+                            <span style="font-size:0.7rem;color:var(--text-dim);margin-left:8px;">${emp.language || 'en'}</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button onclick="resetEmpPassword(${emp.id})" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Reset PW</button>
+                            <button onclick="deleteEmployee(${emp.id})" style="background:none;border:1px solid rgba(239,68,68,0.3);color:var(--neg);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Remove</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Failed to load employees:', e);
+            }
+        }
+
+        async function deleteEmployee(id) {
+            if (!confirm('Remove this employee? They will no longer be able to login.')) return;
+            try {
+                const resp = await fetch(`/api/employee/${id}`, {method: 'DELETE'});
+                const data = await resp.json();
+                if (data.success) loadEmployees();
+            } catch (e) { console.error(e); }
+        }
+
+        async function resetEmpPassword(id) {
+            const newPw = prompt('Enter new password (min 4 chars):');
+            if (!newPw || newPw.length < 4) { alert('Password must be at least 4 characters.'); return; }
+            try {
+                const resp = await fetch(`/api/employee/${id}/reset-password`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({new_password: newPw})
+                });
+                const data = await resp.json();
+                if (data.success) alert('Password reset successfully.');
+            } catch (e) { console.error(e); }
+        }
+
+        // Load employees on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEmployees();
+        });
+    </script>
 </body>
 </html>

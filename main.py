@@ -743,6 +743,140 @@ def get_staff_intelligence_api(hotel_id: int, session: dict = Depends(require_se
 
 
 # ============================================================
+# EMPLOYEE MANAGEMENT (Manager Only)
+# ============================================================
+
+@app.post("/api/employee/create")
+async def create_employee(
+    request: Request,
+    session: dict = Depends(require_session)
+):
+    """Manager creates a staff account linked to their hotel."""
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+    role = data.get("role", "staff")
+
+    if not email or not password:
+        return JSONResponse({"error": "Email and password are required"}, status_code=400)
+
+    if "@" not in email:
+        return JSONResponse({"error": "Invalid email address"}, status_code=400)
+
+    if len(password) < 4:
+        return JSONResponse({"error": "Password must be at least 4 characters"}, status_code=400)
+
+    if role not in ("staff", "manager"):
+        role = "staff"
+
+    from database import get_user_by_email, create_user, update_user_hotel
+    existing = get_user_by_email(email)
+    if existing:
+        return JSONResponse({"error": "Email already registered"}, status_code=409)
+
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return JSONResponse({"error": "Your account is not linked to a hotel. Complete onboarding first."}, status_code=400)
+
+    password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    user_id = create_user(email, password_hash, role)
+    update_user_hotel(user_id, hotel_id)
+
+    return JSONResponse({
+        "success": True,
+        "user_id": user_id,
+        "email": email,
+        "role": role
+    })
+
+
+@app.get("/api/employees")
+def list_employees(session: dict = Depends(require_session)):
+    """List all employees linked to the manager's hotel."""
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return JSONResponse({"employees": []})
+
+    import sqlite3
+    conn = sqlite3.connect("ageiz.db")
+    cursor = conn.execute("""
+        SELECT id, email, role, telegram_id, language, created_at
+        FROM users
+        WHERE hotel_id = ?
+        ORDER BY created_at DESC
+    """, (hotel_id,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    employees = [
+        {"id": r[0], "email": r[1], "role": r[2], "telegram_id": r[3], "language": r[4], "created_at": r[5]}
+        for r in rows
+    ]
+    return JSONResponse({"employees": employees})
+
+
+@app.delete("/api/employee/{employee_id}")
+def delete_employee(employee_id: int, session: dict = Depends(require_session)):
+    """Remove an employee (reset their hotel link so they can't login)."""
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        raise HTTPException(status_code=400, detail="No hotel linked")
+
+    import sqlite3
+    conn = sqlite3.connect("ageiz.db")
+    # Verify the employee belongs to this hotel
+    cursor = conn.execute("SELECT hotel_id FROM users WHERE id = ?", (employee_id,))
+    row = cursor.fetchone()
+    if not row or row[0] != hotel_id:
+        conn.close()
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    conn.execute("UPDATE users SET hotel_id = NULL WHERE id = ?", (employee_id,))
+    conn.commit()
+    conn.close()
+
+    return JSONResponse({"success": True})
+
+
+@app.post("/api/employee/{employee_id}/reset-password")
+async def reset_employee_password(
+    employee_id: int, request: Request, session: dict = Depends(require_session)
+):
+    """Reset an employee's password."""
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+    new_password = data.get("new_password", "")
+    if len(new_password) < 4:
+        return JSONResponse({"error": "Password must be at least 4 characters"}, status_code=400)
+
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        raise HTTPException(status_code=400, detail="No hotel linked")
+
+    import sqlite3
+    conn = sqlite3.connect("ageiz.db")
+    cursor = conn.execute("SELECT hotel_id FROM users WHERE id = ?", (employee_id,))
+    row = cursor.fetchone()
+    if not row or row[0] != hotel_id:
+        conn.close()
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+    conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (password_hash, employee_id))
+    conn.commit()
+    conn.close()
+
+    return JSONResponse({"success": True})
+
+
+# ============================================================
 # TELEGRAM & MISC
 # ============================================================
 
