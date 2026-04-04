@@ -1433,6 +1433,56 @@
         }
         pollPipeline._lastThought = "";
 
+        // Auto-detect pipeline runs (from Telegram or other sources) every 8 seconds
+        let activePollInterval = null;
+        async function autoDetectActiveTask() {
+            try {
+                const res = await fetch(`/api/refresh/{{ hotel.id }}/status`);
+                const data = await res.json();
+                if (data.task && (data.task.status === 'pending' || data.task.status === 'running')) {
+                    // Don't start a second poll if one is already running
+                    if (activePollInterval) return;
+                    
+                    const allBtns = document.querySelectorAll('.refresh-btn');
+                    allBtns.forEach(b => {
+                        b.disabled = true;
+                        b.innerHTML = `<div class="btn-spinner"></div><span>Syncing... ${data.task.progress || 0}%</span>`;
+                    });
+                    
+                    // Poll until complete
+                    const pollAuto = async () => {
+                        try {
+                            const tRes = await fetch(`/api/task/${data.task.id}`);
+                            const t = await tRes.json();
+                            allBtns.forEach(b => b.innerHTML = `<div class="btn-spinner"></div><span>${t.message || 'Processing'}... ${t.progress || 0}%</span>`);
+                            if (t.status === 'completed') {
+                                allBtns.forEach(b => b.innerHTML = `<span>${T.finalizingCycle}</span>`);
+                                setTimeout(() => window.location.reload(), 1000);
+                                activePollInterval = null;
+                            } else if (t.status === 'failed') {
+                                allBtns.forEach(b => {
+                                    b.disabled = false;
+                                    b.innerHTML = `<span>${T.updateIntelligence}</span>`;
+                                });
+                                activePollInterval = null;
+                            } else {
+                                activePollInterval = setTimeout(pollAuto, 3000);
+                            }
+                        } catch (e) {
+                            activePollInterval = setTimeout(pollAuto, 5000);
+                        }
+                    };
+                    activePollInterval = setTimeout(pollAuto, 3000);
+                }
+            } catch (e) {
+                // Ignore - no active task
+            }
+        }
+        // Check every 8 seconds for pipeline runs triggered from anywhere
+        setInterval(autoDetectActiveTask, 8000);
+        // Also check immediately on load
+        autoDetectActiveTask();
+
         async function checkActiveTask(hotelId) {
             try {
                 const res = await fetch(`/api/refresh/${hotelId}/status`);
