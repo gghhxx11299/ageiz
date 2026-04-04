@@ -988,12 +988,19 @@ async def handle_ai_chat(update: Update, context: ContextTypes.DEFAULT_TYPE, use
 # ============================
 
 bot_app = None
-_WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")
+# On Render, WEBHOOK_URL should be set to https://ageiz.onrender.com
+# If not set, bot is disabled (polling blocks gunicorn workers)
+_WEBHOOK_URL = os.getenv("WEBHOOK_URL", "").strip()
 
 async def setup_bot():
     global bot_app
     if not TOKEN:
         logger.info("[telegram] TELEGRAM_BOT_TOKEN not found — bot disabled.")
+        return
+
+    # Webhook mode only — polling blocks gunicorn workers
+    if not _WEBHOOK_URL:
+        logger.warning("[telegram] WEBHOOK_URL not set. Bot disabled (polling blocks Render workers). Set WEBHOOK_URL in env vars.")
         return
 
     try:
@@ -1017,17 +1024,14 @@ async def setup_bot():
         await application.initialize()
         await application.start()
 
-        if _WEBHOOK_URL:
-            webhook_url = _WEBHOOK_URL.rstrip("/") + "/telegram/webhook"
-            await application.bot.set_webhook(webhook_url)
-            logger.info(f"[telegram] Webhook set: {webhook_url}")
-        else:
-            await application.updater.start_polling(drop_pending_updates=True)
-            logger.info("[telegram] Polling mode (dev).")
+        webhook_url = _WEBHOOK_URL.rstrip("/") + "/telegram/webhook"
+        await application.bot.set_webhook(webhook_url)
+        logger.info(f"[telegram] Webhook set: {webhook_url}")
+
     except Exception as e:
         error_str = str(e)
         if "Conflict" in error_str or "terminated" in error_str:
-            logger.warning("[telegram] ⚠️ Another bot instance detected. Bot disabled. Web app works normally.")
+            logger.warning("[telegram] ⚠️ Another bot instance detected. Bot disabled.")
         else:
             logger.error(f"[telegram] Failed to start: {e}")
         try:

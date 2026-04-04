@@ -38,12 +38,12 @@ async def startup_event():
     except Exception as e:
         print(f"[startup] DB init failed (non-fatal): {e}")
 
-    # Lazy import Telegram to avoid import-time crashes
+    # Fire-and-forget Telegram bot setup — never blocks
     try:
         from telegram_bot import setup_bot
         asyncio.create_task(setup_bot())
     except Exception as e:
-        print(f"[startup] Telegram bot disabled: {e}")
+        print(f"[startup] Telegram bot disabled (non-fatal): {e}")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "ageiz-local-dev-secret-key-change-in-production")
 serializer = URLSafeTimedSerializer(SECRET_KEY)
