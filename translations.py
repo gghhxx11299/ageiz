@@ -633,6 +633,168 @@ TRANSLATIONS = {
             "tigrinya": "ርግጸኛነት",
             "chinese": "置信度"
         },
+        # Staff Portal
+        "staff_portal": {
+            "english": "Staff Intelligence Portal",
+            "amharic": "የሰራተኛ ኢንተለጀንስ ፖርታል",
+            "oromoo": "Portaala Beekumsa Hojjettootaa",
+            "tigrinya": "ፖርታል ኢንተለጀንስ ሰራሕተኛ",
+            "chinese": "员工智能门户"
+        },
+        "daily_report": {
+            "english": "Daily Observation Report",
+            "amharic": "ዕለታዊ ሪፖርት",
+            "oromoo": "Gabaasa Guyyaa",
+            "tigrinya": "ጸብጻብ መዓልቲ",
+            "chinese": "每日观察报告"
+        },
+        "weekly_report": {
+            "english": "Weekly Summary Report",
+            "amharic": "ሳምንታዊ ሪፖርት",
+            "oromoo": "Gabaasa Torbanii",
+            "tigrinya": "ጸብጻብ ሰሙን",
+            "chinese": "每周总结报告"
+        },
+        "monthly_report": {
+            "english": "Monthly Analysis Report",
+            "amharic": "ወርሃዊ ሪፖርት",
+            "oromoo": "Gabaasa Ji'aa",
+            "tigrinya": "ጸብጻብ ወርሒ",
+            "chinese": "每月分析报告"
+        },
+        "customer_satisfaction": {
+            "english": "Customer Satisfaction",
+            "amharic": "የደንበኛ እርካታ",
+            "oromoo": "Quubsummaa Maamilaa",
+            "tigrinya": "ዕግበት ዓማዊል",
+            "chinese": "客户满意度"
+        },
+        "guest_count": {
+            "english": "Estimated Guest Count",
+            "amharic": "የእንግዳ ብዛት",
+            "oromoo": "Lakkoofsa Keessummaa",
+            "tigrinya": "ቍጽሪ እንጋዚ",
+            "chinese": "预估客人数量"
+        },
+        "occupancy": {
+            "english": "Estimated Occupancy %",
+            "amharic": "የእንግዳ መያዣ %",
+            "oromoo": "Qabeenya Kuusaa %",
+            "tigrinya": "መያዚ %",
+            "chinese": "预估入住率 %"
+        },
+        "supply_issues": {
+            "english": "Supply Chain Issues",
+            "amharic": "የአቅርቦት ችግሮች",
+            "oromoo": "Rakkoo Dhiyeessii",
+            "tigrinya": "ጸገም ሰንሰለት አቅርቦት",
+            "chinese": "供应链问题"
+        },
+        "complaints": {
+            "english": "Guest Complaints",
+            "amharic": "የደንበኛ ቅሬታዎች",
+            "oromoo": "Komii Maamilaa",
+            "tigrinya": "ጥርዓን ዓማዊል",
+            "chinese": "客人投诉"
+        },
+        "competitor_activity": {
+            "english": "Competitor Activity",
+            "amharic": "የተወዳዳሪ እንቅስቃሴ",
+            "oromoo": "Sochii Dorgomaa",
+            "tigrinya": "ንጥፈት ውድድር",
+            "chinese": "竞争对手活动"
+        },
+        "events_booked": {
+            "english": "Events / Group Bookings",
+            "amharic": "ዝግጅቶች / ቡድን ቦታ ማስያዣ",
+            "oromoo": "Ibsamaa / Galmaa'aa",
+            "tigrinya": "መደባት / ምዝጋብ ጉጅለ",
+            "chinese": "活动/团体预订"
+        },
+        "maintenance_issues": {
+            "english": "Maintenance Issues",
+            "amharic": "የጥገና ችግሮች",
+            "oromoo": "Rakkoo Tinfiilee",
+            "tigrinya": "ጸገም ምዕቃብ",
+            "chinese": "维护问题"
+        },
+        "notes": {
+            "english": "Additional Notes",
+            "amharic": "ተጨማሪ ማስታወሻዎች",
+            "oromoo": "Yaada Dabalataa",
+            "tigrinya": "ተወሳኺ መዝገብ",
+            "chinese": "附加说明"
+        },
+        "free_text_observation": {
+            "english": "What did you observe today? Be specific.",
+            "amharic": "ዛሬ ምን አስተዋሉ? ዝርዝር ይንገሩን።",
+            "oromoo": "Har maal argite? Ibsi kenni.",
+            "tigrinya": "ሎሚ እንታይራኢኻ? ዝርዝር ንገር።",
+            "chinese": "今天您观察到了什么？请具体说明。"
+        },
+        "submit": {
+            "english": "Submit Report",
+            "amharic": "ሪፖርት ያስገቡ",
+            "oromoo": "Gabaasa Ergi",
+            "tigrinya": "ጸብጻብ ኣእቱ",
+            "chinese": "提交报告"
+        },
+        "recent_reports": {
+            "english": "Recent Reports",
+            "amharic": "የቅርብ ሪፖርቶች",
+            "oromoo": "Gabaasa Dhiyoo",
+            "tigrinya": "ጸብጻብ ቀረባ",
+            "chinese": "近期报告"
+        },
+        "report_history": {
+            "english": "Report History",
+            "amharic": "የሪፖርት ታሪክ",
+            "oromoo": "Seenaa Gabaasaa",
+            "tigrinya": "ታሪኽ ጸብጻብ",
+            "chinese": "报告历史"
+        },
+        "no_reports_yet": {
+            "english": "No reports submitted yet. Start with your first observation above.",
+            "amharic": "እስካሁን ሪፖርት አልተገባም። ከላይ የመጀመሪያዎን ምልከታ ያስገቡ።",
+            "oromoo": "Gabaasi hin ergamne. Ijannoo keessan jalqabaa ol galchaa.",
+            "tigrinya": "ጸብጻብ ኣይኣተወን። ቀዳማይ ርእይቶኹም ኣእትዉ።",
+            "chinese": "尚未提交报告。请在上方提交您的第一次观察。"
+        },
+        "daily": {
+            "english": "Daily",
+            "amharic": "ዕለታዊ",
+            "oromoo": "Guyyaa",
+            "tigrinya": "መዓልታዊ",
+            "chinese": "每日"
+        },
+        "weekly": {
+            "english": "Weekly",
+            "amharic": "ሳምንታዊ",
+            "oromoo": "Torbanii",
+            "tigrinya": "ሰሙናዊ",
+            "chinese": "每周"
+        },
+        "monthly": {
+            "english": "Monthly",
+            "amharic": "ወርሃዊ",
+            "oromoo": "Ji'aa",
+            "tigrinya": "ወርሓዊ",
+            "chinese": "每月"
+        },
+        "ai_processing": {
+            "english": "AI Processing...",
+            "amharic": "AI እያቀነባበረ ነው...",
+            "oromoo": "AI Haa'aa jira...",
+            "tigrinya": "AI የቀነባብር ኣሎ...",
+            "chinese": "AI 处理中..."
+        },
+        "report_submitted": {
+            "english": "Report Submitted!",
+            "amharic": "ሪፖርት ቀርቧል!",
+            "oromoo": "Gabaasi Ergameera!",
+            "tigrinya": "ጸብጻብ ኣትዩ!",
+            "chinese": "报告已提交！"
+        },
     }
 }
 

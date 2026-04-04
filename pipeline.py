@@ -325,6 +325,39 @@ async def run_pipeline(hotel_id: int, task_id: int = None) -> dict:
                 "interpretation": interp_r.get("interpretation", "Custom signal unavailable")
             }
 
+        # --- Append Staff Intelligence as a signal ---
+        try:
+            from database import get_staff_report_summary
+            staff_summary = get_staff_report_summary(hotel_id, days=7)
+            total_staff = staff_summary.get("total_reports", 0)
+            sentiment_bk = staff_summary.get("sentiment_breakdown", {})
+            pos_ratio = sentiment_bk.get("positive", 0) / total_staff if total_staff > 0 else 0.5
+
+            if total_staff > 0:
+                staff_sentiment = "positive" if pos_ratio > 0.55 else "negative" if pos_ratio < 0.35 else "neutral"
+                latest = staff_summary.get("latest_by_type", {})
+                summaries = [v.get("summary", "") for v in latest.values() if v.get("summary")]
+                combined_summary = "; ".join(summaries[:3]) if summaries else f"{total_staff} staff reports submitted this week"
+
+                today_signals["staff_intelligence"] = {
+                    "sentiment": staff_sentiment,
+                    "strength": "strong" if total_staff > 3 else "moderate",
+                    "interpretation": f"Staff ground intel ({total_staff} reports): {combined_summary}",
+                    "total_reports": total_staff,
+                    "sentiment_breakdown": sentiment_bk,
+                    "latest_by_type": {k: {"summary": v.get("summary", ""), "satisfaction": v.get("customer_satisfaction")} for k, v in latest.items()}
+                }
+
+                # Also save to signal history
+                _safe_save_signal(
+                    hotel_id, location, "staff_intelligence",
+                    staff_sentiment,
+                    combined_summary,
+                    json.dumps({"total_reports": total_staff, "sentiment_breakdown": sentiment_bk, "latest_by_type": latest})
+                )
+        except Exception as e:
+            print(f"[pipeline] ⚠ Staff intelligence integration failed: {e}")
+
         # Save to cache
         try:
             save_cache(hotel_id, location, "today_signals", json.dumps(today_signals))

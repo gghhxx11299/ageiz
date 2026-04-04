@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agéiz — Staff Intelligence Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050508; --surface: #0F0F1A; --primary: #10B981;
+            --primary-glow: rgba(16, 185, 129, 0.3); --border: rgba(255,255,255,0.08);
+            --text: #F8FAFC; --text-dim: #94A3B8; --glass: rgba(15,15,26,0.7);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        .header { display:flex; justify-content:space-between; align-items:center; padding:16px 24px; background:var(--surface); border-bottom:1px solid var(--border); }
+        .header h1 { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; color:var(--primary); }
+        .header .user-info { font-size:0.8rem; color:var(--text-dim); }
+        .logout-link { color:var(--text-dim); text-decoration:none; font-size:0.8rem; margin-left:16px; }
+        .logout-link:hover { color:var(--primary); }
+        .container { max-width:960px; margin:0 auto; padding:24px; }
+        .hotel-banner { background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.02)); border:1px solid rgba(16,185,129,0.2); border-radius:16px; padding:20px; margin-bottom:24px; }
+        .hotel-banner h2 { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; }
+        .hotel-banner p { color:var(--text-dim); font-size:0.85rem; margin-top:4px; }
+
+        .tabs { display:flex; gap:8px; margin-bottom:24px; }
+        .tab-btn { flex:1; padding:12px; text-align:center; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-dim); background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; transition:all 0.3s; }
+        .tab-btn.active { color:#FFF; background:var(--primary); border-color:var(--primary); box-shadow:0 4px 15px var(--primary-glow); }
+
+        .form-panel { display:none; animation:fadeIn 0.3s ease; }
+        .form-panel.active { display:block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+        .glass-card { background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:16px; padding:32px; margin-bottom:24px; }
+        .glass-card h3 { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; margin-bottom:20px; color:var(--primary); }
+
+        .form-group { margin-bottom:20px; }
+        .form-group label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-dim); margin-bottom:8px; }
+        input[type="text"], input[type="number"], textarea {
+            width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid var(--border);
+            border-radius:10px; color:#FFF; font-family:inherit; font-size:0.9rem; transition:all 0.2s;
+        }
+        input:focus, textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+        textarea { resize:vertical; min-height:100px; }
+
+        /* Slider inputs */
+        .slider-group { margin-bottom:20px; }
+        .slider-group label { display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:600; color:var(--text-dim); margin-bottom:8px; }
+        .slider-group label .slider-value { color:var(--primary); font-weight:700; font-size:0.9rem; }
+        input[type="range"] { width:100%; height:6px; -webkit-appearance:none; background:rgba(255,255,255,0.1); border-radius:3px; outline:none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; background:var(--primary); border-radius:50%; cursor:pointer; box-shadow:0 0 10px var(--primary-glow); }
+
+        .submit-btn { width:100%; padding:14px; background:var(--primary); color:#FFF; border:none; border-radius:12px; font-size:0.95rem; font-weight:700; cursor:pointer; transition:all 0.3s; }
+        .submit-btn:hover { transform:translateY(-2px); box-shadow:0 10px 25px var(--primary-glow); }
+        .submit-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+        .ai-preview { background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2); border-radius:12px; padding:16px; margin-top:16px; display:none; }
+        .ai-preview.visible { display:block; }
+        .ai-preview h4 { font-size:0.8rem; color:var(--primary); margin-bottom:10px; }
+        .ai-preview p { font-size:0.85rem; color:var(--text-dim); margin-bottom:6px; }
+        .ai-preview .sentiment-badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+        .sentiment-positive { background:rgba(34,197,94,0.2); color:#22C55E; }
+        .sentiment-negative { background:rgba(239,68,68,0.2); color:#EF4444; }
+        .sentiment-neutral { background:rgba(234,179,8,0.2); color:#EAB308; }
+
+        .report-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; }
+        .report-card .meta { display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-dim); margin-bottom:8px; }
+        .report-card .summary { font-size:0.85rem; color:var(--text); line-height:1.5; }
+        .report-card .ai-insight { font-size:0.8rem; color:var(--primary); font-style:italic; margin-top:8px; }
+        .empty-state { text-align:center; padding:40px; color:var(--text-dim); }
+        .spinner { width:20px; height:20px; border:2px solid rgba(255,255,255,0.1); border-top-color:var(--primary); border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; }
+        @keyframes spin { to{transform:rotate(360deg)} }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Agéiz Staff Portal</h1>
+            <div class="user-info">{{ session.get('email', '') }}</div>
+        </div>
+        <div>
+            {% if hotel %}
+            <span style="font-size:0.8rem;color:var(--text-dim);">{{ hotel.get('hotel_name', '') }}</span>
+            {% endif %}
+            <a href="/auth/logout" class="logout-link">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if not hotel %}
+        <div class="empty-state">
+            <h2 style="margin-bottom:12px;">⚠️ No Hotel Profile Linked</h2>
+            <p>Your account is not linked to a hotel property yet. Please contact your manager.</p>
+        </div>
+        {% else %}
+
+        <div class="hotel-banner">
+            <h2>📝 {{ hotel.get('hotel_name', 'Hotel') }} — Intelligence Feed</h2>
+            <p>Submit daily, weekly, and monthly observations. AI will structure your reports for management review.</p>
+        </div>
+
+        <!-- Report Type Tabs -->
+        <div class="tabs">
+            <div class="tab-btn active" data-type="daily" onclick="switchTab('daily')">📅 Daily</div>
+            <div class="tab-btn" data-type="weekly" onclick="switchTab('weekly')">📊 Weekly</div>
+            <div class="tab-btn" data-type="monthly" onclick="switchTab('monthly')">📈 Monthly</div>
+        </div>
+
+        <!-- Report Form -->
+        <div class="glass-card">
+            <h3 id="form-title">📅 Daily Observation Report</h3>
+            <form id="report-form">
+                <input type="hidden" id="report-type" value="daily">
+
+                <!-- Free text observation -->
+                <div class="form-group">
+                    <label>{{ translations.get('free_text_observation', 'What did you observe today? Be specific.') }}</label>
+                    <textarea id="raw-input" rows="4" placeholder="e.g., Today there was little seafood supply but high demand. Several guests complained about slow WiFi. The conference room was fully booked. I noticed about 120 guests today, occupancy seems around 75%. Customer satisfaction was about 4/5."></textarea>
+                </div>
+
+                <!-- Sliders -->
+                <div class="slider-group">
+                    <label>
+                        {{ translations.get('customer_satisfaction', 'Customer Satisfaction') }}
+                        <span class="slider-value" id="satisfaction-value">3 / 5</span>
+                    </label>
+                    <input type="range" id="customer-satisfaction" min="1" max="5" value="3" oninput="document.getElementById('satisfaction-value').textContent = this.value + ' / 5'">
+                </div>
+
+                <div class="slider-group">
+                    <label>
+                        {{ translations.get('guest_count', 'Estimated Guest Count') }}
+                        <span class="slider-value" id="guest-count-value">50</span>
+                    </label>
+                    <input type="range" id="guest-count" min="0" max="500" value="50" step="5" oninput="document.getElementById('guest-count-value').textContent = this.value">
+                </div>
+
+                <div class="slider-group">
+                    <label>
+                        {{ translations.get('occupancy', 'Estimated Occupancy %') }}
+                        <span class="slider-value" id="occupancy-value">50%</span>
+                    </label>
+                    <input type="range" id="occupancy-pct" min="0" max="100" value="50" oninput="document.getElementById('occupancy-value').textContent = this.value + '%'">
+                </div>
+
+                <!-- AI Preview -->
+                <div class="ai-preview" id="ai-preview">
+                    <h4>🤖 AI Structured Preview</h4>
+                    <p><span id="preview-sentiment" class="sentiment-badge"></span></p>
+                    <p><strong>Summary:</strong> <span id="preview-summary"></span></p>
+                    <p><strong>AI Insight:</strong> <span id="preview-insight"></span></p>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submit-btn">
+                    Submit Report
+                </button>
+            </form>
+        </div>
+
+        <!-- Report History -->
+        <div class="glass-card">
+            <h3>📋 Recent Reports</h3>
+            <div id="report-history">
+                {% if reports %}
+                    {% for report in reports %}
+                    <div class="report-card">
+                        <div class="meta">
+                            <span>
+                                {% if report.sentiment == 'positive' %}🟢
+                                {% elif report.sentiment == 'negative' %}🔴
+                                {% else %}🟡{% endif %}
+                                {{ report.report_type.upper() }} — {{ report.created_at[:10] }}
+                            </span>
+                            <span>by {{ report.user_email.split('@')[0] if report.user_email else 'Staff' }}</span>
+                        </div>
+                        <div class="summary">{{ report.summary or report.raw_input[:200] }}</div>
+                        {% if report.ai_insights %}
+                        <div class="ai-insight">💡 {{ report.ai_insights }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">No reports submitted yet. Start with your first observation above.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% endif %}
+    </div>
+
+    <script>
+        let structuredData = null;
+
+        function switchTab(type) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-type="${type}"]`).classList.add('active');
+            document.getElementById('report-type').value = type;
+
+            const titles = { daily: '📅 Daily Observation Report', weekly: '📊 Weekly Summary Report', monthly: '📈 Monthly Analysis Report' };
+            document.getElementById('form-title').textContent = titles[type] || 'Report';
+        }
+
+        // Auto-structure on typing (debounced)
+        let debounceTimer;
+        document.getElementById('raw-input').addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const text = document.getElementById('raw-input').value;
+            if (text.length > 20) {
+                debounceTimer = setTimeout(() => structureReport(text), 1000);
+            }
+        });
+
+        async function structureReport(text) {
+            const type = document.getElementById('report-type').value;
+            try {
+                const resp = await fetch('/api/staff/structure', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({raw_input: text, report_type: type})
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    structuredData = data.structured;
+                    showPreview(data.structured);
+                }
+            } catch (e) { console.error('Structure error:', e); }
+        }
+
+        function showPreview(s) {
+            const preview = document.getElementById('ai-preview');
+            preview.classList.add('visible');
+
+            const sentEl = document.getElementById('preview-sentiment');
+            sentEl.textContent = (s.sentiment || 'neutral').toUpperCase();
+            sentEl.className = 'sentiment-badge sentiment-' + (s.sentiment || 'neutral');
+
+            document.getElementById('preview-summary').textContent = s.summary || 'N/A';
+            document.getElementById('preview-insight').textContent = s.ai_insights || 'N/A';
+
+            // Sync sliders from AI
+            if (s.customer_satisfaction) {
+                document.getElementById('customer-satisfaction').value = s.customer_satisfaction;
+                document.getElementById('satisfaction-value').textContent = s.customer_satisfaction + ' / 5';
+            }
+            if (s.guest_count) {
+                document.getElementById('guest-count').value = s.guest_count;
+                document.getElementById('guest-count-value').textContent = s.guest_count;
+            }
+            if (s.occupancy_pct) {
+                document.getElementById('occupancy-pct').value = s.occupancy_pct;
+                document.getElementById('occupancy-value').textContent = Math.round(s.occupancy_pct) + '%';
+            }
+        }
+
+        // Form submit
+        document.getElementById('report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+            const report = {
+                report_type: document.getElementById('report-type').value,
+                raw_input: document.getElementById('raw-input').value,
+                structured: structuredData || {
+                    sentiment: 'neutral',
+                    customer_satisfaction: parseInt(document.getElementById('customer-satisfaction').value),
+                    guest_count: parseInt(document.getElementById('guest-count').value),
+                    occupancy_pct: parseFloat(document.getElementById('occupancy-pct').value),
+                    summary: document.getElementById('raw-input').value.substring(0, 200),
+                    ai_insights: ''
+                }
+            };
+
+            try {
+                const resp = await fetch('/api/staff/report', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(report)
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    btn.innerHTML = '✅ Report Submitted!';
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    btn.innerHTML = '❌ Error — try again';
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                btn.innerHTML = '❌ Network error';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

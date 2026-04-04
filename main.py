@@ -109,7 +109,7 @@ def login_page(request: Request):
     return templates.TemplateResponse(request, "login.html", {})
 
 @app.post("/auth/register")
-async def register(request: Request, email: str = Form(...), password: str = Form(...)):
+async def register(request: Request, email: str = Form(...), password: str = Form(...), role: str = Form("manager")):
     existing = get_user_by_email(email)
     if existing:
         return templates.TemplateResponse(request, "login.html", {
@@ -117,16 +117,23 @@ async def register(request: Request, email: str = Form(...), password: str = For
             "tab": "register"
         })
 
-    password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-    user_id = create_user(email, password_hash)
+    valid_roles = ["manager", "staff"]
+    if role not in valid_roles:
+        role = "manager"
 
-    token = serializer.dumps({"user_id": user_id, "email": email, "hotel_id": None, "language": "english"})
-    response = RedirectResponse(url="/onboard", status_code=302)
+    password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    user_id = create_user(email, password_hash, role)
+
+    token = serializer.dumps({"user_id": user_id, "email": email, "hotel_id": None, "role": role, "language": "english"})
+    if role == "staff":
+        response = RedirectResponse(url="/staff", status_code=302)
+    else:
+        response = RedirectResponse(url="/onboard", status_code=302)
     response.set_cookie("session", token, httponly=True, max_age=86400, samesite="lax")
     return response
 
 @app.post("/auth/login")
-async def login(request: Request, email: str = Form(...), password: str = Form(...)):
+async def login(request: Request, email: str = Form(...), password: str = Form(...), role: str = Form("manager")):
     user = get_user_by_email(email)
     if not user:
         return templates.TemplateResponse(request, "login.html", {
@@ -140,15 +147,22 @@ async def login(request: Request, email: str = Form(...), password: str = Form(.
             "tab": "login"
         })
 
+    user_role = user.get("role", "manager")
     user_language = user.get("language", "english")
     token = serializer.dumps({
         "user_id": user["id"],
         "email": user["email"],
         "hotel_id": user["hotel_id"],
+        "role": user_role,
         "language": user_language
     })
 
-    redirect_url = "/dashboard" if user["hotel_id"] else "/onboard"
+    # Redirect based on role
+    if user_role == "staff":
+        redirect_url = "/staff"
+    else:
+        redirect_url = "/dashboard" if user["hotel_id"] else "/onboard"
+
     response = RedirectResponse(url=redirect_url, status_code=302)
     response.set_cookie("session", token, httponly=True, max_age=86400, samesite="lax")
     return response
@@ -476,9 +490,239 @@ def refresh_status(hotel_id: int, session: dict = Depends(require_session)):
 @app.post("/api/telegram/generate-otp")
 def generate_telegram_otp(session: dict = Depends(require_session)):
     user_id = session["user_id"]
-    otp = f"{random.randint(1000, 9999)}"
+    otp = f"{random.randint(1000, 9994)}"
     save_otp_code(user_id, otp)
     return {"otp": otp, "expires_in": "5 minutes"}
+
+
+# ============================================================
+# STAFF PORTAL
+# ============================================================
+
+def require_staff_session(request: Request) -> dict:
+    session = get_session(request)
+    if not session:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    if session.get("role") != "staff":
+        raise HTTPException(status_code=403, detail="Staff access required")
+    return session
+
+
+@app.get("/staff", response_class=HTMLResponse)
+def staff_dashboard(request: Request, session: dict = Depends(require_staff_session)):
+    from database import get_staff_reports, get_hotel_profile, get_staff_report_summary
+
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return templates.TemplateResponse(request, "staff_dashboard.html", {
+            "session": session,
+            "hotel": None,
+            "reports": [],
+            "summary": {},
+            "user_language": session.get("language", "english")
+        })
+
+    hotel = get_hotel_profile(hotel_id)
+    # Get recent reports
+    reports = get_staff_reports(hotel_id, limit=20)
+    # Get summary
+    summary = get_staff_report_summary(hotel_id, days=7)
+
+    user_language = session.get("language", "english")
+    translations = {
+        "submit_report": get_translation("submit_report", user_language),
+        "daily_report": get_translation("daily_report", user_language),
+        "weekly_report": get_translation("weekly_report", user_language),
+        "monthly_report": get_translation("monthly_report", user_language),
+        "customer_satisfaction": get_translation("customer_satisfaction", user_language),
+        "guest_count": get_translation("guest_count", user_language),
+        "occupancy": get_translation("occupancy", user_language),
+        "supply_issues": get_translation("supply_issues", user_language),
+        "complaints": get_translation("complaints", user_language),
+        "competitor_activity": get_translation("competitor_activity", user_language),
+        "events_booked": get_translation("events_booked", user_language),
+        "maintenance_issues": get_translation("maintenance_issues", user_language),
+        "notes": get_translation("notes", user_language),
+        "free_text_observation": get_translation("free_text_observation", user_language),
+        "submit": get_translation("submit", user_language),
+        "recent_reports": get_translation("recent_reports", user_language),
+        "report_history": get_translation("report_history", user_language),
+        "no_reports_yet": get_translation("no_reports_yet", user_language),
+        "staff_portal": get_translation("staff_portal", user_language),
+        "daily": get_translation("daily", user_language),
+        "weekly": get_translation("weekly", user_language),
+        "monthly": get_translation("monthly", user_language),
+        "logout": get_translation("logout", user_language),
+        "ai_processing": get_translation("ai_processing", user_language),
+        "report_submitted": get_translation("report_submitted", user_language),
+    }
+
+    return templates.TemplateResponse(request, "staff_dashboard.html", {
+        "session": session,
+        "hotel": hotel,
+        "reports": reports,
+        "summary": summary,
+        "user_language": user_language,
+        "translations": translations
+    })
+
+
+@app.post("/api/staff/structure")
+async def structure_staff_report(
+    request: Request,
+    session: dict = Depends(require_staff_session)
+):
+    """AI-structure free-text staff input into structured data."""
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+    raw_input = data.get("raw_input", "")
+    report_type = data.get("report_type", "daily")
+
+    if not raw_input:
+        return JSONResponse({"error": "No input provided"}, status_code=400)
+
+    from ai_client import call_ai_for_json
+    import json
+
+    prompt = f"""You are an AI assistant for Agéiz, a hotel intelligence platform.
+A hotel staff member has submitted a {report_type} observation report in free text.
+Your job is to extract and structure the information.
+
+Based on the text, determine:
+1. overall sentiment (positive/negative/neutral)
+2. customer_satisfaction (1-5 integer, or null if not mentioned)
+3. guest_count (integer estimate, or null)
+4. occupancy_pct (percentage 0-100 float, or null)
+5. popular_dishes (comma-separated string of mentioned popular foods/drinks)
+6. complaints (string summary of any complaints mentioned)
+7. supply_issues (string describing any supply chain or inventory issues)
+8. competitor_activity (string describing any competitor activity mentioned)
+9. events_booked (string about events or group bookings mentioned)
+10. maintenance_issues (string about any facility or maintenance issues)
+11. summary (one clear sentence summarizing the report)
+12. ai_insights (one sentence of AI-generated insight or recommendation based on the data)
+
+Return ONLY this JSON with no other text. Use null for fields not mentioned:
+{{
+  "sentiment": "positive" or "negative" or "neutral",
+  "customer_satisfaction": 1-5 or null,
+  "guest_count": integer or null,
+  "occupancy_pct": 0-100 float or null,
+  "popular_dishes": "comma-separated or empty string",
+  "complaints": "string or empty",
+  "supply_issues": "string or empty",
+  "competitor_activity": "string or empty",
+  "events_booked": "string or empty",
+  "maintenance_issues": "string or empty",
+  "summary": "one sentence summary",
+  "ai_insights": "one sentence insight/recommendation"
+}}
+
+Staff free text:
+{raw_input}
+"""
+
+    try:
+        structured = call_ai_for_json(prompt, use_heavy_model=False)
+        return JSONResponse({"success": True, "structured": structured})
+    except Exception as e:
+        return JSONResponse({
+            "success": True,
+            "structured": {
+                "sentiment": "neutral",
+                "customer_satisfaction": None,
+                "guest_count": None,
+                "occupancy_pct": None,
+                "popular_dishes": "",
+                "complaints": "",
+                "supply_issues": "",
+                "competitor_activity": "",
+                "events_booked": "",
+                "maintenance_issues": "",
+                "summary": f"Staff submitted {report_type} report. AI processing failed to structure.",
+                "ai_insights": "Data could not be auto-structured. Manager should review raw input."
+            }
+        })
+
+
+@app.post("/api/staff/report")
+async def submit_staff_report(
+    request: Request,
+    session: dict = Depends(require_staff_session)
+):
+    """Save a structured staff report."""
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+    hotel_id = session.get("hotel_id")
+    user_id = session["user_id"]
+    report_type = data.get("report_type", "daily")
+    raw_input = data.get("raw_input", "")
+    structured = data.get("structured", {})
+
+    from database import create_staff_report
+    import json
+
+    report_id = create_staff_report(
+        hotel_id=hotel_id,
+        user_id=user_id,
+        report_type=report_type,
+        raw_input=raw_input,
+        structured_data=json.dumps(structured),
+        sentiment=structured.get("sentiment", "neutral"),
+        customer_satisfaction=structured.get("customer_satisfaction"),
+        guest_count=structured.get("guest_count"),
+        occupancy_pct=structured.get("occupancy_pct"),
+        popular_dishes=structured.get("popular_dishes"),
+        complaints=structured.get("complaints"),
+        supply_issues=structured.get("supply_issues"),
+        competitor_activity=structured.get("competitor_activity"),
+        events_booked=structured.get("events_booked"),
+        maintenance_issues=structured.get("maintenance_issues"),
+        summary=structured.get("summary"),
+        ai_insights=structured.get("ai_insights")
+    )
+
+    return JSONResponse({"success": True, "report_id": report_id})
+
+
+@app.get("/api/staff/reports")
+def get_staff_reports_api(session: dict = Depends(require_staff_session)):
+    """Get staff report history for the current hotel."""
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return JSONResponse({"reports": []})
+
+    from database import get_staff_reports
+    reports = get_staff_reports(hotel_id, limit=30)
+    return JSONResponse({"reports": reports})
+
+
+@app.get("/api/staff/intelligence")
+def get_staff_intelligence_api(hotel_id: int, session: dict = Depends(require_session)):
+    """Manager endpoint: get aggregated staff intelligence for their hotel."""
+    session_hotel = session.get("hotel_id")
+    if session_hotel is not None and session_hotel != hotel_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    from database import get_staff_reports, get_staff_report_summary
+    reports = get_staff_reports(hotel_id, limit=30)
+    summary = get_staff_report_summary(hotel_id, days=7)
+
+    return JSONResponse({
+        "reports": reports,
+        "summary": summary
+    })
+
+
+# ============================================================
+# TELEGRAM & MISC
+# ============================================================
 
 @app.get("/api/telegram/status")
 def telegram_status(request: Request):

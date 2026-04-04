@@ -22,11 +22,18 @@ def init_db():
                 email TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
                 hotel_id INTEGER,
+                role TEXT DEFAULT 'manager',
                 telegram_id TEXT UNIQUE,
                 language TEXT DEFAULT 'english',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        # Backward compat: add role column if it doesn't exist
+        try:
+            conn.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'manager'")
+        except Exception:
+            pass  # Column already exists
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS hotel_profiles (
@@ -155,6 +162,33 @@ def init_db():
                 last_error TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (hotel_id) REFERENCES hotel_profiles(id)
+            )
+        """)
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS staff_reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                hotel_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
+                report_type TEXT NOT NULL,
+                raw_input TEXT NOT NULL,
+                structured_data TEXT,
+                sentiment TEXT DEFAULT 'neutral',
+                customer_satisfaction INTEGER,
+                guest_count INTEGER,
+                occupancy_pct REAL,
+                popular_dishes TEXT,
+                complaints TEXT,
+                supply_issues TEXT,
+                competitor_activity TEXT,
+                events_booked TEXT,
+                revenue_estimate TEXT,
+                maintenance_issues TEXT,
+                marketing_notes TEXT,
+                summary TEXT,
+                ai_insights TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (hotel_id) REFERENCES hotel_profiles(id)
             )
         """)
@@ -394,14 +428,20 @@ def get_user_by_email(email: str) -> dict | None:
         row = cursor.fetchone()
         if not row:
             return None
-        return {"id": row[0], "email": row[1], "password_hash": row[2], "hotel_id": row[3], "telegram_id": row[4], "language": row[5] if len(row) > 5 else "english", "created_at": row[6]}
+        return {
+            "id": row[0], "email": row[1], "password_hash": row[2],
+            "hotel_id": row[3], "role": row[4] if len(row) > 4 else "manager",
+            "telegram_id": row[5] if len(row) > 5 else None,
+            "language": row[6] if len(row) > 6 else "english",
+            "created_at": row[7] if len(row) > 7 else None
+        }
     finally:
         conn.close()
 
-def create_user(email: str, password_hash: str) -> int:
+def create_user(email: str, password_hash: str, role: str = "manager") -> int:
     conn = get_connection()
     try:
-        cursor = conn.execute("INSERT INTO users (email, password_hash) VALUES (?, ?)", (email, password_hash))
+        cursor = conn.execute("INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)", (email, password_hash, role))
         user_id = cursor.lastrowid
         conn.commit()
         return user_id
@@ -537,7 +577,13 @@ def get_user_by_telegram_id(telegram_id: str) -> dict | None:
         row = cursor.fetchone()
         if not row:
             return None
-        return {"id": row[0], "email": row[1], "password_hash": row[2], "hotel_id": row[3], "telegram_id": row[4], "language": row[5] if len(row) > 5 else "english", "created_at": row[6]}
+        return {
+            "id": row[0], "email": row[1], "password_hash": row[2],
+            "hotel_id": row[3], "role": row[4] if len(row) > 4 else "manager",
+            "telegram_id": row[5] if len(row) > 5 else None,
+            "language": row[6] if len(row) > 6 else "english",
+            "created_at": row[7] if len(row) > 7 else None
+        }
     finally:
         conn.close()
 
@@ -736,5 +782,138 @@ def update_custom_signal_status(signal_id: int, status: str, error: str = None):
             WHERE id = ?
         """, (status, error, signal_id))
         conn.commit()
+    finally:
+        conn.close()
+
+
+# --- Staff Reports ---
+
+def create_staff_report(hotel_id: int, user_id: int, report_type: str, raw_input: str,
+                        structured_data: str = None, sentiment: str = "neutral",
+                        customer_satisfaction: int = None, guest_count: int = None,
+                        occupancy_pct: float = None, popular_dishes: str = None,
+                        complaints: str = None, supply_issues: str = None,
+                        competitor_activity: str = None, events_booked: str = None,
+                        revenue_estimate: str = None, maintenance_issues: str = None,
+                        marketing_notes: str = None, summary: str = None,
+                        ai_insights: str = None) -> int:
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            INSERT INTO staff_reports (
+                hotel_id, user_id, report_type, raw_input, structured_data,
+                sentiment, customer_satisfaction, guest_count, occupancy_pct,
+                popular_dishes, complaints, supply_issues, competitor_activity,
+                events_booked, revenue_estimate, maintenance_issues,
+                marketing_notes, summary, ai_insights
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            hotel_id, user_id, report_type, raw_input, structured_data,
+            sentiment, customer_satisfaction, guest_count, occupancy_pct,
+            popular_dishes, complaints, supply_issues, competitor_activity,
+            events_booked, revenue_estimate, maintenance_issues,
+            marketing_notes, summary, ai_insights
+        ))
+        report_id = cursor.lastrowid
+        conn.commit()
+        return report_id
+    finally:
+        conn.close()
+
+def get_staff_reports(hotel_id: int, report_type: str = None, limit: int = 50) -> list:
+    conn = get_connection()
+    try:
+        if report_type:
+            cursor = conn.execute("""
+                SELECT sr.*, u.email as user_email
+                FROM staff_reports sr
+                JOIN users u ON sr.user_id = u.id
+                WHERE sr.hotel_id = ? AND sr.report_type = ?
+                ORDER BY sr.created_at DESC LIMIT ?
+            """, (hotel_id, report_type, limit))
+        else:
+            cursor = conn.execute("""
+                SELECT sr.*, u.email as user_email
+                FROM staff_reports sr
+                JOIN users u ON sr.user_id = u.id
+                WHERE sr.hotel_id = ?
+                ORDER BY sr.created_at DESC LIMIT ?
+            """, (hotel_id, limit))
+        rows = cursor.fetchall()
+        return [
+            {
+                "id": r[0], "hotel_id": r[1], "user_id": r[2],
+                "report_type": r[3], "raw_input": r[4], "structured_data": r[5],
+                "sentiment": r[6], "customer_satisfaction": r[7],
+                "guest_count": r[8], "occupancy_pct": r[9],
+                "popular_dishes": r[10], "complaints": r[11],
+                "supply_issues": r[12], "competitor_activity": r[13],
+                "events_booked": r[14], "revenue_estimate": r[15],
+                "maintenance_issues": r[16], "marketing_notes": r[17],
+                "summary": r[18], "ai_insights": r[19], "created_at": r[20],
+                "user_email": r[21]
+            }
+            for r in rows
+        ]
+    finally:
+        conn.close()
+
+def get_staff_report_summary(hotel_id: int, report_type: str = None, days: int = 7) -> dict:
+    """Get aggregated summary of staff reports for a given period."""
+    conn = get_connection()
+    try:
+        where = "WHERE sr.hotel_id = ? AND sr.created_at >= datetime('now', '-' || ? || ' days')"
+        params = [hotel_id, days]
+
+        if report_type:
+            where += " AND sr.report_type = ?"
+            params.append(report_type)
+
+        cursor = conn.execute(f"""
+            SELECT
+                COUNT(*) as total_reports,
+                AVG(sr.customer_satisfaction) as avg_satisfaction,
+                SUM(sr.guest_count) as total_guests,
+                AVG(sr.occupancy_pct) as avg_occupancy,
+                sr.sentiment,
+                COUNT(*) as count
+            FROM staff_reports sr
+            {where}
+            GROUP BY sr.sentiment
+        """, params)
+        rows = cursor.fetchall()
+
+        sentiment_breakdown = {"positive": 0, "negative": 0, "neutral": 0}
+        for r in rows:
+            if r[4] in sentiment_breakdown:
+                sentiment_breakdown[r[4]] = r[5]
+
+        # Get latest raw reports by type
+        latest_cursor = conn.execute(f"""
+            SELECT sr.report_type, sr.summary, sr.raw_input, sr.created_at,
+                   sr.customer_satisfaction, sr.guest_count, sr.supply_issues, sr.complaints
+            FROM staff_reports sr
+            {where}
+            GROUP BY sr.report_type
+            ORDER BY sr.created_at DESC
+        """, params)
+        latest_rows = latest_cursor.fetchall()
+        latest_by_type = {}
+        for r in latest_rows:
+            latest_by_type[r[0]] = {
+                "summary": r[1],
+                "raw_input": r[2],
+                "created_at": r[3],
+                "customer_satisfaction": r[4],
+                "guest_count": r[5],
+                "supply_issues": r[6],
+                "complaints": r[7]
+            }
+
+        return {
+            "total_reports": sum(sentiment_breakdown.values()),
+            "sentiment_breakdown": sentiment_breakdown,
+            "latest_by_type": latest_by_type
+        }
     finally:
         conn.close()
