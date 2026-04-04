@@ -362,6 +362,10 @@
     <nav class="nav">
         <div class="nav-logo">Agéiz</div>
         <div class="nav-actions">
+            <div id="health-badge" style="display:flex;align-items:center;gap:8px;margin-right:16px;font-size:0.75rem;color:var(--text-dim);">
+                <span id="health-dot" style="width:8px;height:8px;border-radius:50%;background:#64748b;display:inline-block;"></span>
+                <span id="health-text">Checking...</span>
+            </div>
             <a href="/login" class="btn btn-ghost">Sign In</a>
             <a href="/login" class="btn btn-primary">Get Started</a>
         </div>
@@ -515,5 +519,31 @@
     <footer class="footer">
         <p>© 2026 Agéiz — Precision Intelligence for Ethiopian Hospitality • Powered by AI</p>
     </footer>
+
+    <script>
+        // Health check ping
+        async function checkHealth() {
+            const dot = document.getElementById('health-dot');
+            const text = document.getElementById('health-text');
+            try {
+                const start = Date.now();
+                const res = await fetch('/health');
+                const latency = Date.now() - start;
+                if (res.ok) {
+                    dot.style.background = '#22c55e';
+                    dot.style.boxShadow = '0 0 8px #22c55e';
+                    text.textContent = `Online · ${latency}ms`;
+                } else {
+                    throw new Error('not ok');
+                }
+            } catch (e) {
+                dot.style.background = '#ef4444';
+                dot.style.boxShadow = '0 0 8px #ef4444';
+                text.textContent = 'Offline';
+            }
+        }
+        checkHealth();
+        setInterval(checkHealth, 30000);
+    </script>
 </body>
 </html>
