@@ -43,24 +43,34 @@ async def call_poe_search(query: str) -> str:
         return "Search unavailable due to connection error."
 
 async def get_chat_response(
-    hotel_id: int, 
-    user_id: int, 
-    user_message: str, 
-    location: Optional[str] = None, 
+    hotel_id: int,
+    user_id: int,
+    user_message: str,
+    location: Optional[str] = None,
     user_language: str = "english"
 ) -> str:
     # 1. Gather Context
     profile = get_hotel_profile(hotel_id)
     if not profile:
         return "Error: Hotel profile not found."
-        
+
     history = get_chat_history(hotel_id, location=None, limit=CHAT_HISTORY_LIMIT)
-    
+
     # Get latest signals and recommendations from cache
     signals_raw = get_cache(hotel_id, location, "today_signals") if location else None
     signals = json.loads(signals_raw) if signals_raw else {}
-    
-    # 2. Build System Prompt with full context
+
+    # 2. Build System Prompt with language instruction
+    lang_instruction = ""
+    if user_language and user_language.lower() != "english":
+        lang_map = {
+            "amharic": "IMPORTANT: Respond entirely in Amharic (አማርኛ).",
+            "oromoo": "IMPORTANT: Respond entirely in Afaan Oromoo.",
+            "tigrinya": "IMPORTANT: Respond entirely in Tigrinya (ትግርኛ).",
+            "chinese": "IMPORTANT: Respond entirely in Chinese (中文).",
+        }
+        lang_instruction = f"\nLANGUAGE: {lang_map.get(user_language.lower(), '')}"
+
     context_str = f"""You are the Agéiz Strategy AI, an expert revenue management consultant advising the management team and staff of Ethiopian hotels and resorts.
 You speak directly to hotel managers, revenue officers, and operational staff — NOT to guests or customers.
 Your role is to help them make data-driven pricing, yield, and operational decisions.
@@ -70,6 +80,7 @@ Positioning: {profile.get('brand_positioning', 'Standard')}
 Objectives: {profile.get('business_objectives', 'Revenue growth and high occupancy')}
 Target Segments: {profile.get('target_guest_segments', 'Local and Diaspora')}
 Current Location Focus: {location if location else 'All'}
+User Language: {user_language}
 
 Latest Market Intelligence:
 {json.dumps(signals, indent=2)}
@@ -80,27 +91,28 @@ Guidelines:
 - Provide specific, actionable advice based on the signals.
 - Use Ethiopian cultural context (holidays, fasting, diaspora trends).
 - If the user asks for information you don't have (like competitor rates today, general news outside your cache, or technical tourism stats), you should explicitly say you are 'searching' and then you will be provided with search results.
+{lang_instruction}
 """
 
     # 3. Decision: Do we need search? (Simple heuristic for now)
     search_triggers = ["search", "competitor", "latest", "news", "stats", "price of", "weather next month"]
     needs_search = any(word in user_message.lower() for word in search_triggers)
-    
+
     search_results = ""
     if needs_search:
         search_results = await call_poe_search(user_message)
 
     # 4. Final Call to Groq
     messages: List[Dict[str, str]] = [{"role": "system", "content": context_str}]
-    
+
     # Add history
     for msg in history:
         messages.append({"role": msg["role"], "content": msg["content"]})
-    
+
     # Add search results if any
     if search_results:
         messages.append({"role": "system", "content": f"EXTERNAL SEARCH RESULTS FROM POE WEB-SEARCH:\n{search_results}"})
-    
+
     # Add current message
     messages.append({"role": "user", "content": user_message})
 
@@ -117,13 +129,19 @@ Guidelines:
         save_chat_message(hotel_id, user_id, location, "user", user_message)
         save_chat_message(hotel_id, user_id, location, "assistant", ai_response)
 
-        # 6. Translate response if user language is not English
+        # 6. Translate only if AI didn't follow language instruction (fallback)
         if user_language and user_language.lower() != "english":
-            translated = translate_text(ai_response, user_language)
-            # If translation failed (NLLB returned original), note it but use it anyway
-            if translated == ai_response:
-                print(f"[chat_agent] NLLB translation returned original text for {user_language}")
-            ai_response = translated
+            # Check if response is still in English (AI might not have followed instruction)
+            # Simple heuristic: if first 50 chars are ASCII, it's likely English
+            first_chars = ai_response[:50]
+            is_likely_english = all(ord(c) < 128 for c in first_chars if c.isalpha())
+            if is_likely_english:
+                print(f"[chat_agent] AI responded in English, translating to {user_language}")
+                translated = translate_text(ai_response, user_language)
+                if translated != ai_response:
+                    ai_response = translated
+                    # Re-save with translated response
+                    save_chat_message(hotel_id, user_id, location, "assistant", ai_response)
 
         return ai_response
     except Exception as e:
