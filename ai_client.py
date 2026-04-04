@@ -46,7 +46,7 @@ def _call_openrouter(prompt: str) -> str:
     headers = {
         "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://ageiz.app",
+        "HTTP-Referer": "https://ageiz.onrender.com",
         "X-Title": "Ageiz"
     }
     body = {
