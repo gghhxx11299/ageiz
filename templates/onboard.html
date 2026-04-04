@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agéiz — Property Onboarding</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050508;
+            --surface: #0F0F1A;
+            --primary: #6366F1;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --accent: #06B6D4;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #F8FAFC;
+            --text-dim: #94A3B8;
+            --pos: #10B981;
+            --error: #EF4444;
+            --glass: rgba(15, 15, 26, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 80px 24px;
+            background-image:
+                radial-gradient(circle at 0% 0%, var(--primary-glow) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #FFF 0%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle at 100% 0%, var(--primary-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .step-num {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: #FFF;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .step-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #FFF;
+        }
+
+        .desc {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+            margin-bottom: 32px;
+        }
+
+        /* URL Input Group */
+        .url-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #FFF;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .url-input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .url-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .scan-btn {
+            background: var(--primary);
+            border: none;
+            color: #FFF;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .scan-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .scan-btn:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
+
+        .loading-msg {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 16px;
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            border-radius: 12px;
+        }
+
+        .loading-msg .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(6, 182, 212, 0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-msg {
+            font-size: 0.85rem;
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .status-msg.success {
+            color: var(--pos);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-msg.error {
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .field-group {
+            margin-bottom: 8px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: var(--text-dim);
+        }
+
+        input[type="text"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--text);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-dim);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: #FFF;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            margin-top: 32px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Language Selector */
+        .language-selector {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 32px;
+        }
+
+        .language-selector:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .language-selector option {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .lang-selector-wrapper {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .url-group { flex-direction: column; }
+            .glass-card { padding: 32px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">Agéiz</h1>
+            <p class="subtitle">Property Intelligence Onboarding</p>
+        </header>
+
+        <div class="lang-selector-wrapper">
+            <select id="language-selector" class="language-selector" onchange="changeLanguage(this.value)">
+                <option value="english">🇬🇧 English</option>
+                <option value="amharic">🇪🇹 አማርኛ</option>
+                <option value="oromoo">🇪🇹 Afaan Oromoo</option>
+                <option value="tigrinya">🇪🇭 ትግርኛ</option>
+                <option value="chinese">🇨🇳 中文</option>
+            </select>
+        </div>
+
+        <form action="/onboard/save" method="POST" id="onboard-form">
+            <!-- Step 1: URL Scan -->
+            <div class="glass-card">
+                <div class="step-header">
+                    <div class="step-num">1</div>
+                    <h2 class="step-title">Neural Property Scan</h2>
+                </div>
+                <p class="desc">Provide your property's public URL. Our intelligence engine will parse your brand positioning, inventory categories, and market tier to calibrate your custom dashboard.</p>
+
+                <div class="url-group">
+                    <input type="url" id="website-url" class="url-input" placeholder="https://www.your-resort.com" required>
+                    <button type="button" class="scan-btn" id="analyze-btn">Initialize Scan</button>
+                </div>
+
+                <div class="loading-msg" id="loading-spinner">
+                    <div class="spinner"></div>
+                    <span>Scanning market presence... establishing yield parameters...</span>
+                </div>
+                <div id="scrape-message"></div>
+            </div>
+
+            <!-- Step 2: Calibration -->
+            <div class="glass-card">
+                <div class="step-header">
+                    <div class="step-num">2</div>
+                    <h2 class="step-title">Calibration Audit</h2>
+                </div>
+                <p class="desc">Verify the extracted intelligence profile. These parameters define how the strategy AI interprets global market signals for your specific property.</p>
+
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label class="field-label">Official Property Identity *</label>
+                        <input type="text" id="hotel_name" name="hotel_name" required>
+                    </div>
+
+                    <div class="full-width">
+                        <label class="field-label">Validated Digital Asset URL</label>
+                        <input type="url" id="website_url_form" name="website_url">
+                    </div>
+
+                    <div class="full-width">
+                        <label class="field-label">Operational Locations * (comma separated)</label>
+                        <input type="text" id="locations" name="locations" required placeholder="e.g. Bishoftu, Entoto">
+                    </div>
+
+                    <div>
+                        <label class="field-label">Inventory Classes</label>
+                        <input type="text" id="room_types" name="room_types" placeholder="Standard, Suite, Villa">
+                    </div>
+
+                    <div>
+                        <label class="field-label">Market Tier *</label>
+                        <select id="price_range" name="price_range" required>
+                            <option value="">Select Tier</option>
+                            <option value="budget">Value</option>
+                            <option value="mid-range">Mid-Market</option>
+                            <option value="premium">Premium Boutique</option>
+                            <option value="luxury">Luxury Elite</option>
+                        </select>
+                    </div>
+
+                    <div class="full-width">
+                        <label class="field-label">Core Amenities & Facilities (comma separated)</label>
+                        <textarea id="amenities" name="amenities" placeholder="e.g. Infinity Pool, Indoor Spa, Horse Riding, Conference Center, Wine Cellar"></textarea>
+                    </div>
+
+                    <div class="full-width">
+                        <label class="field-label">Brand Value Proposition</label>
+                        <textarea id="brand_positioning" name="brand_positioning" placeholder="How does your property position itself in the market?"></textarea>
+                    </div>
+
+                    <div class="full-width">
+                        <label class="field-label">Yield Objectives</label>
+                        <textarea id="business_objectives" name="business_objectives" placeholder="What are your primary revenue goals?"></textarea>
+                    </div>
+
+                    <input type="hidden" id="raw_scraped_text" name="raw_scraped_text">
+                    <input type="hidden" id="target_guest_segments" name="target_guest_segments">
+                    <input type="hidden" id="unique_selling_points" name="unique_selling_points">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Establish Dashboard
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const websiteUrlInput = document.getElementById('website-url');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const scrapeMessage = document.getElementById('scrape-message');
+
+        analyzeBtn.addEventListener('click', async () => {
+            const url = websiteUrlInput.value.trim();
+            if (!url) return;
+
+            analyzeBtn.disabled = true;
+            loadingSpinner.style.display = 'flex';
+            scrapeMessage.innerHTML = '';
+
+            try {
+                const formData = new FormData();
+                formData.append('url', url);
+
+                const response = await fetch('/onboard/scrape', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const p = result.profile;
+
+                    // Populate visible fields
+                    document.getElementById('hotel_name').value = p.hotel_name || '';
+                    document.getElementById('website_url_form').value = p.website_url || url;
+
+                    if (p.locations) {
+                        document.getElementById('locations').value = Array.isArray(p.locations) ? p.locations.join(', ') : p.locations;
+                    }
+
+                    if (p.room_types) {
+                        document.getElementById('room_types').value = Array.isArray(p.room_types) ? p.room_types.join(', ') : p.room_types;
+                    }
+
+                    document.getElementById('price_range').value = p.price_range || '';
+                    document.getElementById('brand_positioning').value = p.brand_positioning || '';
+                    document.getElementById('business_objectives').value = p.business_objectives || '';
+
+                    if (p.amenities) {
+                        document.getElementById('amenities').value = Array.isArray(p.amenities) ? p.amenities.join(', ') : p.amenities;
+                    }
+
+                    document.getElementById('raw_scraped_text').value = result.scraped_text || '';
+
+                    // Hidden fields
+                    if (p.target_guest_segments) {
+                        document.getElementById('target_guest_segments').value = Array.isArray(p.target_guest_segments) ? p.target_guest_segments.join(', ') : p.target_guest_segments;
+                    }
+                    if (p.unique_selling_points) {
+                        document.getElementById('unique_selling_points').value = Array.isArray(p.unique_selling_points) ? p.unique_selling_points.join(', ') : p.unique_selling_points;
+                    }
+
+                    loadingSpinner.style.display = 'none';
+                    scrapeMessage.innerHTML = '<div class="status-msg success">Scan Successful. Parameters calibrated.</div>';
+                } else {
+                    throw new Error("Scan incomplete");
+                }
+            } catch (error) {
+                console.error("Scrape error", error);
+                loadingSpinner.style.display = 'none';
+                scrapeMessage.innerHTML = '<div class="status-msg error">Scan Failed. Manual override required.</div>';
+            } finally {
+                analyzeBtn.disabled = false;
+            }
+        });
+
+        // Language switching
+        async function changeLanguage(lang) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            overlay.innerHTML = '<div style="background:var(--surface);padding:48px;border-radius:24px;border:1px solid var(--border);text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.6);"><div style="width:60px;height:60px;border:4px solid rgba(255,255,255,0.1);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px;"></div><h3 style="font-family:\'Space Grotesk\',sans-serif;font-size:1.3rem;color:#FFF;margin-bottom:12px;">Translating Interface</h3><p style="font-size:0.9rem;color:var(--text-dim);">Applying language preferences...</p></div>';
+            document.body.appendChild(overlay);
+
+            try {
+                const response = await fetch('/api/language', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({language: lang})
+                });
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    overlay.remove();
+                }
+            } catch (error) {
+                console.error('Language switch error:', error);
+                overlay.remove();
+            }
+        }
+    </script>
+</body>
+</html>

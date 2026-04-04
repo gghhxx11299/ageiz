@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agéiz — Neural Yield Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #050508;
+            --surface: #0F0F1A;
+            --primary: #6366F1;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --accent: #06B6D4;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #F8FAFC;
+            --text-dim: #94A3B8;
+            --pos: #10B981;
+            --neg: #EF4444;
+            --glass: rgba(15, 15, 26, 0.7);
+            --sidebar-w: 280px;
+            --chat-w: 400px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            background-image: 
+                radial-gradient(circle at 0% 0%, var(--primary-glow) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar-nav {
+            width: var(--sidebar-w);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 40px 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            flex-shrink: 0;
+        }
+
+        .brand-zone {
+            padding: 0 32px 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFF 0%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-group { flex: 1; padding: 0 16px; }
+
+        .nav-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 24px 16px 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-link:hover { color: #FFF; background: rgba(255,255,255,0.05); }
+        .nav-link.active { color: #FFF; background: var(--primary); box-shadow: 0 4px 15px var(--primary-glow); }
+
+        .user-zone { padding: 24px 32px 0; border-top: 1px solid var(--border); }
+        .hotel-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; color: #FFF; }
+        .logout-btn { font-size: 0.75rem; color: var(--neg); text-decoration: none; font-weight: 700; text-transform: uppercase; background: none; border: none; cursor: pointer; width: 100%; text-align: left; padding: 0; }
+        .logout-btn:hover { opacity: 0.8; }
+
+        /* --- Main Content --- */
+        .main-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-width: 0;
+        }
+
+        .top-bar {
+            padding: 32px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 8, 0.5);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .view-title { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: #FFF; }
+
+        .refresh-btn {
+            background: var(--primary);
+            color: #FFF;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+            justify-content: center;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .refresh-btn:disabled { background: #333; cursor: wait; box-shadow: none; }
+        .refresh-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); }
+
+        .content-body { padding: 40px 48px 60px; max-width: 1200px; }
+
+        /* --- Recommendation Hero --- */
+        .hero-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: ''; position: absolute; top: 0; right: 0; width: 300px; height: 300px;
+            background: radial-gradient(circle at 100% 0%, var(--primary-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 32px;
+            border-radius: 8px;
+            border: 1px solid;
+        }
+
+        .status-act-now { color: var(--neg); border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1); }
+        .status-act-soon { color: var(--accent); border-color: rgba(6, 182, 212, 0.3); background: rgba(6, 182, 212, 0.1); }
+        .status-hold { color: var(--pos); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
+
+        .key-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+
+        .metric { border-left: 1px solid var(--border); padding-left: 24px; }
+        .metric-label { font-size: 0.65rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: #FFF; }
+
+        /* --- Sector Cards --- */
+        .sector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+        .sector-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+        }
+
+        .sector-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 24px; display: block; }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .price-label { color: var(--text-dim); font-size: 0.9rem; }
+        .price-val { font-weight: 700; font-size: 1rem; }
+        .val-up { color: var(--pos); }
+        .val-down { color: var(--neg); }
+
+        .reasoning-text { font-size: 0.85rem; line-height: 1.6; color: var(--text-dim); margin-top: 20px; }
+
+        /* --- Signals Section --- */
+        .signals-header { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: #FFF; margin: 60px 0 24px; }
+        .signal-nodes { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+
+        .node {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .node:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); transform: translateY(-4px); }
+        .node-top { display: flex; justify-content: space-between; margin-bottom: 16px; }
+        .node-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #FFF; }
+        .node-text { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+
+        /* --- Chat Panel (Right) --- */
+        .chat-sidebar {
+            width: var(--chat-w);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            flex-shrink: 0;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .chat-sidebar.expanded {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 900px; height: 80vh; z-index: 2000;
+            border-radius: 32px; border: 1px solid var(--primary);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.6);
+        }
+
+        .chat-overlay-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            z-index: 1999; display: none;
+        }
+
+        .chat-header { padding: 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .pulse { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: dotPulse 2s infinite; }
+        .chat-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; color: #FFF; }
+
+        .expand-btn { background: none; border: none; cursor: pointer; color: var(--text-dim); padding: 8px; border-radius: 8px; transition: all 0.2s; }
+        .expand-btn:hover { color: #FFF; background: rgba(255,255,255,0.05); }
+
+        .chat-messages { flex: 1; padding: 32px; overflow-y: auto; background: rgba(0,0,0,0.1); }
+        .msg { margin-bottom: 24px; max-width: 90%; animation: slideUp 0.3s ease; }
+        .msg-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 8px; }
+        .msg-body { padding: 16px; border-radius: 16px; font-size: 0.9rem; line-height: 1.6; }
+        .msg-user { margin-left: auto; text-align: right; }
+        .msg-user .msg-body { background: var(--primary); color: #FFF; border-bottom-right-radius: 4px; }
+        .msg-ai .msg-body { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+
+        .chat-input-zone { padding: 24px 32px; border-top: 1px solid var(--border); }
+        .typing-indicator { display: none; align-items: center; gap: 4px; margin-bottom: 12px; }
+        .dot { width: 4px; height: 4px; background: var(--primary); border-radius: 50%; animation: dotPulse 1.5s infinite; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .input-wrapper { display: flex; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; padding: 8px 16px; align-items: center; }
+        .chat-input { flex: 1; border: none; background: transparent; color: #FFF; padding: 8px 0; font-family: inherit; font-size: 0.95rem; outline: none; }
+        .send-btn { background: none; border: none; cursor: pointer; color: var(--primary); padding: 8px; }
+
+        /* --- Modal --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 60px; }
+        .modal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 32px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; padding: 60px; position: relative; }
+        .close-modal { position: absolute; top: 30px; right: 30px; background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-dim); }
+
+        /* Telegram Login Popup */
+        .telegram-popup {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            z-index: 1500;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-width: 380px;
+            animation: slideInRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .telegram-popup-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .telegram-popup-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .telegram-popup-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #FFF;
+        }
+
+        .telegram-popup-text {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .telegram-popup-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .telegram-popup-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .telegram-popup-btn.primary {
+            background: var(--primary);
+            color: #FFF;
+        }
+
+        .telegram-popup-btn.secondary {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+
+        .telegram-popup-btn.secondary:hover {
+            color: #FFF;
+            border-color: var(--primary);
+        }
+
+        .telegram-popup-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px;
+        }
+
+        /* Language Selector in Top Bar */
+        .language-selector-top {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .language-selector-top:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .language-selector-top option {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        /* Loading Overlay for Language Switch */
+        .language-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .language-loading-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+        }
+
+        .location-section { display: none; }
+        .location-section.active { display: block; }
+
+        .btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #FFF; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes dotPulse { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 1200px) {
+            :root {
+                --chat-w: 340px;
+            }
+            .content-body { padding: 32px 24px 60px; }
+        }
+
+        @media (max-width: 1024px) {
+            .chat-sidebar {
+                position: fixed;
+                right: -400px;
+                top: 0;
+                height: 100vh;
+                z-index: 1500;
+                transition: right 0.3s ease;
+            }
+            .chat-sidebar.mobile-open {
+                right: 0;
+            }
+            .key-metrics {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-nav {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 1500;
+                transition: left 0.3s ease;
+            }
+            .sidebar-nav.mobile-open {
+                left: 0;
+            }
+            .main-view {
+                width: 100%;
+            }
+            .mobile-menu-btn {
+                display: block !important;
+            }
+            .top-bar {
+                padding: 16px 20px;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .top-bar-left {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .view-title {
+                font-size: 1.3rem;
+            }
+            .refresh-btn {
+                min-width: auto;
+                padding: 10px 16px;
+                font-size: 0.7rem;
+            }
+            .content-body {
+                padding: 20px 16px 60px;
+            }
+            .hero-card {
+                padding: 24px 20px;
+            }
+            .key-metrics {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .metric {
+                padding-left: 12px;
+            }
+            .metric-val {
+                font-size: 1.2rem;
+            }
+            .sector-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .signal-nodes {
+                grid-template-columns: 1fr;
+            }
+            .node {
+                padding: 16px;
+            }
+            #language-selector-top {
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+            .user-zone {
+                padding: 16px 20px 0;
+            }
+            .modal-overlay {
+                padding: 20px;
+            }
+            .modal-card {
+                padding: 32px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .key-metrics {
+                grid-template-columns: 1fr;
+            }
+            .top-bar {
+                padding: 12px 16px;
+            }
+            .view-title {
+                font-size: 1.1rem;
+            }
+            .hero-card {
+                padding: 20px 16px;
+                border-radius: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-overlay-bg" id="chat-overlay-bg"></div>
+    <div class="chat-overlay-bg" id="sidebar-overlay-bg" style="display:none;" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar-nav" id="sidebar-nav">
+        <div class="brand-zone">
+            <div class="logo">Agéiz</div>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">{{ translations.neural_nodes if translations else 'Neural Nodes' }}</div>
+            {% for location in locations %}
+            <button class="nav-link {% if loop.first %}active{% endif %} property-node" data-loc="{{ location }}">
+                {{ location }}
+            </button>
+            {% endfor %}
+
+            <div class="nav-label">{{ translations.account if translations else 'Account' }}</div>
+            <button class="nav-link" id="settings-tab">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 12px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                {{ translations.settings if translations else 'Settings' }}
+            </button>
+        </div>
+
+        <div class="user-zone">
+            <div class="hotel-name">{{ hotel.hotel_name }}</div>
+            
+            <!-- Telegram Link Section -->
+            <div id="telegram-link-zone" style="margin: 16px 0; padding: 16px; background: rgba(99, 102, 241, 0.05); border-radius: 12px; border: 1px solid var(--border);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+                    <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--primary);">{{ translations.telegram_neural_link if translations else 'Telegram Neural Link' }}</span>
+                </div>
+                <div id="tg-status-loading" style="font-size: 0.7rem; color: var(--text-dim);">{{ translations.checking_link_status if translations else 'Checking link status...' }}</div>
+                <div id="tg-status-unlinked" style="display: none;">
+                    <p style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 12px;">{{ translations.link_for_mobile if translations else 'Link your account for mobile command.' }}</p>
+                    <button onclick="generateTelegramOTP()" id="tg-otp-btn" style="width: 100%; padding: 8px; background: var(--primary); color: #FFF; border: none; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">{{ translations.generate_code if translations else 'Generate Code' }}</button>
+                    <div id="tg-otp-display" style="display: none; margin-top: 12px; text-align: center;">
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--accent); letter-spacing: 4px;" id="tg-otp-code">----</span>
+                        <p style="font-size: 0.6rem; color: var(--text-dim); margin-top: 4px;">Valid for 5 mins</p>
+                    </div>
+                </div>
+                <div id="tg-status-linked" style="display: none; text-align: center;">
+                    <p style="font-size: 0.7rem; color: var(--pos); font-weight: 700; margin-bottom: 8px;">✅ {{ translations.connected if translations else 'Connected' }}</p>
+                    <button onclick="unlinkTelegram()" style="background: none; border: none; color: var(--neg); font-size: 0.65rem; font-weight: 700; cursor: pointer; text-transform: uppercase;">{{ translations.disconnect if translations else 'Disconnect' }}</button>
+                </div>
+            </div>
+
+            <button type="submit" form="logout-form" class="logout-btn">{{ translations.logout if translations else 'Logout' }}</button>
+            <form id="logout-form" action="/auth/logout" method="POST" style="display: none;"></form>
+        </div>
+    </aside>
+
+    <main class="main-view">
+        {% for location in locations %}
+        <div class="location-section {% if loop.first %}active{% endif %}" id="view-{{ location | replace(' ', '-') }}">
+            {% set loc_data = dashboard_data[location] %}
+            
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display:none; background:none; border:none; color:var(--text); cursor:pointer; padding:8px; margin-right:8px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+                    <h1 class="view-title">{{ location }}</h1>
+                    <select id="language-selector-top" class="language-selector-top" onchange="changeLanguage(this.value)">
+                        <option value="english" {% if user_language == 'english' %}selected{% endif %}>🇬🇧 English</option>
+                        <option value="amharic" {% if user_language == 'amharic' %}selected{% endif %}>🇪🇹 አማርኛ</option>
+                        <option value="oromoo" {% if user_language == 'oromoo' %}selected{% endif %}>🇪🇹 Afaan Oromoo</option>
+                        <option value="tigrinya" {% if user_language == 'tigrinya' %}selected{% endif %}>🇪🇭 ትግርኛ</option>
+                        <option value="chinese" {% if user_language == 'chinese' %}selected{% endif %}>🇨🇳 中文</option>
+                    </select>
+                </div>
+                <button class="refresh-btn" onclick="triggerRefresh('{{ hotel.id }}', this)">
+                    <span>{{ translations.update_intelligence if translations else 'Update Intelligence' }}</span>
+                </button>
+            </div>
+
+            <div class="content-body">
+                {% if loc_data.recommendation is none %}
+                <div class="hero-card" style="text-align: center; padding: 120px 0;">
+                    <p style="color: var(--text-dim); margin-bottom: 24px;">{{ translations.market_intelligence_pending if translations else 'Market intelligence pending initialization.' }}</p>
+                    <button class="refresh-btn" onclick="triggerRefresh('{{ hotel.id }}', this)">{{ translations.execute_market_scan if translations else 'Execute Market Scan' }}</button>
+                </div>
+                {% else %}
+                {% set rec = loc_data.recommendation %}
+                
+                <div class="hero-card">
+                    {% set urg = rec.urgency %}
+                    <div class="status-badge {% if urg == 'act now' %}status-act-now{% elif urg == 'act soon' %}status-act-soon{% else %}status-hold{% endif %}">
+                        {{ translations.recommendation if translations else 'Recommendation' }}: {{ urg }}
+                    </div>
+
+                    <!-- Sentiment Radar Chart -->
+                    <div class="radar-container" style="height: 300px; margin: 20px 0; position: relative;">
+                        <canvas id="radar-{{ location | replace(' ', '-') }}"></canvas>
+                    </div>
+
+                    <div class="key-metrics">
+                        <div class="metric" style="border: none; padding: 0;">
+                            <div class="metric-label">{{ translations.neural_confidence if translations else 'Neural Confidence' }}</div>
+                            <div class="metric-val">{{ rec.overall_confidence }}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">{{ translations.primary_driver if translations else 'Primary Driver' }}</div>
+                            <div class="metric-val" style="font-size: 1.1rem; line-height: 1.2;">{{ rec.key_drivers[0] if rec.key_drivers else (translations.market_stability if translations else 'Market Stability') }}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">{{ translations.risk_profile if translations else 'Risk Profile' }}</div>
+                            <div class="metric-val" style="font-size: 1.1rem; line-height: 1.2;">{{ rec.risk_factors[0] if rec.risk_factors else (translations.nominal if translations else 'Nominal') }}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">{{ translations.cycle_calibration if translations else 'Cycle Calibration' }}</div>
+                            <div class="metric-val" style="font-size: 1rem;">{{ loc_data.history[0].created_at[:10] if loc_data.history else (translations.live if translations else 'Live') }}</div>
+                        </div>
+                    </div>
+
+                    <div class="sector-grid">
+                        <div class="sector-card">
+                            <span class="sector-name">{{ translations.inventory_calibration if translations else 'Inventory Calibration' }}</span>
+                            <div class="price-list">
+                                <div class="price-row"><span class="price-label">{{ translations.standard_inventory if translations else 'Standard Inventory' }}</span><span class="price-val {% if '+' in rec.room_rates.standard_rooms and '0%' not in rec.room_rates.standard_rooms %}val-up{% elif '-' in rec.room_rates.standard_rooms %}val-down{% endif %}">{{ rec.room_rates.standard_rooms }}</span></div>
+                                <div class="price-row"><span class="price-label">{{ translations.premium_suites if translations else 'Premium / Suites' }}</span><span class="price-val {% if '+' in rec.room_rates.suites_and_premium and '0%' not in rec.room_rates.suites_and_premium %}val-up{% elif '-' in rec.room_rates.suites_and_premium %}val-down{% endif %}">{{ rec.room_rates.suites_and_premium }}</span></div>
+                            </div>
+                            <p class="reasoning-text">"{{ rec.room_rates.reasoning }}"</p>
+                        </div>
+
+                        <div class="sector-card">
+                            <span class="sector-name">{{ translations.yield_food_beverage if translations else 'Yield: Food & Beverage' }}</span>
+                            <div class="price-list">
+                                <div class="price-row"><span class="price-label">{{ translations.main_intake if translations else 'Main Intake' }}</span><span class="price-val {% if '+' in rec.food_beverage.restaurant_menu and '0%' not in rec.food_beverage.restaurant_menu %}val-up{% elif '-' in rec.food_beverage.restaurant_menu %}val-down{% endif %}">{{ rec.food_beverage.restaurant_menu }}</span></div>
+                                <div class="price-row"><span class="price-label">{{ translations.events_bar if translations else 'Events / Bar' }}</span><span class="price-val {% if '+' in rec.food_beverage.bar_and_events and '0%' not in rec.food_beverage.bar_and_events %}val-up{% elif '-' in rec.food_beverage.bar_and_events %}val-down{% endif %}">{{ rec.food_beverage.bar_and_events }}</span></div>
+                            </div>
+                            <p class="reasoning-text">"{{ rec.food_beverage.reasoning }}"</p>
+                        </div>
+
+                        <!-- Amenities -->
+                        <div class="sector-card" style="grid-column: span 2;">
+                            <span class="sector-name">{{ translations.asset_specific_yield if translations else 'Asset-Specific Yield Adjustments' }}</span>
+                            {% if rec.amenities_and_facilities and rec.amenities_and_facilities.specific_adjustments %}
+                            <div class="price-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px;">
+                                {% for item in rec.amenities_and_facilities.specific_adjustments %}
+                                <div class="price-row">
+                                    <div style="display:flex; flex-direction:column;">
+                                        <span class="price-label" style="font-weight:600; color: #FFF;">{{ item.asset }}</span>
+                                        <span style="font-size: 0.7rem; color: var(--text-dim);">{{ item.logic }}</span>
+                                    </div>
+                                    {% if '0%' in item.adjustment or item.adjustment|int == 0 %}
+                                    <span class="price-val" style="color: var(--text-dim);">
+                                        {{ translations.stable if translations else 'Stable' }}
+                                    </span>
+                                    {% elif '+' in item.adjustment %}
+                                    <span class="price-val val-up">
+                                        {{ item.adjustment }}
+                                    </span>
+                                    {% elif '-' in item.adjustment %}
+                                    <span class="price-val val-down">
+                                        {{ item.adjustment }}
+                                    </span>
+                                    {% else %}
+                                    <span class="price-val" style="color: var(--text-dim);">
+                                        {{ item.adjustment }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="reasoning-text">{{ translations.no_granular_asset if translations else 'No granular asset adjustments required.' }}</p>
+                            {% endif %}
+
+                            {% if rec.amenities_and_facilities %}
+                            <p class="reasoning-text" style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+                                {{ rec.amenities_and_facilities.reasoning }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border);">
+                        <div class="metric-label">{{ translations.neural_cycle_summary if translations else 'Neural Cycle Summary' }}</div>
+                        <p style="font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; color: var(--accent); line-height: 1.5; font-weight: 500;">
+                            {{ rec.trend_context }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Weekly Trend Chart -->
+                <div class="trend-container" style="height: 250px; margin: 40px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px;">
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">
+                        {{ translations.weekly_intelligence_trend if translations else 'Weekly Intelligence Trend' }}
+                    </h3>
+                    <div style="height: 180px;">
+                        <canvas id="trend-{{ location | replace(' ', '-') }}"></canvas>
+                    </div>
+                </div>
+
+                <div class="signals-header">{{ translations.live_market_nodes if translations else 'Live Market Nodes' }}</div>
+                <div class="signal-nodes">
+                    {% for s_name, s_data in loc_data.signals.items() %}
+                    <div class="node" onclick="showNodeData('{{ s_name }}', {{ hotel.id }}, '{{ location }}')">
+                        <div class="node-top">
+                            <span class="node-title">{{ s_name }}</span>
+                            <span>{% if s_data.sentiment == 'positive' %}🟢{% elif s_data.sentiment == 'negative' %}🔴{% else %}🟡{% endif %}</span>
+                        </div>
+                        <p class="node-text">{{ s_data.interpretation[:100] }}...</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Settings View -->
+        <div class="location-section" id="view-settings">
+            <div class="top-bar">
+                <h1 class="view-title">{{ translations.account_settings if translations else 'Account Settings' }}</h1>
+            </div>
+            <div class="content-body">
+                <div class="hero-card">
+                    <span class="sector-name">{{ translations.security_sessions if translations else 'Security & Sessions' }}</span>
+                    <p class="desc" style="color: var(--text-dim); margin-bottom: 32px;">{{ translations.manage_sessions if translations else 'Manage your active Agéiz sessions and mobile nodes.' }}</p>
+
+                    <div class="sector-card" style="max-width: 500px;">
+                        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                            <div style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1rem; color: #FFF;">{{ translations.telegram_mobile_node if translations else 'Telegram Mobile Node' }}</h4>
+                                <p id="settings-tg-status" style="font-size: 0.8rem; color: var(--text-dim);">Checking status...</p>
+                            </div>
+                        </div>
+
+                        <div id="settings-tg-actions">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Intelligence Sources -->
+                <div class="hero-card" style="margin-top: 32px;">
+                    <span class="sector-name">Custom Intelligence Sources</span>
+                    <p style="color: var(--text-dim); margin-bottom: 24px; font-size: 0.85rem;">
+                        Add external APIs, RSS feeds, or data endpoints. The AI will interpret them during each market scan.
+                    </p>
+
+                    <button onclick="showCustomSignalForm()" style="padding: 12px 24px; background: var(--primary); border: none; color: #FFF; border-radius: 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
+                        + Add Custom Source
+                    </button>
+
+                    <div id="custom-sources-list" style="margin-top: 24px;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <aside class="chat-sidebar" id="chat-sidebar">
+        <div class="chat-header">
+            <div class="chat-title-group">
+                <div class="pulse"></div>
+                <h2 class="chat-title">{{ translations.strategy_ai if translations else 'Strategy AI' }}</h2>
+            </div>
+            <button class="expand-btn" id="expand-chat-btn" title="Expand Session">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chat-scroller">
+            <div class="msg msg-ai">
+                <div class="msg-label">{{ translations.strategy_ai if translations else 'Agéiz Intelligence' }}</div>
+                <div class="msg-body">{{ translations.neural_link_established if translations else 'Neural link established' }}. {{ translations.awaiting_strategic_query if translations else 'Awaiting strategic query.' }}</div>
+            </div>
+        </div>
+
+        <div class="chat-input-zone">
+            <div class="typing-indicator" id="typing-indicator">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span style="font-size: 0.6rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-left: 4px;">{{ translations.processing_signals if translations else 'Processing Signals' }}</span>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" id="chat-field" class="chat-input" placeholder="{{ translations.query_strategy_engine if translations else 'Query strategy engine...' }}">
+                <button id="chat-send" class="send-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Telegram Login Popup -->
+    <div id="telegram-popup" class="telegram-popup" style="display: none;">
+        <button class="telegram-popup-close" onclick="closeTelegramPopup()">&times;</button>
+        <div class="telegram-popup-header">
+            <div class="telegram-popup-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+            </div>
+            <span class="telegram-popup-title">{{ translations.telegram_neural_link_popup if translations else 'Telegram Neural Link' }}</span>
+        </div>
+        <p class="telegram-popup-text">
+            {{ translations.account_linked_telegram if translations else 'Your account has been linked to Telegram. You should receive a confirmation message.' }}
+        </p>
+        <div class="telegram-popup-actions">
+            <button class="telegram-popup-btn secondary" onclick="closeTelegramPopup()">
+                {{ translations.dismiss if translations else 'Dismiss' }}
+            </button>
+            <button class="telegram-popup-btn primary" onclick="closeTelegramPopup(); document.getElementById('settings-tab').click();">
+                {{ translations.not_you if translations else 'Not You?' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Language Loading Overlay -->
+    <div id="language-loading" class="language-loading-overlay">
+        <div class="language-loading-card">
+            <div style="width:60px;height:60px;border:4px solid rgba(255,255,255,0.1);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px;"></div>
+            <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;color:#FFF;margin-bottom:12px;">{{ translations.translating_interface if translations else 'Translating Interface' }}</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">{{ translations.applying_language if translations else 'Applying language preferences across all modules...' }}</p>
+        </div>
+    </div>
+
+    <!-- Custom Signal Source Modal -->
+    <div id="custom-signal-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card" style="max-width: 700px;">
+            <button class="close-modal" onclick="closeCustomSignalForm()">&times;</button>
+            <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: #FFF; margin-bottom: 32px;">Add Custom Intelligence Source</h2>
+
+            <form id="custom-signal-form" onsubmit="saveCustomSignal(event)">
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Source Name *</label>
+                    <input type="text" id="cs-name" required placeholder="e.g., Competitor Rates API" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: #FFF; font-size: 0.9rem;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">What this source tracks *</label>
+                    <textarea id="cs-description" required placeholder="e.g., Daily room rates for 3 competing resorts in Bishoftu. Higher prices mean competitors are raising rates." rows="3" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: #FFF; font-size: 0.9rem; resize: vertical;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">API URL</label>
+                    <input type="url" id="cs-url" placeholder="https://api.example.com/data" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: #FFF; font-size: 0.9rem;">
+                </div>
+
+                <details style="margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+                    <summary style="font-size: 0.8rem; font-weight: 700; color: var(--accent); cursor: pointer;">Advanced Configuration</summary>
+
+                    <div style="margin-top: 16px;">
+                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">API Key</label>
+                        <input type="password" id="cs-api-key" placeholder="Leave blank if not needed" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">API Key Label / Header Name</label>
+                        <input type="text" id="cs-api-key-label" value="Authorization" placeholder="Authorization" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">Custom Headers (JSON)</label>
+                        <textarea id="cs-headers" placeholder='{"X-Custom-Header": "value"}' rows="2" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem; font-family: monospace;"></textarea>
+                    </div>
+
+                    <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">Method</label>
+                            <select id="cs-method" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">Response Path</label>
+                            <input type="text" id="cs-response-path" placeholder="data.results[0]" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">Request Body (JSON, for POST)</label>
+                        <textarea id="cs-body" placeholder='{"query": "value"}' rows="2" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem; font-family: monospace;"></textarea>
+                    </div>
+                </details>
+
+                <div id="cs-test-result" style="display: none; margin-top: 16px; padding: 16px; border-radius: 10px; font-size: 0.85rem;"></div>
+
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button type="button" onclick="testCustomSignal()" style="flex: 1; padding: 12px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--accent); border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
+                        Test Connection
+                    </button>
+                    <button type="submit" style="flex: 2; padding: 12px; background: var(--primary); border: none; color: #FFF; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
+                        Save Source
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="node-modal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="hideNodeData()">&times;</button>
+            <div id="node-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // Translation variables from backend
+        const T = {
+            statusActiveLinked: "{{ translations.status_active_linked if translations else 'Status: Active & Linked' }}",
+            statusNotLinked: "{{ translations.status_not_linked if translations else 'Status: Not Linked' }}",
+            accountLinkedDesc: "{{ translations.account_linked_telegram if translations else 'Your account is currently synchronized with a mobile node. You receive real-time intelligence alerts on Telegram.' }}",
+            terminateMobileSession: "{{ translations.terminate_mobile_session if translations else 'Terminate Mobile Session' }}",
+            linkTelegramDesc: "{{ translations.link_telegram_desc if translations else 'Link a Telegram account to access your property dashboard and Strategy AI via mobile command.' }}",
+            initializeMobileLink: "{{ translations.initialize_mobile_link if translations else 'Initialize Mobile Link' }}",
+            generating: "{{ translations.generating if translations else 'Generating...' }}",
+            operator: "{{ translations.operator if translations else 'Operator' }}",
+            ageizIntelligence: "{{ translations.ageiz_intelligence if translations else 'Agéiz Intelligence' }}",
+            accessingDataNode: "{{ translations.accessing_data_node if translations else 'Accessing data node...' }}",
+            errorLoadingTelemetry: "{{ translations.error_loading_telemetry if translations else 'Error loading telemetry.' }}",
+            neuralInterpretation: "{{ translations.neural_interpretation if translations else 'Neural Interpretation' }}",
+            nodeSentiment: "{{ translations.node_sentiment if translations else 'Node Sentiment' }}",
+            rawTelemetryData: "{{ translations.raw_telemetry_data if translations else 'Raw Telemetry Data' }}",
+            cycleError: "{{ translations.cycle_error if translations else 'Cycle Error' }}",
+            initializing: "{{ translations.initializing if translations else 'Initializing...' }}",
+            restoringSession: "{{ translations.restoring_session if translations else 'Restoring Session...' }}",
+            finalizingCycle: "{{ translations.finalizing_cycle if translations else 'Finalizing Cycle...' }}",
+            updateIntelligence: "{{ translations.update_intelligence if translations else 'Update Intelligence' }}",
+            marketStability: "{{ translations.market_stability if translations else 'Market Stability' }}",
+            nominal: "{{ translations.nominal if translations else 'Nominal' }}",
+            live: "{{ translations.live if translations else 'Live' }}",
+            sentimentRadar: "{{ translations.sentiment_radar if translations else 'Sentiment Radar' }}",
+            weeklyIntelligenceTrend: "{{ translations.weekly_intelligence_trend if translations else 'Weekly Intelligence Trend' }}",
+            sentimentDistribution: "{{ translations.sentiment_distribution if translations else 'Sentiment Distribution' }}",
+            positive: "{{ translations.positive if translations else 'Positive' }}",
+            negative: "{{ translations.negative if translations else 'Negative' }}",
+            neutral: "{{ translations.neutral if translations else 'Neutral' }}",
+            noDataYet: "{{ translations.no_data_yet if translations else 'No data yet' }}",
+            confidence: "{{ translations.confidence if translations else 'Confidence' }}",
+            noGranularAsset: "{{ translations.no_granular_asset if translations else 'No granular asset adjustments required.' }}",
+            terminateMobileConfirm: "{{ translations.terminate_mobile_confirm if translations else 'Terminate mobile session?' }}",
+            neuralLinkEstablishedLoc: "{{ translations.neural_link_established if translations else 'Neural link established' }}",
+            awaitingStrategicQueryLoc: "{{ translations.awaiting_strategic_query if translations else 'Awaiting strategic query.' }}",
+        };
+
+        // --- Chart Management ---
+        const charts = {
+            radar: {},
+            trend: {},
+            donut: null
+        };
+
+        const mapSentiment = (sentiment, strength) => {
+            let base = 0.5; // Neutral
+            if (sentiment === 'positive') base = 1.0;
+            if (sentiment === 'negative') base = 0.0;
+            
+            let mult = 0.33; // Weak
+            if (strength === 'moderate') mult = 0.66;
+            if (strength === 'strong') mult = 1.0;
+            
+            return base * mult;
+        };
+
+        const chartObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const loc = entry.target.dataset.loc;
+                    if (loc) initTrendChart(loc);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        function initCharts(location) {
+            // Destroy existing for this location
+            const locKey = location.replace(/ /g, '-');
+            if (charts.radar[locKey]) charts.radar[locKey].destroy();
+            
+            // Get data from embedded JSON if possible or from DOM
+            const section = document.getElementById(`view-${locKey}`);
+            if (!section) return;
+
+            // Radar Chart Initialization
+            const canvasRadar = document.getElementById(`radar-${locKey}`);
+            if (canvasRadar) {
+                // We need to extract current signal data. In a real template we'd inject this.
+                // For now, let's assume we can pull from the nodes.
+                const nodes = section.querySelectorAll('.node');
+                const labels = [];
+                const dataValues = [];
+                
+                // Signal types to look for
+                const signalTypes = ['weather', 'calendar', 'flights', 'trends', 'news', 'reddit', 'youtube', 'exchange'];
+                
+                // Extract from template data (loc_data.signals)
+                // Note: In Jinja we can inject this directly into JS
+                const signals = {
+                    {% for loc in locations %}
+                    "{{ loc }}": {
+                        {% set ld = dashboard_data[loc] %}
+                        {% if ld.signals %}
+                        {% for sn, sd in ld.signals.items() %}
+                        "{{ sn }}": { sentiment: "{{ sd.sentiment }}", strength: "{{ sd.strength }}" },
+                        {% endfor %}
+                        {% endif %}
+                    },
+                    {% endfor %}
+                };
+
+                const currentSignals = signals[location] || {};
+                signalTypes.forEach(st => {
+                    labels.push(st.charAt(0).toUpperCase() + st.slice(1));
+                    if (currentSignals[st]) {
+                        dataValues.push(mapSentiment(currentSignals[st].sentiment, currentSignals[st].strength));
+                    } else {
+                        dataValues.push(0.5 * 0.33); // Default weak neutral
+                    }
+                });
+
+                charts.radar[locKey] = new Chart(canvasRadar, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: T.sentimentRadar,
+                            data: dataValues,
+                            backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                            borderColor: '#6366F1',
+                            pointBackgroundColor: '#06B6D4',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                angleLines: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { display: false },
+                                suggestedMin: 0,
+                                suggestedMax: 1
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            // Trend Chart Initialization via Observer
+            const trendContainer = section.querySelector('.trend-container');
+            if (trendContainer) {
+                trendContainer.dataset.loc = location;
+                chartObserver.observe(trendContainer);
+            }
+        }
+
+        async function initTrendChart(location) {
+            const locKey = location.replace(/ /g, '-');
+            const canvasTrend = document.getElementById(`trend-${locKey}`);
+            if (!canvasTrend || charts.trend[locKey]) return;
+
+            try {
+                const res = await fetch(`/api/history/{{ hotel.id }}/${encodeURIComponent(location)}`);
+                const history = await res.json();
+                
+                if (!history || history.length === 0) {
+                    canvasTrend.parentElement.innerHTML = `<p style="color:var(--text-dim); text-align:center; padding-top:60px;">${T.noDataYet}</p>`;
+                    return;
+                }
+
+                const labels = history.slice(0, 7).reverse().map(h => h.created_at.slice(5, 10)); // MM-DD
+                const dataValues = history.slice(0, 7).reverse().map(h => {
+                    const adj = h.room_rate_adjustment || "0%";
+                    return parseFloat(adj.replace(/[+%]/g, '')) || 0;
+                });
+                const colors = history.slice(0, 7).reverse().map(h => {
+                    const urg = h.urgency.toLowerCase();
+                    if (urg.includes('now') || urg.includes('reduce')) return '#EF4444';
+                    if (urg.includes('soon')) return '#06B6D4';
+                    return '#10B981';
+                });
+
+                charts.trend[locKey] = new Chart(canvasTrend, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: colors,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const h = history.slice(0, 7).reverse()[ctx.dataIndex];
+                                        return [`${T.confidence}: ${h.confidence}`, h.reasoning.slice(0, 50) + '...'];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } },
+                            y: { grid: { display: false }, ticks: { color: '#94A3B8' } }
+                        }
+                    }
+                });
+            } catch (e) { console.error("Trend fetch failed", e); }
+        }
+
+        const tabs = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.location-section');
+        const chatSidebar = document.getElementById('chat-sidebar');
+        const expandBtn = document.getElementById('expand-chat-btn');
+        const overlayBg = document.getElementById('chat-overlay-bg');
+        const scroller = document.getElementById('chat-scroller');
+        const input = document.getElementById('chat-field');
+        const send = document.getElementById('chat-send');
+        const typing = document.getElementById('typing-indicator');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                sections.forEach(s => s.classList.remove('active'));
+
+                if (tab.id === 'settings-tab') {
+                    document.getElementById('view-settings').classList.add('active');
+                } else {
+                    const loc = tab.dataset.loc;
+                    document.getElementById(`view-${loc.replace(/ /g, '-')}`).classList.add('active');
+                    loadChat(loc);
+                    initCharts(loc);
+                }
+            });
+        });
+
+        expandBtn.addEventListener('click', () => {
+            const isExpanded = chatSidebar.classList.toggle('expanded');
+            overlayBg.style.display = isExpanded ? 'block' : 'none';
+        });
+
+        overlayBg.addEventListener('click', () => {
+            chatSidebar.classList.remove('expanded');
+            overlayBg.style.display = 'none';
+        });
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-nav');
+            const overlay = document.getElementById('sidebar-overlay-bg');
+            const isOpen = sidebar.classList.toggle('mobile-open');
+            overlay.style.display = isOpen ? 'block' : 'none';
+        }
+
+        // Close sidebar when clicking a nav link on mobile
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    const sidebar = document.getElementById('sidebar-nav');
+                    const overlay = document.getElementById('sidebar-overlay-bg');
+                    sidebar.classList.remove('mobile-open');
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+
+        async function loadChat(location) {
+            try {
+                const res = await fetch(`/api/chat/history?location=${encodeURIComponent(location)}`);
+                const data = await res.json();
+                if (data.history && data.history.length > 0) {
+                    scroller.innerHTML = data.history.map(m => `
+                        <div class="msg ${m.role === 'user' ? 'msg-user' : 'msg-ai'}">
+                            <div class="msg-label">${m.role === 'user' ? 'Operator' : 'Agéiz Intelligence'}</div>
+                            <div class="msg-body">${m.content}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    scroller.innerHTML = `<div class="msg msg-ai"><div class="msg-label">${T.ageizIntelligence}</div><div class="msg-body">${T.neuralLinkEstablishedLoc} ${T.awaitingStrategicQueryLoc}</div></div>`;
+                }
+                scroller.scrollTop = scroller.scrollHeight;
+            } catch (e) {}
+        }
+
+        async function postMessage() {
+            const val = input.value.trim();
+            if (!val) return;
+            const loc = document.querySelector('.nav-link.active').dataset.loc;
+            
+            const userMsg = document.createElement('div');
+            userMsg.className = 'msg msg-user';
+            userMsg.innerHTML = `<div class="msg-label">${T.operator}</div><div class="msg-body">${val}</div>`;
+            scroller.appendChild(userMsg);
+            input.value = '';
+            scroller.scrollTop = scroller.scrollHeight;
+            typing.style.display = 'flex';
+
+            try {
+                const res = await fetch('/api/chat/message', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: val, location: loc })
+                });
+                const data = await res.json();
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'msg msg-ai';
+                aiMsg.innerHTML = `<div class="msg-label">${T.ageizIntelligence}</div><div class="msg-body">${data.response}</div>`;
+                scroller.appendChild(aiMsg);
+                scroller.scrollTop = scroller.scrollHeight;
+            } catch (e) {
+                // Remove the user message if AI failed
+                scroller.removeChild(userMsg);
+            } finally {
+                typing.style.display = 'none';
+            }
+        }
+
+        send.addEventListener('click', postMessage);
+        input.addEventListener('keypress', (e) => { if(e.key === 'Enter') postMessage(); });
+
+        async function triggerRefresh(id, btn) {
+            const allBtns = document.querySelectorAll('.refresh-btn');
+            allBtns.forEach(b => {
+                b.disabled = true;
+                b.innerHTML = `<div class="btn-spinner"></div><span>${T.initializing}</span>`;
+            });
+            try {
+                const res = await fetch(`/api/refresh/${id}`, {method: 'POST'});
+                const data = await res.json();
+                if (data.success) pollPipeline(data.task_id);
+            } catch (e) { 
+                allBtns.forEach(b => {
+                    b.disabled = false;
+                    b.innerHTML = `<span>${T.updateIntelligence}</span>`;
+                });
+            }
+        }
+
+        async function pollPipeline(taskId, startTime) {
+            startTime = startTime || Date.now();
+            // Stop polling if it's been running for more than 5 minutes (stuck task)
+            if (Date.now() - startTime > 300000) {
+                console.warn('[pipeline] Task', taskId, 'timed out after 5 minutes');
+                const allBtns = document.querySelectorAll('.refresh-btn');
+                allBtns.forEach(b => {
+                    b.disabled = false;
+                    b.innerHTML = `<span>${T.updateIntelligence}</span>`;
+                });
+                return;
+            }
+            try {
+                const res = await fetch(`/api/task/${taskId}`);
+                const task = await res.json();
+                const allBtns = document.querySelectorAll('.refresh-btn');
+                if (task.message) {
+                    allBtns.forEach(b => b.innerHTML = `<div class="btn-spinner"></div><span>${task.message}...</span>`);
+                }
+                if (task.thoughts) {
+                    const lines = task.thoughts.split('\n').filter(l => l.trim());
+                    if (lines.length > 0) {
+                        const last = lines[lines.length - 1];
+                        // Only append if the thought has changed (prevents duplicate messages)
+                        if (last !== pollPipeline._lastThought) {
+                            pollPipeline._lastThought = last;
+                            const aiMsg = document.createElement('div');
+                            aiMsg.className = 'msg msg-ai';
+                            aiMsg.innerHTML = `<div class="msg-label">Neural Cycle</div><div class="msg-body" style="font-size: 0.75rem; color: var(--primary); border-color: var(--primary);">${last}</div>`;
+                            scroller.appendChild(aiMsg);
+                            scroller.scrollTop = scroller.scrollHeight;
+                        }
+                    }
+                }
+                if (task.status === 'completed') {
+                    allBtns.forEach(b => b.innerHTML = `<span>${T.finalizingCycle}</span>`);
+                    setTimeout(() => window.location.reload(), 1000);
+                } else if (task.status === 'failed') {
+                    alert(`${T.cycleError}: ` + task.error);
+                    window.location.reload();
+                } else { setTimeout(() => pollPipeline(taskId), 2000); }
+            } catch (e) {
+                console.warn('Pipeline poll error, retrying...', e);
+                // Retry after 3 seconds on network error
+                setTimeout(() => pollPipeline(taskId), 3000);
+            }
+        }
+        pollPipeline._lastThought = "";
+
+        async function checkActiveTask(hotelId) {
+            try {
+                const res = await fetch(`/api/refresh/${hotelId}/status`);
+                const data = await res.json();
+                if (data.task && (data.task.status === 'pending' || data.task.status === 'running')) {
+                    const allBtns = document.querySelectorAll('.refresh-btn');
+                    allBtns.forEach(b => {
+                        b.disabled = true;
+                        b.innerHTML = `<div class="btn-spinner"></div><span>${T.restoringSession}</span>`;
+                    });
+                    pollPipeline(data.task.id);
+                } else if (data.task && data.task.status === 'failed') {
+                    // Reset buttons if previous task failed so user can retry
+                    const allBtns = document.querySelectorAll('.refresh-btn');
+                    allBtns.forEach(b => {
+                        b.disabled = false;
+                        b.innerHTML = `<span>${T.updateIntelligence}</span>`;
+                    });
+                }
+            } catch (e) {
+                // On fetch error, ensure buttons are enabled
+                const allBtns = document.querySelectorAll('.refresh-btn');
+                allBtns.forEach(b => {
+                    b.disabled = false;
+                    b.innerHTML = `<span>${T.updateIntelligence}</span>`;
+                });
+            }
+        }
+
+        async function showNodeData(name, hotelId, location) {
+            const modal = document.getElementById('node-modal');
+            const target = document.getElementById('node-content');
+            modal.style.display = 'flex';
+            target.innerHTML = `<p>${T.accessingDataNode}</p>`;
+            try {
+                const res = await fetch(`/api/signals/${hotelId}/${encodeURIComponent(location)}/raw`);
+                const data = await res.json();
+                if (data.error) {
+                    target.innerHTML = `<p style="color: var(--neg);">${data.error}</p>`;
+                    return;
+                }
+                const interp = data.signals[name];
+                const raw = data.raw_data ? data.raw_data[name] : null;
+
+                if (!interp) {
+                    target.innerHTML = `<p style="color: var(--text-dim);">No data available for "${name}" at this location.</p>`;
+                    return;
+                }
+
+                // Historical summary for donut
+                const history = data.history ? data.history.filter(h => h.signal_type === name) : [];
+                const counts = { positive: 0, negative: 0, neutral: 0 };
+                history.forEach(h => {
+                    if (counts.hasOwnProperty(h.sentiment)) counts[h.sentiment]++;
+                    else counts.neutral++;
+                });
+
+                // Check if this is an error state
+                const isError = interp.interpretation && (
+                    interp.interpretation.toLowerCase().includes('unavailable') ||
+                    interp.interpretation.toLowerCase().includes('failed') ||
+                    interp.interpretation.toLowerCase().includes('error')
+                );
+
+                const errorBanner = isError ? `
+                    <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--neg); text-transform: uppercase;">⚠ Signal Error</span>
+                        <p style="font-size: 0.85rem; color: var(--neg); margin-top: 8px; line-height: 1.5;">${interp.interpretation}</p>
+                        ${raw && raw.raw_data && raw.raw_data.error ? `<pre style="font-size: 0.7rem; color: var(--neg); margin-top: 8px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; overflow-x: auto;">${JSON.stringify(raw.raw_data, null, 2)}</pre>` : ''}
+                    </div>
+                ` : '';
+
+                const rawDataHtml = raw && raw.raw_data
+                    ? `<div class="metric-label">${T.rawTelemetryData}</div>
+                       <div style="background: rgba(0,0,0,0.3); padding: 32px; border: 1px solid var(--border); border-radius: 20px; font-family: monospace; font-size: 0.8rem; line-height: 1.5; color: var(--accent); margin-top: 16px; overflow-x: auto;">
+                           <pre>${JSON.stringify(raw.raw_data, null, 2)}</pre>
+                       </div>`
+                    : `<div class="metric-label">${T.rawTelemetryData}</div>
+                       <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 8px;">Raw data not available for this signal.</p>`;
+
+                target.innerHTML = `
+                    <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; font-weight: 700; color: #FFF; margin-bottom: 40px;">${name.toUpperCase()}</h2>
+                    ${errorBanner}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 60px;">
+                        <div>
+                            <div class="metric-label">${T.neuralInterpretation}</div>
+                            <p style="font-size: 1.1rem; line-height: 1.6; margin-top: 12px; color: ${isError ? 'var(--neg)' : '#FFF'};">${interp.interpretation}</p>
+                        </div>
+                        <div style="display: flex; gap: 30px;">
+                            <div>
+                                <div class="metric-label">${T.nodeSentiment}</div>
+                                <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+                                    <div style="font-size: 2rem;">${interp.sentiment === 'positive' ? '🟢' : (interp.sentiment === 'negative' ? '🔴' : '🟡')}</div>
+                                    <span style="font-weight: 700; text-transform: uppercase; color: #FFF;">${interp.sentiment}</span>
+                                    ${interp.strength ? `<span style="font-size: 0.7rem; color: var(--text-dim); margin-left: 8px;">(${interp.strength})</span>` : ''}
+                                </div>
+                            </div>
+                            <div style="width: 100px; height: 100px;">
+                                <div class="metric-label" style="margin-bottom:8px;">${T.sentimentDistribution}</div>
+                                <canvas id="node-donut"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    ${rawDataHtml}
+                `;
+
+                // Init Donut Chart
+                const ctx = document.getElementById('node-donut').getContext('2d');
+                if (charts.donut) charts.donut.destroy();
+                
+                const hasHistory = (counts.positive + counts.negative + counts.neutral) > 0;
+                const chartData = hasHistory ? [counts.positive, counts.negative, counts.neutral] : [0, 0, 1];
+
+                charts.donut = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [T.positive, T.negative, T.neutral],
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: ['#10B981', '#EF4444', '#94A3B8'],
+                            borderWidth: 0,
+                            cutout: '70%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+            } catch (e) { 
+                console.error("Node data load failed", e);
+                target.innerHTML = T.errorLoadingTelemetry; 
+            }
+        }
+
+        function hideNodeData() { 
+            if (charts.donut) charts.donut.destroy();
+            document.getElementById('node-modal').style.display = 'none'; 
+        }
+
+        // Telegram Linking
+        async function checkTelegramStatus() {
+            const loading = document.getElementById('tg-status-loading');
+            const unlinked = document.getElementById('tg-status-unlinked');
+            const linked = document.getElementById('tg-status-linked');
+            const settingsStatus = document.getElementById('settings-tg-status');
+            const settingsActions = document.getElementById('settings-tg-actions');
+            
+            try {
+                const res = await fetch('/api/telegram/status', { credentials: 'include' });
+
+                // If session expired or invalid, show unlinked state instead of hanging
+                if (res.status === 401) {
+                    console.warn("[telegram] Session expired, showing unlinked state");
+                    loading.style.display = 'none';
+                    unlinked.style.display = 'block';
+                    linked.style.display = 'none';
+                    if (settingsStatus) {
+                        settingsStatus.textContent = T.statusNotLinked;
+                        settingsStatus.style.color = "var(--text-dim)";
+                    }
+                    return;
+                }
+
+                const data = await res.json();
+
+                loading.style.display = 'none';
+                if (data.linked) {
+                    unlinked.style.display = 'none';
+                    linked.style.display = 'block';
+
+                    if (settingsStatus) {
+                        settingsStatus.textContent = T.statusActiveLinked;
+                        settingsStatus.style.color = "var(--pos)";
+                        settingsActions.innerHTML = `
+                            <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px;">${T.accountLinkedDesc}</p>
+                            <button onclick="unlinkTelegram()" style="padding: 12px 24px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--neg); border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-transform: uppercase;">${T.terminateMobileSession}</button>
+                        `;
+                    }
+                } else {
+                    unlinked.style.display = 'block';
+                    linked.style.display = 'none';
+
+                    if (settingsStatus) {
+                        settingsStatus.textContent = T.statusNotLinked;
+                        settingsStatus.style.color = "var(--text-dim)";
+                        settingsActions.innerHTML = `
+                            <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px;">${T.linkTelegramDesc}</p>
+                            <button onclick="generateTelegramOTP()" style="padding: 12px 24px; background: var(--primary); border: none; color: #FFF; border-radius: 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-transform: uppercase;">${T.initializeMobileLink}</button>
+                        `;
+                    }
+                }
+            } catch (e) {
+                console.error("TG status failed", e);
+                // On network error, show unlinked state
+                loading.style.display = 'none';
+                unlinked.style.display = 'block';
+                linked.style.display = 'none';
+                if (settingsStatus) {
+                    settingsStatus.textContent = T.statusNotLinked;
+                    settingsStatus.style.color = "var(--text-dim)";
+                }
+            }
+        }
+
+        async function generateTelegramOTP() {
+            const btn = document.getElementById('tg-otp-btn');
+            const display = document.getElementById('tg-otp-display');
+            const codeSpan = document.getElementById('tg-otp-code');
+
+            btn.disabled = true;
+            btn.textContent = T.generating;
+
+            try {
+                const res = await fetch('/api/telegram/generate-otp', { method: 'POST', credentials: 'include' });
+                const data = await res.json();
+                codeSpan.textContent = data.otp;
+                btn.style.display = 'none';
+                display.style.display = 'block';
+
+                // Start polling for link status every 10 seconds
+                if (generateTelegramOTP._pollInterval) clearInterval(generateTelegramOTP._pollInterval);
+                generateTelegramOTP._pollInterval = setInterval(async () => {
+                    try {
+                        const statusRes = await fetch('/api/telegram/status', { credentials: 'include' });
+
+                        // Stop polling if session expired
+                        if (statusRes.status === 401) {
+                            console.warn("[telegram] Session expired during polling, stopping");
+                            clearInterval(generateTelegramOTP._pollInterval);
+                            generateTelegramOTP._pollInterval = null;
+                            return;
+                        }
+
+                        const statusData = await statusRes.json();
+
+                        if (statusData.linked) {
+                            clearInterval(generateTelegramOTP._pollInterval);
+                            generateTelegramOTP._pollInterval = null;
+
+                            // Update sidebar UI
+                            document.getElementById('tg-status-loading').style.display = 'none';
+                            document.getElementById('tg-status-unlinked').style.display = 'none';
+                            document.getElementById('tg-status-linked').style.display = 'block';
+                            btn.style.display = 'none';
+                            display.style.display = 'none';
+
+                            // Update settings section
+                            const settingsStatus = document.getElementById('settings-tg-status');
+                            const settingsActions = document.getElementById('settings-tg-actions');
+                            if (settingsStatus) {
+                                settingsStatus.textContent = T.statusActiveLinked;
+                                settingsStatus.style.color = "var(--pos)";
+                            }
+                            if (settingsActions) {
+                                settingsActions.innerHTML = `
+                                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px;">${T.accountLinkedDesc}</p>
+                                    <button onclick="unlinkTelegram()" style="padding: 12px 24px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--neg); border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-transform: uppercase;">${T.terminateMobileSession}</button>
+                                `;
+                            }
+                        }
+                    } catch (e) {
+                        // Keep polling even if one check fails
+                    }
+                }, 10000);
+
+                // Auto-stop polling after 5 minutes (OTP expiry)
+                setTimeout(() => {
+                    if (generateTelegramOTP._pollInterval) {
+                        clearInterval(generateTelegramOTP._pollInterval);
+                        generateTelegramOTP._pollInterval = null;
+                    }
+                }, 300000);
+
+            } catch (e) {
+                btn.disabled = false;
+                btn.textContent = "Retry";
+            }
+        }
+        generateTelegramOTP._pollInterval = null;
+
+        async function unlinkTelegram() {
+            const msg = (T && T.terminateMobileConfirm) || 'Terminate mobile session?';
+            if (!confirm(msg)) return;
+            try {
+                await fetch('/api/telegram/unlink', { method: 'POST', credentials: 'include' });
+
+                // Stop any active link polling
+                if (generateTelegramOTP._pollInterval) {
+                    clearInterval(generateTelegramOTP._pollInterval);
+                    generateTelegramOTP._pollInterval = null;
+                }
+
+                checkTelegramStatus();
+                document.getElementById('tg-otp-btn').style.display = 'block';
+                document.getElementById('tg-otp-display').style.display = 'none';
+            } catch (e) {}
+        }
+
+        // Telegram popup
+        function showTelegramPopup() {
+            document.getElementById('telegram-popup').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('telegram-popup').style.opacity = '1';
+            }, 10);
+        }
+
+        function closeTelegramPopup() {
+            document.getElementById('telegram-popup').style.display = 'none';
+        }
+
+        // Language switching with loading
+        async function changeLanguage(lang) {
+            const loading = document.getElementById('language-loading');
+            loading.style.display = 'flex';
+
+            try {
+                const response = await fetch('/api/language', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({language: lang})
+                });
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    loading.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Language switch error:', error);
+                loading.style.display = 'none';
+            }
+        }
+
+        if (tabs.length > 0) {
+            const initialLoc = tabs[0].dataset.loc;
+            loadChat(initialLoc);
+            initCharts(initialLoc);
+        }
+        checkActiveTask('{{ hotel.id }}');
+        checkTelegramStatus();
+        loadCustomSignals();
+
+        // Show Telegram popup if linked
+        {% if telegram_linked %}
+        setTimeout(showTelegramPopup, 2000);
+        {% endif %}
+
+        // --- Custom Signal Sources Management ---
+        let editingSignalId = null;
+
+        async function loadCustomSignals() {
+            const list = document.getElementById('custom-sources-list');
+            if (!list) return;
+
+            try {
+                const res = await fetch('/api/custom-signals');
+                const data = await res.json();
+
+                if (!data.signals || data.signals.length === 0) {
+                    list.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-dim);">No custom sources configured. Click "Add Custom Source" to get started.</p>`;
+                    return;
+                }
+
+                list.innerHTML = data.signals.map(s => {
+                    const statusBadge = s.enabled
+                        ? '<span style="font-size: 0.6rem; padding: 2px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; background: rgba(16,185,129,0.1); color: var(--pos);">Active</span>'
+                        : '<span style="font-size: 0.6rem; padding: 2px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; background: rgba(255,255,255,0.05); color: var(--text-dim);">Disabled</span>';
+
+                    const errorDetail = (s.last_status === 'error' && s.last_error)
+                        ? `<details style="margin-top: 8px; font-size: 0.7rem; color: var(--neg); cursor: pointer;">
+                                <summary style="font-weight: 700;">⚠ Error: ${s.last_error.substring(0, 80)}${s.last_error.length > 80 ? '...' : ''}</summary>
+                                <pre style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; margin-top: 4px; font-size: 0.65rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 120px;">${s.last_error}</pre>
+                           </details>`
+                        : (s.last_status === 'error' ? '<span style="font-size: 0.6rem; color: var(--neg);">⚠ Last fetch failed</span>' : '');
+
+                    return `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid ${s.last_status === 'error' ? 'rgba(239,68,68,0.3)' : 'var(--border)'}; border-radius: 12px; margin-bottom: 8px;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-weight: 700; color: #FFF; font-size: 0.9rem;">${s.name}</span>
+                                ${statusBadge}
+                            </div>
+                            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">${s.description}</p>
+                            ${s.url ? `<p style="font-size: 0.65rem; color: var(--accent); font-family: monospace; margin-top: 4px;">${s.url}</p>` : ''}
+                            ${errorDetail}
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="editCustomSignal(${s.id})" style="background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 6px;">✏️</button>
+                            <button onclick="toggleCustomSignal(${s.id})" style="background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 6px;">${s.enabled ? '⏸' : '▶️'}</button>
+                            <button onclick="deleteCustomSignal(${s.id})" style="background: none; border: none; color: var(--neg); cursor: pointer; padding: 6px;">🗑</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                list.innerHTML = `<p style="color: var(--neg);">Failed to load custom sources.</p>`;
+            }
+        }
+
+        function showCustomSignalForm(id) {
+            editingSignalId = id || null;
+            document.getElementById('custom-signal-modal').style.display = 'flex';
+            document.getElementById('cs-test-result').style.display = 'none';
+
+            if (id) {
+                fetch('/api/custom-signals').then(r => r.json()).then(data => {
+                    const s = data.signals.find(x => x.id === id);
+                    if (s) {
+                        document.getElementById('cs-name').value = s.name;
+                        document.getElementById('cs-description').value = s.description;
+                        document.getElementById('cs-url').value = s.url || '';
+                        document.getElementById('cs-api-key').value = '';
+                        document.getElementById('cs-api-key-label').value = s.api_key_label || 'Authorization';
+                        document.getElementById('cs-headers').value = s.headers || '';
+                        document.getElementById('cs-method').value = s.method || 'GET';
+                        document.getElementById('cs-response-path').value = s.response_path || '';
+                        document.getElementById('cs-body').value = s.body || '';
+                    }
+                });
+            } else {
+                document.getElementById('custom-signal-form').reset();
+                document.getElementById('cs-api-key-label').value = 'Authorization';
+                document.getElementById('cs-method').value = 'GET';
+            }
+        }
+
+        function closeCustomSignalForm() {
+            document.getElementById('custom-signal-modal').style.display = 'none';
+            editingSignalId = null;
+        }
+
+        async function saveCustomSignal(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('cs-name').value,
+                description: document.getElementById('cs-description').value,
+                url: document.getElementById('cs-url').value,
+                api_key: document.getElementById('cs-api-key').value,
+                api_key_label: document.getElementById('cs-api-key-label').value,
+                headers: document.getElementById('cs-headers').value,
+                method: document.getElementById('cs-method').value,
+                response_path: document.getElementById('cs-response-path').value,
+                body: document.getElementById('cs-body').value
+            };
+
+            try {
+                let res;
+                if (editingSignalId) {
+                    res = await fetch(`/api/custom-signals/${editingSignalId}`, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    res = await fetch('/api/custom-signals', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                }
+
+                const data = await res.json();
+                if (data.success) {
+                    closeCustomSignalForm();
+                    loadCustomSignals();
+                }
+            } catch (e) {
+                alert('Failed to save custom source.');
+            }
+        }
+
+        async function testCustomSignal() {
+            const result = document.getElementById('cs-test-result');
+            result.style.display = 'block';
+            result.innerHTML = `<span style="color: var(--accent);">Testing connection...</span>`;
+
+            const payload = {
+                name: document.getElementById('cs-name').value || 'Test',
+                description: document.getElementById('cs-description').value || '',
+                url: document.getElementById('cs-url').value,
+                api_key: document.getElementById('cs-api-key').value,
+                api_key_label: document.getElementById('cs-api-key-label').value,
+                headers: document.getElementById('cs-headers').value,
+                method: document.getElementById('cs-method').value,
+                response_path: document.getElementById('cs-response-path').value,
+                body: document.getElementById('cs-body').value
+            };
+
+            try {
+                const res = await fetch('/api/custom-signals/test', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    result.style.background = 'rgba(16, 185, 129, 0.1)';
+                    result.innerHTML = `<span style="color: var(--pos);">✅ Success</span><pre style="font-size: 0.75rem; margin-top: 8px; max-height: 200px; overflow-y: auto;">${JSON.stringify(data.data, null, 2)}</pre>`;
+                } else {
+                    result.style.background = 'rgba(239, 68, 68, 0.1)';
+                    result.innerHTML = `<span style="color: var(--neg);">❌ ${data.error}</span>`;
+                }
+            } catch (e) {
+                result.style.background = 'rgba(239, 68, 68, 0.1)';
+                result.innerHTML = `<span style="color: var(--neg);">❌ Connection failed</span>`;
+            }
+        }
+
+        async function toggleCustomSignal(id) {
+            await fetch(`/api/custom-signals/${id}/toggle`, {method: 'POST'});
+            loadCustomSignals();
+        }
+
+        async function deleteCustomSignal(id) {
+            if (!confirm('Delete this custom source?')) return;
+            await fetch(`/api/custom-signals/${id}`, {method: 'DELETE'});
+            loadCustomSignals();
+        }
+
+        function editCustomSignal(id) {
+            showCustomSignalForm(id);
+        }
+    </script>
+</body>
+</html>
