@@ -71,6 +71,27 @@
         .empty-state { text-align:center; padding:40px; color:var(--text-dim); }
         .spinner { width:20px; height:20px; border:2px solid rgba(56,66,44,0.14); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; }
         @keyframes spin { to{transform:rotate(360deg)} }
+    
+        @media (max-width: 768px) {
+            .header { padding: 10px 16px; flex-wrap: wrap; gap: 6px; }
+            .header h1 { font-size: 1.1rem; }
+            .container { padding: 12px; }
+            .hotel-banner { padding: 14px; }
+            .hotel-banner h2 { font-size: 1.1rem; }
+            .tabs { flex-wrap: wrap; }
+            .tab-btn { font-size: 0.75rem; padding: 10px; }
+            .glass-card { padding: 20px 16px; }
+            .slider-group label { font-size: 0.7rem; }
+            input[type="range"] { height: 8px; }
+        }
+        @media (max-width: 480px) {
+            .header { flex-direction: column; align-items: flex-start; }
+            .header h1 { font-size: 1rem; }
+            .container { padding: 8px; }
+            .glass-card { padding: 16px 12px; border-radius: 12px; }
+            .slider-group label { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .tab-btn { font-size: 0.7rem; padding: 8px; }
+        }
     </style>
 </head>
 <body>

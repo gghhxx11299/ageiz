@@ -252,6 +252,25 @@
             color: var(--text-dim);
             font-weight: 500;
         }
+
+        @media (max-width: 768px) {
+            .login-container { max-width: 100%; }
+            .glass-card { padding: 32px 24px; border-radius: 20px; }
+            .logo { font-size: 2rem; }
+            .subtitle { font-size: 0.8rem; }
+            .role-btn { padding: 12px 10px; font-size: 0.75rem; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .glass-card { padding: 24px 18px; border-radius: 16px; }
+            .logo { font-size: 1.8rem; }
+            .brand-header { margin-bottom: 24px; }
+            input { padding: 12px 14px; font-size: 0.85rem; }
+            .submit-btn { padding: 14px; font-size: 0.85rem; }
+            .tab { padding: 8px; font-size: 0.75rem; }
+            .role-selector { flex-direction: column; gap: 8px; }
+            .role-btn .role-icon { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>

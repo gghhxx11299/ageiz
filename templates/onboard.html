@@ -351,6 +351,19 @@
             .url-group { flex-direction: column; }
             .glass-card { padding: 32px 24px; }
         }
+
+        @media (max-width: 768px) {
+            .onboard-container { max-width: 100%; padding: 16px; }
+            .glass-card { padding: 32px 24px; }
+            .logo { font-size: 2rem; }
+        }
+        @media (max-width: 480px) {
+            .onboard-container { padding: 12px; }
+            .glass-card { padding: 24px 18px; border-radius: 16px; }
+            .logo { font-size: 1.8rem; }
+            input, textarea { font-size: 0.85rem; padding: 12px; }
+            .submit-btn { padding: 14px; font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>

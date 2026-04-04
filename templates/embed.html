@@ -56,6 +56,26 @@
         .error-msg{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:12px 16px;border-radius:10px;font-size:0.8rem;margin-bottom:16px;display:none}
         .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
         @keyframes spin{to{transform:rotate(360deg)}}
+    
+        @media (max-width: 768px) {
+            .card { max-width: 100%; border-radius: 12px; }
+            .header { padding: 18px 20px 16px; }
+            .header h1 { font-size: 1rem; }
+            .header p { font-size: 0.75rem; }
+            .form-body { padding: 18px 20px 22px; }
+            .form-row { flex-direction: column; gap: 0; }
+            .stars label.star { font-size: 1.4rem; }
+            .reward-points { font-size: 1.5rem; }
+            .redeem-code { font-size: 1.1rem; }
+            #qr-code canvas { max-width: 150px !important; height: auto !important; }
+        }
+        @media (max-width: 400px) {
+            .card { border-radius: 8px; }
+            .header { padding: 14px 16px 12px; }
+            .form-body { padding: 14px 16px 18px; }
+            input[type="text"], input[type="date"], select, textarea { font-size: 0.8rem; padding: 8px 12px; }
+            .submit-btn { font-size: 0.85rem; padding: 12px; }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
