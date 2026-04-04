@@ -1,4 +1,4 @@
-import libsql_experimental as libsql
+import sqlite3
 import os
 import time
 from dotenv import load_dotenv
@@ -6,9 +6,12 @@ from datetime import datetime, timedelta
 
 load_dotenv()
 
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ageiz.db")
+
 def get_connection():
-    # Use local SQLite DB — Turso cloud DB is unreachable from this network
-    return libsql.connect(database="ageiz.db")
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = None  # Use tuple rows
+    return conn
 
 def init_db():
     conn = get_connection()

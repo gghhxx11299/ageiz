@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+gunicorn
 python-dotenv
 httpx
 beautifulsoup4
@@ -8,7 +9,6 @@ feedparser
 ddgs
 pytrends
 groq
-libsql-experimental
 bcrypt
 itsdangerous
 amadeus

@@ -26,15 +26,17 @@ from translator import translate_text
 from translations import get_translation
 
 load_dotenv()
-init_db()
 
 app = FastAPI(title="Ageiz")
 
+templates = Jinja2Templates(directory="templates")
+
 @app.on_event("startup")
 async def startup_event():
+    # Initialize database on startup (Render ephemeral disk)
+    init_db()
     # Start Telegram Bot in the same event loop
     asyncio.create_task(setup_bot())
-templates = Jinja2Templates(directory="templates")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "ageiz-local-dev-secret-key-change-in-production")
 serializer = URLSafeTimedSerializer(SECRET_KEY)
