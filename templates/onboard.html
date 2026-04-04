@@ -45,6 +45,31 @@
         header {
             text-align: center;
             margin-bottom: 48px;
+            position: relative;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px var(--primary-glow);
         }
 
         .logo {
@@ -369,6 +394,10 @@
 <body>
     <div class="container">
         <header>
+            <a href="/" class="back-link" title="Back to Home">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Back to Home
+            </a>
             <h1 class="logo">Agéiz</h1>
             <p class="subtitle">Property Intelligence Onboarding</p>
         </header>
@@ -382,6 +411,17 @@
                 <option value="chinese">🇨🇳 中文</option>
             </select>
         </div>
+
+        <script>
+            // Set current language from cookie/session on page load
+            (function() {
+                // Try to get current language from cookie or default to english
+                var currentLang = document.cookie.match(/(?:^|;\s*)lang=([^;]*)/);
+                if (currentLang) {
+                    document.getElementById('language-selector').value = currentLang[1];
+                }
+            })();
+        </script>
 
         <form action="/onboard/save" method="POST" id="onboard-form">
             <!-- Step 1: URL Scan -->
