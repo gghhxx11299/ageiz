@@ -3,6 +3,22 @@ import time
 from datetime import date
 from decorators import with_retry
 
+# In-memory cache for weather API to avoid 429 rate limits
+_weather_cache = {}
+_WEATHER_CACHE_TTL = 3600  # 1 hour
+
+def _get_cached_weather(key: str) -> dict | None:
+    if key in _weather_cache:
+        entry = _weather_cache[key]
+        if time.time() - entry["ts"] < _WEATHER_CACHE_TTL:
+            return entry["data"]
+        else:
+            del _weather_cache[key]
+    return None
+
+def _set_cached_weather(key: str, data: dict):
+    _weather_cache[key] = {"data": data, "ts": time.time()}
+
 ETHIOPIA_LOCATIONS = {
     "Addis Ababa": {"lat": 9.02, "lon": 38.75, "baseline_rain": 1200, "baseline_temp": 20, "type": "city"},
     "Bishoftu": {"lat": 8.75, "lon": 38.98, "baseline_rain": 900, "baseline_temp": 22, "type": "lake_resort"},
@@ -75,17 +91,26 @@ def resolve_location(location_name: str) -> dict | None:
 
 @with_retry()
 def fetch_weather(location_name: str) -> dict:
+    # Check cache first
+    cache_key = location_name.lower().strip()
+    cached = _get_cached_weather(cache_key)
+    if cached is not None:
+        return cached
+
     loc = resolve_location(location_name)
     if loc is None:
         return {"error": f"Location {location_name} not found"}
-    
+
+    # Small delay to avoid rate limiting (Open-Meteo free tier)
+    time.sleep(1.5)
+
     url = (
         f"https://api.open-meteo.com/v1/forecast"
         f"?latitude={loc['lat']}&longitude={loc['lon']}"
         f"&daily=precipitation_sum,temperature_2m_max,temperature_2m_min"
         f"&forecast_days=16&timezone=Africa%2FAddis_Ababa"
     )
-    
+
     try:
         response = httpx.get(url, timeout=15)
         response.raise_for_status()
@@ -110,10 +135,8 @@ def fetch_weather(location_name: str) -> dict:
             rain_ratio = 1.0
         
         avg_temp = sum(t for t in temp_max if t is not None) / len(temp_max) if temp_max else 0
-        
-        # Removed time.sleep(2)
-        
-        return {
+
+        result = {
             "location": location_name,
             "location_type": loc["type"],
             "forecast_days": len(dates),
@@ -127,6 +150,10 @@ def fetch_weather(location_name: str) -> dict:
             "forecast_dates": dates[:16],
             "daily_precipitation": precipitation[:16]
         }
+
+        # Cache the result
+        _set_cached_weather(cache_key, result)
+        return result
     except Exception as e:
         print(f"[weather] Failed to fetch weather for {location_name}: {e}")
         return {"error": str(e), "location": location_name}
