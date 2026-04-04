@@ -21,7 +21,6 @@ from ai_client import call_ai_for_json
 from pipeline import run_pipeline
 from chat_agent import get_chat_response
 from database import get_chat_history
-from telegram_bot import setup_bot, bot_app
 from translator import translate_text
 from translations import get_translation
 
@@ -33,10 +32,18 @@ templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 async def startup_event():
-    # Initialize database on startup (Render ephemeral disk)
-    init_db()
-    # Start Telegram Bot in the same event loop
-    asyncio.create_task(setup_bot())
+    try:
+        init_db()
+        print("[startup] Database initialized.")
+    except Exception as e:
+        print(f"[startup] DB init failed (non-fatal): {e}")
+
+    # Lazy import Telegram to avoid import-time crashes
+    try:
+        from telegram_bot import setup_bot
+        asyncio.create_task(setup_bot())
+    except Exception as e:
+        print(f"[startup] Telegram bot disabled: {e}")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "ageiz-local-dev-secret-key-change-in-production")
 serializer = URLSafeTimedSerializer(SECRET_KEY)
@@ -491,14 +498,16 @@ def telegram_status(request: Request):
 async def telegram_unlink(user: dict = Depends(get_current_user)):
     tg_id = user.get("telegram_id")
     if tg_id:
-        if bot_app:
-            try:
+        try:
+            from telegram_bot import bot_app
+            if bot_app:
                 await bot_app.bot.send_message(
                     chat_id=tg_id,
                     text="🚪 *Security Alert*\nYour mobile session has been terminated from the web interface. Please generate a new OTP to reconnect.",
                     parse_mode='Markdown'
                 )
-            except: pass
+        except Exception:
+            pass
         unlink_telegram_id(tg_id)
     return {"success": True}
 
