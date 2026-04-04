@@ -93,6 +93,25 @@ def get_current_user(session: dict = Depends(require_session)) -> dict:
         raise HTTPException(status_code=401, detail="User session invalid")
     return user
 
+# Telegram webhook endpoint
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes
+
+@app.post("/telegram/webhook")
+async def telegram_webhook(request: Request):
+    """Receive Telegram updates via webhook."""
+    try:
+        from telegram_bot import bot_app
+        if not bot_app:
+            return JSONResponse({"error": "Bot not initialized"}, status_code=503)
+
+        data = await request.json()
+        update = Update.de_json(data, bot_app.bot)
+        await bot_app.process_update(update)
+        return JSONResponse({"status": "ok"})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
 @app.get("/health")
 def health():
     return {"status": "ok", "timestamp": datetime.now().isoformat(), "service": "Ageiz"}

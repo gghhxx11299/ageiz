@@ -603,6 +603,7 @@ RULES:
         logger.error(f"Error in handle_ai_chat: {e}")
 
 bot_app = None
+_WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")
 
 async def setup_bot():
     global bot_app
@@ -611,7 +612,6 @@ async def setup_bot():
         return
 
     try:
-        # Increased timeout for slower networks
         application = ApplicationBuilder().token(TOKEN).read_timeout(30).write_timeout(30).connect_timeout(30).build()
     except Exception as e:
         logger.error(f"[telegram] Failed to build Telegram app: {e}")
@@ -622,28 +622,30 @@ async def setup_bot():
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
     application.add_handler(CallbackQueryHandler(handle_callback))
 
-    # Add error handler to log all unhandled exceptions
     async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
         error = context.error
         logger.error(f"[telegram] Unhandled error: {error}")
-        if update and hasattr(update, 'effective_user'):
-            logger.error(f"[telegram] Error for user: {update.effective_user.id}")
 
     application.add_error_handler(error_handler)
 
     try:
         await application.initialize()
         await application.start()
-        await application.updater.start_polling(drop_pending_updates=True)
-        logger.info("[telegram] Agéiz Telegram Bot is active and polling for updates.")
+
+        # Use webhooks in production (WEBHOOK_URL set), polling locally
+        if _WEBHOOK_URL:
+            webhook_url = _WEBHOOK_URL.rstrip("/") + "/telegram/webhook"
+            await application.bot.set_webhook(webhook_url)
+            logger.info(f"[telegram] Webhook set: {webhook_url}")
+        else:
+            await application.updater.start_polling(drop_pending_updates=True)
+            logger.info("[telegram] Polling mode (dev).")
     except Exception as e:
         error_str = str(e)
-        if "Conflict" in error_str or "terminated by other getUpdates" in error_str:
-            logger.warning("[telegram] ⚠️ Another bot instance is running (Conflict). Bot disabled for this deploy. The web app works normally.")
+        if "Conflict" in error_str or "terminated" in error_str:
+            logger.warning("[telegram] ⚠️ Another bot instance detected. Bot disabled for this deploy. Web app works normally.")
         else:
-            logger.error(f"[telegram] Failed to start Telegram bot: {e}")
-            logger.info("[telegram] Bot is disabled. The web app will continue to work normally.")
-        # Gracefully shut down any partial init
+            logger.error(f"[telegram] Failed to start: {e}")
         try:
             await application.shutdown()
         except Exception:

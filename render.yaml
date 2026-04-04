@@ -33,3 +33,5 @@ services:
         sync: false
       - key: POE_API_KEY
         sync: false
+      - key: WEBHOOK_URL
+        value: https://ageiz.onrender.com
