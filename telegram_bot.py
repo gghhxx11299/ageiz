@@ -637,9 +637,17 @@ async def setup_bot():
         await application.updater.start_polling(drop_pending_updates=True)
         logger.info("[telegram] Agéiz Telegram Bot is active and polling for updates.")
     except Exception as e:
-        logger.error(f"[telegram] Failed to start Telegram bot: {e}")
-        logger.info("[telegram] Bot is disabled. The web app will continue to work normally.")
-        # Keep bot_app so it's not GC'd if that's an issue, but mark as disabled
+        error_str = str(e)
+        if "Conflict" in error_str or "terminated by other getUpdates" in error_str:
+            logger.warning("[telegram] ⚠️ Another bot instance is running (Conflict). Bot disabled for this deploy. The web app works normally.")
+        else:
+            logger.error(f"[telegram] Failed to start Telegram bot: {e}")
+            logger.info("[telegram] Bot is disabled. The web app will continue to work normally.")
+        # Gracefully shut down any partial init
+        try:
+            await application.shutdown()
+        except Exception:
+            pass
         return
 
     return application
