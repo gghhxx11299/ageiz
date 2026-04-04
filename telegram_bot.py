@@ -364,25 +364,30 @@ async def run_global_refresh(query, context, user):
         except TelegramError:
             status_msg = None
 
-        last_thought = ""
+        last_progress = -1
         max_wait = 600
         waited = 0
 
         while waited < max_wait:
-            await asyncio.sleep(5)
-            waited += 5
+            await asyncio.sleep(3)
+            waited += 3
 
             try:
                 task = get_pipeline_task(task_id)
                 if not task:
                     break
 
-                current_thought = task.get("thoughts", "").split("\n")[-1] if task.get("thoughts") else task.get("message", "Processing")
+                progress = task.get('progress', 0)
+                message = task.get('message', 'Processing...')
 
-                if current_thought != last_thought and status_msg:
+                # Always update if progress changed
+                if progress != last_progress and status_msg:
                     try:
-                        await status_msg.edit_text(f"⚡ *Neural Cycle: {task['progress']}%*\n`{current_thought}`", parse_mode='Markdown')
-                        last_thought = current_thought
+                        await status_msg.edit_text(
+                            f"⚡ *Neural Cycle: {progress}%*\n`{message}`",
+                            parse_mode='Markdown'
+                        )
+                        last_progress = progress
                     except TelegramError:
                         pass
 
@@ -390,7 +395,7 @@ async def run_global_refresh(query, context, user):
                     hotel = get_hotel_profile(user["hotel_id"])
                     if not hotel:
                         if status_msg:
-                            await status_msg.edit_text("✅ Pipeline complete but hotel profile not found.")
+                            await status_msg.edit_text("✅ Pipeline complete. Refresh the web dashboard to see results.")
                         return
 
                     loc_list = _parse_locations(hotel.get("locations", ""))
@@ -406,13 +411,13 @@ async def run_global_refresh(query, context, user):
                                 pos_count = sum(1 for s in signals.values() if s.get("sentiment") == "positive")
                                 neg_count = sum(1 for s in signals.values() if s.get("sentiment") == "negative")
                                 dashboard_text += f"   Signals: 🟢{pos_count} 🔴{neg_count} / {len(signals)}\n"
-                                for sig_name in ["weather", "calendar", "flights", "exchange"]:
+                                for sig_name in ["weather", "calendar", "flights", "exchange", "staff_intelligence"]:
                                     if sig_name in signals:
                                         sig = signals[sig_name]
                                         emoji = "🟢" if sig.get("sentiment") == "positive" else "🔴" if sig.get("sentiment") == "negative" else "🟡"
-                                        interp = sig.get("interpretation", "")[:80]
+                                        interp = sig.get("interpretation", "")[:60]
                                         if interp:
-                                            dashboard_text += f"   {emoji} *{sig_name.capitalize()}*: {interp}\n"
+                                            dashboard_text += f"   {emoji} {sig_name.capitalize()}: {interp}\n"
                             except:
                                 dashboard_text += f"   ⚠️ Signals corrupted\n"
 
@@ -423,33 +428,41 @@ async def run_global_refresh(query, context, user):
                                 urgency = rec.get("urgency", "N/A").upper()
                                 confidence = rec.get("overall_confidence", "N/A")
                                 rooms = rec.get("room_rates", {})
-                                dashboard_text += f"   Strategy: {urgency} | {confidence}\n"
-                                dashboard_text += f"   🏨 Standard: {rooms.get('standard_rooms', 'N/A')} | Suites: {rooms.get('suites_and_premium', 'N/A')}\n"
+                                dashboard_text += f"   💰 {urgency} · {confidence}\n"
+                                std = rooms.get('standard_rooms', '—')
+                                suite = rooms.get('suites_and_premium', '—')
+                                if std != '—' or suite != '—':
+                                    dashboard_text += f"   🏨 Std: {std} | Suite: {suite}\n"
                             except:
                                 pass
 
                         dashboard_text += "\n"
 
+                    dashboard_text += "\n🔄 *The web dashboard is also updated.*"
+
                     keyboard = []
                     for loc in loc_list:
-                        keyboard.append([InlineKeyboardButton(f"📊 Full Signals: {loc}", callback_data=f"signals_{loc}")])
-                        keyboard.append([InlineKeyboardButton(f"💰 Full Strategy: {loc}", callback_data=f"rec_{loc}")])
-                    keyboard.append([InlineKeyboardButton("⬅️ Back to Main Menu", callback_data="main_menu")])
+                        keyboard.append([InlineKeyboardButton(f"📊 {loc} Signals", callback_data=f"signals_{loc}")])
+                        keyboard.append([InlineKeyboardButton(f"💰 {loc} Strategy", callback_data=f"rec_{loc}")])
+                    keyboard.append([InlineKeyboardButton("⬅️ Main Menu", callback_data="main_menu")])
 
                     reply_markup = InlineKeyboardMarkup(keyboard)
 
                     if status_msg:
                         try:
-                            if len(dashboard_text) > 3500:
-                                dashboard_text = dashboard_text[:3490] + "..."
-                            await status_msg.edit_text(dashboard_text, reply_markup=reply_markup, parse_mode='Markdown')
-                        except:
-                            pass
+                            safe_text = _truncate(dashboard_text, 3800)
+                            await status_msg.edit_text(safe_text, reply_markup=reply_markup, parse_mode='Markdown')
+                        except Exception as edit_err:
+                            logger.warning(f"Dashboard edit failed: {edit_err}")
+                            try:
+                                await status_msg.edit_text("✅ *Pipeline Complete!*\n\nOpen the web dashboard or check signals/strategy buttons below.", reply_markup=reply_markup, parse_mode='Markdown')
+                            except:
+                                pass
                     return
 
                 elif task["status"] == "failed":
                     if status_msg:
-                        await status_msg.edit_text(f"❌ *Cycle Failed*\nError: {task.get('error', 'Unknown')}\n\nTry again.", parse_mode='Markdown')
+                        await status_msg.edit_text(f"❌ *Cycle Failed*\nError: {task.get('error', 'Unknown')[:100]}\n\nTry again.", parse_mode='Markdown')
                     return
 
             except Exception as e:
@@ -457,7 +470,7 @@ async def run_global_refresh(query, context, user):
                 continue
 
         if status_msg:
-            await status_msg.edit_text("⏱️ *Cycle Timeout*\nPipeline still running in background. Check back later.", parse_mode='Markdown')
+            await status_msg.edit_text("⏱️ *Cycle Timeout*\nPipeline still running in background. Check the web dashboard.", parse_mode='Markdown')
     except Exception as e:
         logger.error(f"Error in run_global_refresh: {e}")
         try:

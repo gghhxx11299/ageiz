@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agéiz — Staff Intelligence Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #F4F1EA; --surface: rgba(255,255,255,0.82); --primary: #38422C;
@@ -13,15 +13,15 @@
             --text: #38422C; --text-dim: #72682A; --glass: rgba(255,255,255,0.82);
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
         .header { display:flex; justify-content:space-between; align-items:center; padding:16px 24px; background:rgba(244,241,234,0.92); border-bottom:1px solid var(--border); }
-        .header h1 { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; color:var(--primary); }
+        .header h1 { font-family:'Playfair Display', Georgia, serif; font-size:1.5rem; color:var(--primary); }
         .header .user-info { font-size:0.8rem; color:var(--text-dim); }
         .logout-link { color:var(--text-dim); text-decoration:none; font-size:0.8rem; margin-left:16px; }
         .logout-link:hover { color:var(--accent); }
         .container { max-width:960px; margin:0 auto; padding:24px; }
         .hotel-banner { background:linear-gradient(135deg, rgba(186,146,64,0.10), rgba(56,66,44,0.04)); border:1px solid rgba(56,66,44,0.16); border-radius:16px; padding:20px; margin-bottom:24px; }
-        .hotel-banner h2 { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; }
+        .hotel-banner h2 { font-family:'Playfair Display', Georgia, serif; font-size:1.3rem; }
         .hotel-banner p { color:var(--text-dim); font-size:0.85rem; margin-top:4px; }
 
         .tabs { display:flex; gap:8px; margin-bottom:24px; }
@@ -33,7 +33,7 @@
         @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
         .glass-card { background:var(--glass); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:16px; padding:32px; margin-bottom:24px; }
-        .glass-card h3 { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; margin-bottom:20px; color:var(--primary); }
+        .glass-card h3 { font-family:'Playfair Display', Georgia, serif; font-size:1.1rem; margin-bottom:20px; color:var(--primary); }
 
         .form-group { margin-bottom:20px; }
         .form-group label { display:block; font-size:0.75rem; font-weight:600; color:var(--text-dim); margin-bottom:8px; }
