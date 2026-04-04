@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ label }} — Guest Feedback</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+        .card{background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:520px;width:100%;overflow:hidden}
+        .header{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:24px 28px 20px}
+        .header h1{font-size:1.2rem;font-weight:700}
+        .header p{font-size:0.8rem;opacity:0.85;margin-top:4px}
+        .form-body{padding:24px 28px 28px}
+        .rating-group{margin-bottom:20px}
+        .rating-group label{display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:8px}
+        .stars{display:flex;gap:4px}
+        .stars input{display:none}
+        .stars label.star{font-size:1.6rem;color:#d1d5db;cursor:pointer;transition:color 0.15s}
+        .stars label.star:hover,.stars label.star.active{color:#f59e0b}
+        .stars input:checked ~ label.star{color:#d1d5db}
+        .stars label.star:has(~ input:checked){color:#f59e0b}
+        .form-row{display:flex;gap:12px;margin-bottom:16px}
+        .form-row .field{flex:1}
+        .field{margin-bottom:16px}
+        .field label{display:block;font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:6px}
+        input[type="text"],input[type="date"],select,textarea{width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:0.85rem;font-family:inherit;background:#f8fafc;transition:border 0.2s}
+        input:focus,select:focus,textarea:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,0.1)}
+        textarea{resize:vertical;min-height:80px}
+        .recommend-row{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+        .recommend-row label{font-size:0.8rem;font-weight:600;color:#475569}
+        .toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+        .toggle input{opacity:0;width:0;height:0}
+        .toggle .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#d1d5db;border-radius:24px;transition:0.3s}
+        .toggle .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s}
+        .toggle input:checked+.slider{background:#6366f1}
+        .toggle input:checked+.slider:before{transform:translateX(20px)}
+        .submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;font-size:0.95rem;font-weight:700;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s}
+        .submit-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(99,102,241,0.3)}
+        .submit-btn:disabled{opacity:0.5;transform:none;cursor:not-allowed}
+        .thank-you{text-align:center;padding:60px 28px;display:none}
+        .thank-you.show{display:block}
+        .thank-you .check{font-size:3rem;margin-bottom:12px}
+        .thank-you h2{font-size:1.2rem;color:#1e293b;margin-bottom:8px}
+        .thank-you p{color:#64748b;font-size:0.85rem}
+        .powered{text-align:center;padding:12px;font-size:0.65rem;color:#94a3b8}
+        .powered a{color:#6366f1;text-decoration:none}
+        .error-msg{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:12px 16px;border-radius:10px;font-size:0.8rem;margin-bottom:16px;display:none}
+        .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1>📝 {{ label }}</h1>
+            <p>Share your experience — it helps us improve.</p>
+        </div>
+        <div class="form-body" id="form-container">
+            <div class="error-msg" id="error-msg"></div>
+
+            <div class="form-row">
+                <div class="field">
+                    <label>Room Type</label>
+                    <select id="room-type">
+                        <option value="">Select...</option>
+                        <option value="Standard">Standard Room</option>
+                        <option value="Deluxe">Deluxe Room</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Villa">Villa</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Guest Type</label>
+                    <select id="guest-type">
+                        <option value="">Select...</option>
+                        <option value="couple">Couple</option>
+                        <option value="family">Family</option>
+                        <option value="solo">Solo</option>
+                        <option value="business">Business</option>
+                        <option value="group">Group</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Visit Date</label>
+                <input type="date" id="visit-date">
+            </div>
+
+            <!-- Rating: Overall -->
+            <div class="rating-group">
+                <label>Overall Experience</label>
+                <div class="stars" data-field="overall">
+                    <input type="radio" name="overall" id="overall-5" value="5"><label for="overall-5" class="star">★</label>
+                    <input type="radio" name="overall" id="overall-4" value="4"><label for="overall-4" class="star">★</label>
+                    <input type="radio" name="overall" id="overall-3" value="3"><label for="overall-3" class="star">★</label>
+                    <input type="radio" name="overall" id="overall-2" value="2"><label for="overall-2" class="star">★</label>
+                    <input type="radio" name="overall" id="overall-1" value="1"><label for="overall-1" class="star">★</label>
+                </div>
+            </div>
+
+            <!-- Rating: Cleanliness -->
+            <div class="rating-group">
+                <label>Cleanliness</label>
+                <div class="stars" data-field="cleanliness">
+                    <input type="radio" name="cleanliness" id="clean-5" value="5"><label for="clean-5" class="star">★</label>
+                    <input type="radio" name="cleanliness" id="clean-4" value="4"><label for="clean-4" class="star">★</label>
+                    <input type="radio" name="cleanliness" id="clean-3" value="3"><label for="clean-3" class="star">★</label>
+                    <input type="radio" name="cleanliness" id="clean-2" value="2"><label for="clean-2" class="star">★</label>
+                    <input type="radio" name="cleanliness" id="clean-1" value="1"><label for="clean-1" class="star">★</label>
+                </div>
+            </div>
+
+            <!-- Rating: Staff -->
+            <div class="rating-group">
+                <label>Staff Friendliness</label>
+                <div class="stars" data-field="staff">
+                    <input type="radio" name="staff" id="staff-5" value="5"><label for="staff-5" class="star">★</label>
+                    <input type="radio" name="staff" id="staff-4" value="4"><label for="staff-4" class="star">★</label>
+                    <input type="radio" name="staff" id="staff-3" value="3"><label for="staff-3" class="star">★</label>
+                    <input type="radio" name="staff" id="staff-2" value="2"><label for="staff-2" class="star">★</label>
+                    <input type="radio" name="staff" id="staff-1" value="1"><label for="staff-1" class="star">★</label>
+                </div>
+            </div>
+
+            <!-- Rating: Value -->
+            <div class="rating-group">
+                <label>Value for Money</label>
+                <div class="stars" data-field="value">
+                    <input type="radio" name="value" id="value-5" value="5"><label for="value-5" class="star">★</label>
+                    <input type="radio" name="value" id="value-4" value="4"><label for="value-4" class="star">★</label>
+                    <input type="radio" name="value" id="value-3" value="3"><label for="value-3" class="star">★</label>
+                    <input type="radio" name="value" id="value-2" value="2"><label for="value-2" class="star">★</label>
+                    <input type="radio" name="value" id="value-1" value="1"><label for="value-1" class="star">★</label>
+                </div>
+            </div>
+
+            <!-- Rating: Food -->
+            <div class="rating-group">
+                <label>Food &amp; Beverage</label>
+                <div class="stars" data-field="food">
+                    <input type="radio" name="food" id="food-5" value="5"><label for="food-5" class="star">★</label>
+                    <input type="radio" name="food" id="food-4" value="4"><label for="food-4" class="star">★</label>
+                    <input type="radio" name="food" id="food-3" value="3"><label for="food-3" class="star">★</label>
+                    <input type="radio" name="food" id="food-2" value="2"><label for="food-2" class="star">★</label>
+                    <input type="radio" name="food" id="food-1" value="1"><label for="food-1" class="star">★</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Your Feedback (optional)</label>
+                <textarea id="feedback" placeholder="Tell us about your experience..."></textarea>
+            </div>
+
+            <div class="recommend-row">
+                <label>Would you recommend us?</label>
+                <div class="toggle">
+                    <input type="checkbox" id="recommend" checked>
+                    <span class="slider"></span>
+                </div>
+            </div>
+
+            <button class="submit-btn" id="submit-btn" onclick="submitForm()">Submit Feedback</button>
+        </div>
+
+        <div class="thank-you" id="thank-you">
+            <div class="check">✅</div>
+            <h2>Thank You!</h2>
+            <p>Your feedback helps us improve. We appreciate your input.</p>
+        </div>
+
+        <div class="powered">Powered by <a href="https://ageiz.onrender.com" target="_blank">Agéiz Intelligence</a></div>
+    </div>
+
+    <script>
+        const EMBED_TOKEN = "{{ token }}";
+        const API_URL = "{{ api_url }}";
+
+        function submitForm() {
+            const btn = document.getElementById('submit-btn');
+            const errEl = document.getElementById('error-msg');
+            errEl.style.display = 'none';
+
+            // Gather data
+            const data = {
+                overall_rating: getStarRating('overall'),
+                cleanliness_rating: getStarRating('cleanliness'),
+                staff_rating: getStarRating('staff'),
+                value_rating: getStarRating('value'),
+                food_rating: getStarRating('food'),
+                feedback_text: document.getElementById('feedback').value,
+                visit_date: document.getElementById('visit-date').value,
+                room_type: document.getElementById('room-type').value,
+                guest_type: document.getElementById('guest-type').value,
+                would_recommend: document.getElementById('recommend').checked ? 1 : 0,
+                source_url: window.location.href
+            };
+
+            if (!data.overall_rating && !data.feedback_text) {
+                errEl.textContent = 'Please rate your overall experience or leave feedback.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+            fetch(`${API_URL}api/embed/${EMBED_TOKEN}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    document.getElementById('form-container').style.display = 'none';
+                    document.getElementById('thank-you').classList.add('show');
+                } else {
+                    errEl.textContent = res.error || 'Submission failed. Please try again.';
+                    errEl.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = 'Submit Feedback';
+                }
+            })
+            .catch(() => {
+                errEl.textContent = 'Network error. Please try again.';
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Submit Feedback';
+            });
+        }
+
+        function getStarRating(field) {
+            const checked = document.querySelector(`input[name="${field}"]:checked`);
+            return checked ? parseInt(checked.value) : null;
+        }
+
+        // Star hover effects
+        document.querySelectorAll('.stars').forEach(group => {
+            const labels = group.querySelectorAll('.star');
+            const inputs = group.querySelectorAll('input');
+            inputs.forEach((input, idx) => {
+                input.addEventListener('change', () => {
+                    labels.forEach((l, i) => {
+                        l.classList.toggle('active', i >= inputs.length - 1 - idx);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
