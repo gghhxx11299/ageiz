@@ -687,8 +687,12 @@ async def submit_staff_report(
     raw_input = data.get("raw_input", "")
     structured = data.get("structured", {})
 
-    from database import create_staff_report
+    from database import create_staff_report, award_points
     import json
+
+    # Determine quality for points
+    has_ai = bool(structured.get("summary") and len(structured.get("summary", "")) > 20)
+    data_quality = "ai_structured" if has_ai else "good"
 
     report_id = create_staff_report(
         hotel_id=hotel_id,
@@ -710,7 +714,36 @@ async def submit_staff_report(
         ai_insights=structured.get("ai_insights")
     )
 
-    return JSONResponse({"success": True, "report_id": report_id})
+    # Award points
+    points = award_points(user_id, hotel_id, report_type, data_quality)
+
+    return JSONResponse({"success": True, "report_id": report_id, "points_earned": points})
+
+
+@app.get("/api/staff/leaderboard")
+def get_staff_leaderboard(session: dict = Depends(require_staff_session)):
+    """Get leaderboard for the staff member's hotel."""
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return JSONResponse({"leaderboard": [], "my_rank": {"rank": 0, "points": 0}})
+
+    from database import get_leaderboard, get_user_rank
+    leaderboard = get_leaderboard(hotel_id, limit=10)
+    my_rank = get_user_rank(hotel_id, session["user_id"])
+
+    return JSONResponse({"leaderboard": leaderboard, "my_rank": my_rank})
+
+
+@app.get("/api/leaderboard")
+def get_manager_leaderboard(hotel_id: int, session: dict = Depends(require_session)):
+    """Manager endpoint: get leaderboard for their hotel."""
+    session_hotel = session.get("hotel_id")
+    if session_hotel is not None and session_hotel != hotel_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    from database import get_leaderboard
+    leaderboard = get_leaderboard(hotel_id, limit=10)
+    return JSONResponse({"leaderboard": leaderboard})
 
 
 @app.get("/api/staff/reports")

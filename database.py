@@ -917,3 +917,88 @@ def get_staff_report_summary(hotel_id: int, report_type: str = None, days: int =
         }
     finally:
         conn.close()
+
+
+# --- Gamification / Leaderboard ---
+
+def award_points(user_id: int, hotel_id: int, report_type: str, data_quality: str = "good") -> int:
+    """Award points to a user based on report submission. Returns points awarded."""
+    # Base points by report type
+    base = {"daily": 10, "weekly": 25, "monthly": 50}.get(report_type, 10)
+
+    # Quality bonus
+    bonus = {"good": 5, "excellent": 15, "ai_structured": 10}.get(data_quality, 0)
+
+    total_awarded = base + bonus
+
+    conn = get_connection()
+    try:
+        conn.execute("UPDATE users SET total_points = total_points + ? WHERE id = ?", (total_awarded, user_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+    return total_awarded
+
+
+def get_leaderboard(hotel_id: int, limit: int = 10) -> list:
+    """Get employee leaderboard for a hotel, ordered by points."""
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            SELECT id, email, role, total_points,
+                   (SELECT COUNT(*) FROM staff_reports WHERE user_id = u.id) as report_count,
+                   (SELECT MAX(created_at) FROM staff_reports WHERE user_id = u.id) as last_report
+            FROM users u
+            WHERE hotel_id = ?
+            ORDER BY total_points DESC
+            LIMIT ?
+        """, (hotel_id, limit))
+        rows = cursor.fetchall()
+        result = []
+        for i, r in enumerate(rows):
+            result.append({
+                "rank": i + 1,
+                "id": r[0],
+                "email": r[1],
+                "role": r[2],
+                "total_points": r[3] or 0,
+                "report_count": r[4] or 0,
+                "last_report": r[5]
+            })
+        return result
+    finally:
+        conn.close()
+
+
+def get_user_rank(hotel_id: int, user_id: int) -> dict:
+    """Get a specific user's rank and points."""
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            SELECT id, email, total_points,
+                   (SELECT COUNT(*) FROM staff_reports WHERE user_id = u.id) as report_count
+            FROM users u
+            WHERE id = ? AND hotel_id = ?
+        """, (user_id, hotel_id))
+        row = cursor.fetchone()
+        if not row:
+            return {"rank": 0, "points": 0, "report_count": 0}
+
+        # Get rank
+        cursor2 = conn.execute("""
+            SELECT COUNT(*) + 1 FROM users
+            WHERE hotel_id = ? AND (total_points > ? OR (total_points = ? AND id < ?))
+        """, (hotel_id, row[2], row[2], row[0]))
+        rank_row = cursor2.fetchone()
+        rank = rank_row[0] if rank_row else 1
+
+        return {
+            "id": row[0],
+            "email": row[1],
+            "total_points": row[2] or 0,
+            "report_count": row[3] or 0,
+            "rank": rank
+        }
+    finally:
+        conn.close()

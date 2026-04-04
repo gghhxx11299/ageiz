@@ -1942,9 +1942,13 @@
 
         async function loadStaffIntelligence() {
             try {
+                // Load reports
                 const resp = await fetch(`/api/staff/intelligence/{{ hotel.id }}`);
                 const data = await resp.json();
                 const container = document.getElementById('staff-intel-content');
+
+                // Load leaderboard
+                loadStaffLeaderboard();
 
                 if (!data.reports || data.reports.length === 0) {
                     container.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:40px;">No staff reports submitted yet.</p>';
@@ -1998,6 +2002,37 @@
                 document.getElementById('staff-intel-content').innerHTML = '<p style="text-align:center;color:var(--neg);">Failed to load staff intelligence.</p>';
             }
         }
+
+        async function loadStaffLeaderboard() {
+            try {
+                const resp = await fetch(`/api/leaderboard?hotel_id={{ hotel.id }}`);
+                const data = await resp.json();
+                const container = document.getElementById('staff-leaderboard-container');
+
+                if (!data.leaderboard || data.leaderboard.length === 0) {
+                    container.innerHTML = '<p style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:12px;">No staff contributions yet.</p>';
+                    return;
+                }
+
+                const top3 = data.leaderboard.slice(0, 3);
+                const medals = ['🥇', '🥈', '🥉'];
+                container.innerHTML = top3.map((emp, i) => {
+                    const colors = ['#FBBF24', '#C0C0C0', '#CD7F32'];
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:${i===0?'rgba(251,191,36,0.08)':'rgba(255,255,255,0.02)'};border:1px solid ${colors[i]};border-radius:10px;margin-bottom:8px;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <span style="font-size:1.4rem;">${medals[i]}</span>
+                            <div>
+                                <span style="font-size:0.85rem;font-weight:600;">${emp.email.split('@')[0]}</span>
+                                <span style="font-size:0.7rem;color:var(--text-dim);margin-left:6px;">${emp.role === 'manager' ? '📊 MGR' : '📝 STAFF'} · ${emp.report_count} reports</span>
+                            </div>
+                        </div>
+                        <span style="font-size:1rem;font-weight:700;color:${colors[i]};">${emp.total_points} pts</span>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Leaderboard load error:', e);
+            }
+        }
     </script>
 
     <!-- Staff Intelligence Modal -->
@@ -2005,7 +2040,14 @@
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto;position:relative;">
             <button onclick="closeStaffIntel()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1.2rem;">✕</button>
             <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;color:var(--primary);margin-bottom:20px;">👥 Staff Intelligence Feed</h2>
-            <div id="staff-intel-content"><p style="text-align:center;color:var(--text-dim);">Loading...</p></div>
+
+            <!-- Top 3 Leaderboard -->
+            <div id="staff-leaderboard-section" style="margin-bottom:24px;">
+                <h3 style="font-size:1rem;color:#FBBF24;margin-bottom:12px;">🏆 Top Contributors</h3>
+                <div id="staff-leaderboard-container"><p style="text-align:center;color:var(--text-dim);">Loading...</p></div>
+            </div>
+
+            <div id="staff-intel-content"><p style="text-align:center;color:var(--text-dim);">Loading reports...</p></div>
         </div>
     </div>
     <style>
