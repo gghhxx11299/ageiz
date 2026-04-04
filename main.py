@@ -687,8 +687,12 @@ async def submit_staff_report(
     raw_input = data.get("raw_input", "")
     structured = data.get("structured", {})
 
-    from database import create_staff_report
+    from database import create_staff_report, award_points
     import json
+
+    # Determine quality for points
+    has_ai = bool(structured.get("summary") and len(structured.get("summary", "")) > 20)
+    data_quality = "ai_structured" if has_ai else "good"
 
     report_id = create_staff_report(
         hotel_id=hotel_id,
@@ -710,7 +714,36 @@ async def submit_staff_report(
         ai_insights=structured.get("ai_insights")
     )
 
-    return JSONResponse({"success": True, "report_id": report_id})
+    # Award points
+    points = award_points(user_id, hotel_id, report_type, data_quality)
+
+    return JSONResponse({"success": True, "report_id": report_id, "points_earned": points})
+
+
+@app.get("/api/staff/leaderboard")
+def get_staff_leaderboard(session: dict = Depends(require_staff_session)):
+    """Get leaderboard for the staff member's hotel."""
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return JSONResponse({"leaderboard": [], "my_rank": {"rank": 0, "points": 0}})
+
+    from database import get_leaderboard, get_user_rank
+    leaderboard = get_leaderboard(hotel_id, limit=10)
+    my_rank = get_user_rank(hotel_id, session["user_id"])
+
+    return JSONResponse({"leaderboard": leaderboard, "my_rank": my_rank})
+
+
+@app.get("/api/leaderboard")
+def get_manager_leaderboard(hotel_id: int, session: dict = Depends(require_session)):
+    """Manager endpoint: get leaderboard for their hotel."""
+    session_hotel = session.get("hotel_id")
+    if session_hotel is not None and session_hotel != hotel_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    from database import get_leaderboard
+    leaderboard = get_leaderboard(hotel_id, limit=10)
+    return JSONResponse({"leaderboard": leaderboard})
 
 
 @app.get("/api/staff/reports")
@@ -740,6 +773,99 @@ def get_staff_intelligence_api(hotel_id: int, session: dict = Depends(require_se
         "reports": reports,
         "summary": summary
     })
+
+
+# ============================================================
+# EMBEDDABLE FORM / WIDGET
+# ============================================================
+
+@app.get("/embed/{token}")
+def embed_form(token: str):
+    """Render the embeddable form as a standalone page."""
+    from database import verify_embed_token
+    embed = verify_embed_token(token)
+    if not embed:
+        return JSONResponse({"error": "Invalid embed token"}, status_code=404)
+
+    return templates.TemplateResponse(None, "embed.html", {
+        "token": token,
+        "label": embed["label"],
+        "api_url": request.base_url
+    })
+
+@app.post("/api/embed/{token}")
+async def submit_embed_form(token: str, request: Request):
+    """Receive embedded form submission."""
+    from database import verify_embed_token, save_embedded_submission
+    embed = verify_embed_token(token)
+    if not embed:
+        return JSONResponse({"error": "Invalid embed token"}, status_code=404)
+
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+    submission_id = save_embedded_submission(
+        hotel_id=embed["hotel_id"],
+        token=token,
+        data=data
+    )
+    return JSONResponse({"success": True, "id": submission_id})
+
+@app.post("/api/embed/create-token")
+async def create_embed_token_api(request: Request, session: dict = Depends(require_session)):
+    """Manager creates a new embed token."""
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return JSONResponse({"error": "No hotel linked"}, status_code=400)
+
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+    label = data.get("label", "Website Feedback Widget")
+    form_fields = data.get("form_fields")
+
+    from database import create_embed_token
+    token = create_embed_token(hotel_id, label, form_fields)
+
+    return JSONResponse({"success": True, "token": token, "label": label})
+
+@app.get("/api/embed/tokens")
+def list_embed_tokens(session: dict = Depends(require_session)):
+    """List embed tokens for manager's hotel."""
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return JSONResponse({"tokens": []})
+
+    from database import get_embed_tokens
+    tokens = get_embed_tokens(hotel_id)
+    return JSONResponse({"tokens": tokens})
+
+@app.delete("/api/embed/token/{token_id}")
+def delete_embed_token_api(token_id: int, session: dict = Depends(require_session)):
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        raise HTTPException(status_code=400, detail="No hotel linked")
+
+    from database import delete_embed_token
+    ok = delete_embed_token(token_id, hotel_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Token not found")
+    return JSONResponse({"success": True})
+
+@app.get("/api/embed/submissions")
+def list_embed_submissions(session: dict = Depends(require_session)):
+    hotel_id = session.get("hotel_id")
+    if not hotel_id:
+        return JSONResponse({"submissions": [], "stats": {}})
+
+    from database import get_embedded_submissions, get_embedded_stats
+    submissions = get_embedded_submissions(hotel_id)
+    stats = get_embedded_stats(hotel_id)
+    return JSONResponse({"submissions": submissions, "stats": stats})
 
 
 # ============================================================

@@ -866,6 +866,36 @@
                         <div id="emp-list-container"><!-- Populated by JS --></div>
                     </div>
                 </div>
+
+                <!-- Embeddable Guest Feedback Form -->
+                <div class="hero-card" style="margin-top: 32px;">
+                    <span class="sector-name">🌐 Embeddable Guest Feedback Form</span>
+                    <p style="color: var(--text-dim); margin-bottom: 24px; font-size: 0.85rem;">
+                        Generate a link to embed a branded feedback form on your website or share directly with guests.
+                    </p>
+
+                    <div style="display:flex; gap:12px; margin-bottom:20px;">
+                        <input type="text" id="embed-label" placeholder="Widget label (e.g. 'Grand Hotel Feedback')" style="flex:2;min-width:200px;">
+                        <button onclick="createEmbedToken()" id="embed-create-btn" style="padding:12px 24px;background:var(--primary);border:none;color:#FFF;border-radius:12px;font-size:0.8rem;font-weight:700;cursor:pointer;">+ Generate Link</button>
+                    </div>
+                    <div id="embed-msg" style="font-size:0.85rem;margin-bottom:16px;"></div>
+
+                    <div id="embed-token-list" style="margin-top:16px;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Embedded Submissions Viewer -->
+                <div class="hero-card" style="margin-top: 32px;">
+                    <span class="sector-name">📊 Guest Feedback Submissions</span>
+                    <p style="color: var(--text-dim); margin-bottom: 20px; font-size: 0.85rem;">
+                        Ratings and feedback collected from embedded forms on your website.
+                    </p>
+                    <div id="embed-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;"></div>
+                    <div id="embed-submissions-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -1944,9 +1974,13 @@
 
         async function loadStaffIntelligence() {
             try {
+                // Load reports
                 const resp = await fetch(`/api/staff/intelligence/{{ hotel.id }}`);
                 const data = await resp.json();
                 const container = document.getElementById('staff-intel-content');
+
+                // Load leaderboard
+                loadStaffLeaderboard();
 
                 if (!data.reports || data.reports.length === 0) {
                     container.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:40px;">No staff reports submitted yet.</p>';
@@ -2000,6 +2034,37 @@
                 document.getElementById('staff-intel-content').innerHTML = '<p style="text-align:center;color:var(--neg);">Failed to load staff intelligence.</p>';
             }
         }
+
+        async function loadStaffLeaderboard() {
+            try {
+                const resp = await fetch(`/api/leaderboard?hotel_id={{ hotel.id }}`);
+                const data = await resp.json();
+                const container = document.getElementById('staff-leaderboard-container');
+
+                if (!data.leaderboard || data.leaderboard.length === 0) {
+                    container.innerHTML = '<p style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:12px;">No staff contributions yet.</p>';
+                    return;
+                }
+
+                const top3 = data.leaderboard.slice(0, 3);
+                const medals = ['🥇', '🥈', '🥉'];
+                container.innerHTML = top3.map((emp, i) => {
+                    const colors = ['#FBBF24', '#C0C0C0', '#CD7F32'];
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:${i===0?'rgba(251,191,36,0.08)':'rgba(255,255,255,0.02)'};border:1px solid ${colors[i]};border-radius:10px;margin-bottom:8px;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <span style="font-size:1.4rem;">${medals[i]}</span>
+                            <div>
+                                <span style="font-size:0.85rem;font-weight:600;">${emp.email.split('@')[0]}</span>
+                                <span style="font-size:0.7rem;color:var(--text-dim);margin-left:6px;">${emp.role === 'manager' ? '📊 MGR' : '📝 STAFF'} · ${emp.report_count} reports</span>
+                            </div>
+                        </div>
+                        <span style="font-size:1rem;font-weight:700;color:${colors[i]};">${emp.total_points} pts</span>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Leaderboard load error:', e);
+            }
+        }
     </script>
 
     <!-- Staff Intelligence Modal -->
@@ -2007,7 +2072,14 @@
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto;position:relative;">
             <button onclick="closeStaffIntel()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1.2rem;">✕</button>
             <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;color:var(--primary);margin-bottom:20px;">👥 Staff Intelligence Feed</h2>
-            <div id="staff-intel-content"><p style="text-align:center;color:var(--text-dim);">Loading...</p></div>
+
+            <!-- Top 3 Leaderboard -->
+            <div id="staff-leaderboard-section" style="margin-bottom:24px;">
+                <h3 style="font-size:1rem;color:#FBBF24;margin-bottom:12px;">🏆 Top Contributors</h3>
+                <div id="staff-leaderboard-container"><p style="text-align:center;color:var(--text-dim);">Loading...</p></div>
+            </div>
+
+            <div id="staff-intel-content"><p style="text-align:center;color:var(--text-dim);">Loading reports...</p></div>
         </div>
     </div>
     <style>
@@ -2110,7 +2182,128 @@
         // Load employees on page load
         document.addEventListener('DOMContentLoaded', () => {
             loadEmployees();
+            loadEmbedTokens();
+            loadEmbedSubmissions();
         });
+
+        // --- Embeddable Form Management ---
+        async function createEmbedToken() {
+            const label = document.getElementById('embed-label').value.trim() || 'Guest Feedback Widget';
+            const msgEl = document.getElementById('embed-msg');
+            msgEl.innerHTML = '<span style="color:var(--text-dim);">Generating...</span>';
+
+            try {
+                const resp = await fetch('/api/embed/create-token', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({label})
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    const formUrl = `${window.location.origin}/embed/${data.token}`;
+                    msgEl.innerHTML = `<span style="color:var(--pos);">✅ Link created! <a href="${formUrl}" target="_blank" style="color:var(--accent);text-decoration:underline;">Open Form</a></span>`;
+                    document.getElementById('embed-label').value = '';
+                    loadEmbedTokens();
+                } else {
+                    msgEl.innerHTML = `<span style="color:var(--neg);">❌ ${data.error}</span>`;
+                }
+            } catch (e) {
+                msgEl.innerHTML = `<span style="color:var(--neg);">❌ Network error.</span>`;
+            }
+        }
+
+        async function loadEmbedTokens() {
+            try {
+                const resp = await fetch('/api/embed/tokens');
+                const data = await resp.json();
+                const container = document.getElementById('embed-token-list');
+
+                if (!data.tokens || data.tokens.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:16px;">No embed links created yet.</p>';
+                    return;
+                }
+
+                container.innerHTML = data.tokens.map(t => {
+                    const formUrl = `${window.location.origin}/embed/${t.token}`;
+                    const iframeCode = `<iframe src="${formUrl}" width="100%" height="700" frameborder="0" style="border-radius:12px;"></iframe>`;
+                    return `<div style="padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div>
+                                <span style="font-size:0.85rem;font-weight:600;">${t.label}</span>
+                                <span style="font-size:0.7rem;color:var(--text-dim);margin-left:8px;">${t.created_at ? t.created_at.substring(0,10) : ''}</span>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <button onclick="navigator.clipboard.writeText('${formUrl}');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Link',1500)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Copy Link</button>
+                                <button onclick="navigator.clipboard.writeText(\`${iframeCode.replace(/`/g, '\\`')}\`);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy iframe',1500)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Copy iframe</button>
+                                <button onclick="deleteEmbedToken(${t.id})" style="background:none;border:1px solid rgba(239,68,68,0.3);color:var(--neg);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Delete</button>
+                            </div>
+                        </div>
+                        <div style="font-size:0.65rem;color:var(--text-dim);margin-top:6px;word-break:break-all;font-family:monospace;">${formUrl}</div>
+                    </div>`;
+                }).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function deleteEmbedToken(id) {
+            if (!confirm('Delete this embed link? Submissions will be preserved.')) return;
+            try {
+                const resp = await fetch(`/api/embed/token/${id}`, {method: 'DELETE'});
+                if ((await resp.json()).success) loadEmbedTokens();
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadEmbedSubmissions() {
+            try {
+                const resp = await fetch('/api/embed/submissions');
+                const data = await resp.json();
+
+                // Stats
+                const s = data.stats || {};
+                const statsEl = document.getElementById('embed-stats');
+                if (s.total > 0) {
+                    statsEl.innerHTML = `
+                        <div style="flex:1;min-width:100px;padding:14px;background:rgba(251,191,36,0.1);border-radius:12px;text-align:center;">
+                            <div style="font-size:1.3rem;font-weight:700;color:#FBBF24;">${s.avg_overall || '—'}</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">Avg Overall</div>
+                        </div>
+                        <div style="flex:1;min-width:100px;padding:14px;background:rgba(34,197,94,0.1);border-radius:12px;text-align:center;">
+                            <div style="font-size:1.3rem;font-weight:700;color:#22C55E;">${s.recommend_pct || '—'}%</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">Recommend</div>
+                        </div>
+                        <div style="flex:1;min-width:100px;padding:14px;background:rgba(99,102,241,0.1);border-radius:12px;text-align:center;">
+                            <div style="font-size:1.3rem;font-weight:700;color:var(--primary);">${s.total}</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">Submissions</div>
+                        </div>`;
+                } else {
+                    statsEl.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem;padding:8px;">No submissions yet.</p>';
+                }
+
+                // Submissions list
+                const listEl = document.getElementById('embed-submissions-list');
+                if (!data.submissions || data.submissions.length === 0) {
+                    listEl.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:16px;">No guest feedback collected via embed forms.</p>';
+                    return;
+                }
+
+                listEl.innerHTML = data.submissions.slice(0, 20).map(sub => {
+                    const stars = (v) => v ? '★'.repeat(v) + '☆'.repeat(5-v) : '—';
+                    return `<div style="padding:14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                            <span style="font-size:0.75rem;color:var(--text-dim);">${sub.created_at ? sub.created_at.substring(0,16).replace('T',' ') : ''} · ${sub.room_type || 'N/A'} · ${sub.guest_type || 'N/A'}</span>
+                            <span style="font-size:0.85rem;color:#FBBF24;">${stars(sub.overall_rating)}</span>
+                        </div>
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px;font-size:0.75rem;color:var(--text-dim);">
+                            <span>🧹 Clean: ${stars(sub.cleanliness_rating)}</span>
+                            <span>😊 Staff: ${stars(sub.staff_rating)}</span>
+                            <span>💰 Value: ${stars(sub.value_rating)}</span>
+                            <span>🍽️ Food: ${stars(sub.food_rating)}</span>
+                            <span>${sub.would_recommend ? '✅ Would recommend' : '❌ Would not recommend'}</span>
+                        </div>
+                        ${sub.feedback_text ? `<div style="font-size:0.8rem;color:var(--text);font-style:italic;margin-top:6px;">"${sub.feedback_text.substring(0,200)}"</div>` : ''}
+                    </div>`;
+                }).join('');
+            } catch (e) { console.error('Failed to load embed submissions:', e); }
+        }
     </script>
 </body>
 </html>

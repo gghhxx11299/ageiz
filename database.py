@@ -145,6 +145,38 @@ def init_db():
         """)
 
         conn.execute("""
+            CREATE TABLE IF NOT EXISTS embed_tokens (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                hotel_id INTEGER NOT NULL,
+                token TEXT UNIQUE NOT NULL,
+                label TEXT NOT NULL,
+                form_fields TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (hotel_id) REFERENCES hotel_profiles(id)
+            )
+        """)
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS embedded_submissions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                hotel_id INTEGER NOT NULL,
+                embed_token TEXT NOT NULL,
+                overall_rating INTEGER,
+                cleanliness_rating INTEGER,
+                staff_rating INTEGER,
+                value_rating INTEGER,
+                food_rating INTEGER,
+                feedback_text TEXT,
+                visit_date TEXT,
+                room_type TEXT,
+                guest_type TEXT,
+                would_recommend INTEGER,
+                source_url TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS custom_signal_sources (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 hotel_id INTEGER NOT NULL,
@@ -914,6 +946,211 @@ def get_staff_report_summary(hotel_id: int, report_type: str = None, days: int =
             "total_reports": sum(sentiment_breakdown.values()),
             "sentiment_breakdown": sentiment_breakdown,
             "latest_by_type": latest_by_type
+        }
+    finally:
+        conn.close()
+
+
+# --- Embedded Form / Widget ---
+
+def create_embed_token(hotel_id: int, label: str, form_fields: str = None) -> str:
+    import secrets
+    token = secrets.token_urlsafe(16)
+    conn = get_connection()
+    try:
+        conn.execute("""
+            INSERT INTO embed_tokens (hotel_id, token, label, form_fields)
+            VALUES (?, ?, ?, ?)
+        """, (hotel_id, token, label, form_fields))
+        conn.commit()
+        return token
+    finally:
+        conn.close()
+
+def get_embed_tokens(hotel_id: int) -> list:
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            SELECT id, token, label, form_fields, created_at
+            FROM embed_tokens WHERE hotel_id = ? ORDER BY created_at DESC
+        """, (hotel_id,))
+        return [{"id": r[0], "token": r[1], "label": r[2], "form_fields": r[3], "created_at": r[4]} for r in cursor.fetchall()]
+    finally:
+        conn.close()
+
+def delete_embed_token(token_id: int, hotel_id: int) -> bool:
+    conn = get_connection()
+    try:
+        cursor = conn.execute("DELETE FROM embed_tokens WHERE id = ? AND hotel_id = ?", (token_id, hotel_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+def verify_embed_token(token: str) -> dict | None:
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            SELECT id, hotel_id, token, label, form_fields
+            FROM embed_tokens WHERE token = ?
+        """, (token,))
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return {"id": row[0], "hotel_id": row[1], "token": row[2], "label": row[3], "form_fields": row[4]}
+    finally:
+        conn.close()
+
+def save_embedded_submission(hotel_id: int, token: str, data: dict) -> int:
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            INSERT INTO embedded_submissions (
+                hotel_id, embed_token, overall_rating, cleanliness_rating,
+                staff_rating, value_rating, food_rating, feedback_text,
+                visit_date, room_type, guest_type, would_recommend, source_url
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            hotel_id, token,
+            data.get("overall_rating"),
+            data.get("cleanliness_rating"),
+            data.get("staff_rating"),
+            data.get("value_rating"),
+            data.get("food_rating"),
+            data.get("feedback_text", ""),
+            data.get("visit_date"),
+            data.get("room_type", ""),
+            data.get("guest_type", ""),
+            data.get("would_recommend"),
+            data.get("source_url", "")
+        ))
+        conn.commit()
+        return cursor.lastrowid
+    finally:
+        conn.close()
+
+def get_embedded_submissions(hotel_id: int, limit: int = 100) -> list:
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            SELECT * FROM embedded_submissions
+            WHERE hotel_id = ? ORDER BY created_at DESC LIMIT ?
+        """, (hotel_id, limit))
+        cols = [d[0] for d in cursor.description]
+        return [dict(zip(cols, r)) for r in cursor.fetchall()]
+    finally:
+        conn.close()
+
+def get_embedded_stats(hotel_id: int) -> dict:
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            SELECT
+                COUNT(*) as total,
+                AVG(overall_rating) as avg_overall,
+                AVG(cleanliness_rating) as avg_cleanliness,
+                AVG(staff_rating) as avg_staff,
+                AVG(value_rating) as avg_value,
+                AVG(food_rating) as avg_food,
+                CAST(SUM(CASE WHEN would_recommend = 1 THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) * 100 as recommend_pct
+            FROM embedded_submissions WHERE hotel_id = ?
+        """, (hotel_id,))
+        row = cursor.fetchone()
+        if not row or row[0] == 0:
+            return {"total": 0}
+        return {
+            "total": row[0],
+            "avg_overall": round(row[1] or 0, 1),
+            "avg_cleanliness": round(row[2] or 0, 1),
+            "avg_staff": round(row[3] or 0, 1),
+            "avg_value": round(row[4] or 0, 1),
+            "avg_food": round(row[5] or 0, 1),
+            "recommend_pct": round(row[6] or 0, 1)
+        }
+    finally:
+        conn.close()
+
+
+# --- Gamification / Leaderboard ---
+
+def award_points(user_id: int, hotel_id: int, report_type: str, data_quality: str = "good") -> int:
+    """Award points to a user based on report submission. Returns points awarded."""
+    # Base points by report type
+    base = {"daily": 10, "weekly": 25, "monthly": 50}.get(report_type, 10)
+
+    # Quality bonus
+    bonus = {"good": 5, "excellent": 15, "ai_structured": 10}.get(data_quality, 0)
+
+    total_awarded = base + bonus
+
+    conn = get_connection()
+    try:
+        conn.execute("UPDATE users SET total_points = total_points + ? WHERE id = ?", (total_awarded, user_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+    return total_awarded
+
+
+def get_leaderboard(hotel_id: int, limit: int = 10) -> list:
+    """Get employee leaderboard for a hotel, ordered by points."""
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            SELECT id, email, role, total_points,
+                   (SELECT COUNT(*) FROM staff_reports WHERE user_id = u.id) as report_count,
+                   (SELECT MAX(created_at) FROM staff_reports WHERE user_id = u.id) as last_report
+            FROM users u
+            WHERE hotel_id = ?
+            ORDER BY total_points DESC
+            LIMIT ?
+        """, (hotel_id, limit))
+        rows = cursor.fetchall()
+        result = []
+        for i, r in enumerate(rows):
+            result.append({
+                "rank": i + 1,
+                "id": r[0],
+                "email": r[1],
+                "role": r[2],
+                "total_points": r[3] or 0,
+                "report_count": r[4] or 0,
+                "last_report": r[5]
+            })
+        return result
+    finally:
+        conn.close()
+
+
+def get_user_rank(hotel_id: int, user_id: int) -> dict:
+    """Get a specific user's rank and points."""
+    conn = get_connection()
+    try:
+        cursor = conn.execute("""
+            SELECT id, email, total_points,
+                   (SELECT COUNT(*) FROM staff_reports WHERE user_id = u.id) as report_count
+            FROM users u
+            WHERE id = ? AND hotel_id = ?
+        """, (user_id, hotel_id))
+        row = cursor.fetchone()
+        if not row:
+            return {"rank": 0, "points": 0, "report_count": 0}
+
+        # Get rank
+        cursor2 = conn.execute("""
+            SELECT COUNT(*) + 1 FROM users
+            WHERE hotel_id = ? AND (total_points > ? OR (total_points = ? AND id < ?))
+        """, (hotel_id, row[2], row[2], row[0]))
+        rank_row = cursor2.fetchone()
+        rank = rank_row[0] if rank_row else 1
+
+        return {
+            "id": row[0],
+            "email": row[1],
+            "total_points": row[2] or 0,
+            "report_count": row[3] or 0,
+            "rank": rank
         }
     finally:
         conn.close()

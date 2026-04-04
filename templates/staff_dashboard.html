@@ -100,6 +100,22 @@
             <p>Submit daily, weekly, and monthly observations. AI will structure your reports for management review.</p>
         </div>
 
+        <!-- Points / Rank Bar -->
+        <div style="display:flex; gap:16px; margin-bottom:24px; flex-wrap:wrap;">
+            <div style="flex:1;min-width:140px;background:linear-gradient(135deg, rgba(251,191,36,0.1), rgba(251,191,36,0.02));border:1px solid rgba(251,191,36,0.3);border-radius:14px;padding:16px;text-align:center;">
+                <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;font-weight:700;">Your Points</div>
+                <div style="font-size:2rem;font-weight:700;color:#FBBF24;" id="my-points">—</div>
+            </div>
+            <div style="flex:1;min-width:140px;background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.02));border:1px solid rgba(16,185,129,0.3);border-radius:14px;padding:16px;text-align:center;">
+                <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;font-weight:700;">Your Rank</div>
+                <div style="font-size:2rem;font-weight:700;color:#10B981;" id="my-rank">—</div>
+            </div>
+            <div style="flex:1;min-width:140px;background:linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.02));border:1px solid rgba(99,102,241,0.3);border-radius:14px;padding:16px;text-align:center;">
+                <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;font-weight:700;">Reports Filed</div>
+                <div style="font-size:2rem;font-weight:700;color:var(--primary);" id="my-reports">—</div>
+            </div>
+        </div>
+
         <!-- Report Type Tabs -->
         <div class="tabs">
             <div class="tab-btn active" data-type="daily" onclick="switchTab('daily')">📅 Daily</div>
@@ -183,6 +199,14 @@
                 {% else %}
                     <div class="empty-state">No reports submitted yet. Start with your first observation above.</div>
                 {% endif %}
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="glass-card">
+            <h3>🏆 Staff Leaderboard</h3>
+            <div id="leaderboard-container">
+                <p style="text-align:center;color:var(--text-dim);font-size:0.85rem;">Loading...</p>
             </div>
         </div>
 
@@ -281,8 +305,12 @@
                 });
                 const data = await resp.json();
                 if (data.success) {
-                    btn.innerHTML = '✅ Report Submitted!';
-                    setTimeout(() => location.reload(), 1500);
+                    const pts = data.points_earned || 0;
+                    btn.innerHTML = `✅ Report Submitted! +${pts} pts`;
+                    // Refresh leaderboard
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
                 } else {
                     btn.innerHTML = '❌ Error — try again';
                     btn.disabled = false;
@@ -291,6 +319,54 @@
                 btn.innerHTML = '❌ Network error';
                 btn.disabled = false;
             }
+        });
+        // Load leaderboard on page load
+        async function loadLeaderboard() {
+            try {
+                const resp = await fetch('/api/staff/leaderboard');
+                const data = await resp.json();
+
+                // Update my stats
+                const my = data.my_rank || {};
+                const ptsEl = document.getElementById('my-points');
+                const rankEl = document.getElementById('my-rank');
+                const repEl = document.getElementById('my-reports');
+                if (ptsEl) ptsEl.textContent = my.total_points || 0;
+                if (rankEl) rankEl.textContent = my.rank ? `#${my.rank}` : '—';
+                if (repEl) repEl.textContent = my.report_count || 0;
+
+                // Render leaderboard
+                const container = document.getElementById('leaderboard-container');
+                if (!data.leaderboard || data.leaderboard.length === 0) {
+                    container.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:20px;">No data yet. Submit reports to climb the leaderboard!</p>';
+                    return;
+                }
+
+                const medals = ['🥇', '🥈', '🥉'];
+                container.innerHTML = data.leaderboard.map(emp => {
+                    const medal = emp.rank <= 3 ? medals[emp.rank - 1] : `#${emp.rank}`;
+                    const isMe = emp.email === '{{ session.get("email", "") }}';
+                    const bg = emp.rank === 1 ? 'rgba(251,191,36,0.08)' : emp.rank === 2 ? 'rgba(192,192,192,0.08)' : emp.rank === 3 ? 'rgba(205,127,50,0.08)' : 'rgba(255,255,255,0.02)';
+                    const border = emp.rank <= 3 ? `rgba(251,191,36,0.3)` : 'var(--border)';
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:${bg};border:1px solid ${border};border-radius:10px;margin-bottom:8px;${isMe ? 'outline:2px solid var(--primary);outline-offset:2px;' : ''}">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <span style="font-size:1.2rem;">${medal}</span>
+                            <div>
+                                <span style="font-size:0.85rem;font-weight:600;">${emp.email.split('@')[0]}</span>
+                                <span style="font-size:0.7rem;color:var(--text-dim);margin-left:6px;">${emp.report_count} reports</span>
+                            </div>
+                        </div>
+                        <span style="font-size:0.9rem;font-weight:700;color:#FBBF24;">${emp.total_points} pts</span>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Leaderboard load error:', e);
+            }
+        }
+
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLeaderboard();
         });
     </script>
 </body>
