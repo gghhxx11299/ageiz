@@ -529,9 +529,12 @@ def require_staff_session(request: Request) -> dict:
 
 @app.get("/staff", response_class=HTMLResponse)
 def staff_dashboard(request: Request, session: dict = Depends(require_staff_session)):
-    from database import get_staff_reports, get_hotel_profile, get_staff_report_summary
+    from database import get_staff_reports, get_hotel_profile, get_staff_report_summary, get_user_by_email
 
-    hotel_id = session.get("hotel_id")
+    # Look up hotel_id from DB (handles stale sessions)
+    user = get_user_by_email(session.get("email", ""))
+    hotel_id = user.get("hotel_id") if user else session.get("hotel_id")
+
     if not hotel_id:
         return templates.TemplateResponse(request, "staff_dashboard.html", {
             "session": session,
