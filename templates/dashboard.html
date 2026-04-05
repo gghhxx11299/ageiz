@@ -977,7 +977,7 @@
                     </p>
 
                     <div style="display:flex; gap:12px; margin-bottom:20px;">
-                        <input type="text" id="embed-label" placeholder="{{ translations.embed_label_placeholder if translations else 'Widget label (e.g. \'Grand Hotel Feedback\')' }}" style="flex:2;min-width:200px;">
+                        <input type="text" id="embed-label" placeholder="{{ translations.embed_label_placeholder if translations else 'Widget label (e.g. \"Grand Hotel Feedback\")' }}" style="flex:2;min-width:200px;">
                         <button onclick="createEmbedToken()" id="embed-create-btn" style="padding:12px 24px;background:var(--primary);border:none;color:#FFF;border-radius:12px;font-size:0.8rem;font-weight:700;cursor:pointer;">{{ translations.generate_link if translations else '+ Generate Link' }}</button>
                     </div>
                     <div id="embed-msg" style="font-size:0.85rem;margin-bottom:16px;"></div>
@@ -1198,7 +1198,7 @@
             embedFeedbackTitle: "{{ translations.embed_feedback_title if translations else 'Embeddable Guest Feedback Form' }}",
             embedFeedbackDesc: "{{ translations.embed_feedback_desc if translations else 'Generate a link to embed a branded feedback form on your website or share directly with guests.' }}",
             generateLink: "{{ translations.generate_link if translations else '+ Generate Link' }}",
-            embedLabelPlaceholder: "{{ translations.embed_label_placeholder if translations else 'Widget label (e.g. \\'Grand Hotel Feedback\\')' }}",
+            embedLabelPlaceholder: "{{ translations.embed_label_placeholder if translations else 'Widget label (e.g. \"Grand Hotel Feedback\")' }}",
             guestFeedbackSubmissions: "{{ translations.guest_feedback_submissions if translations else 'Guest Feedback Submissions' }}",
             guestFeedbackDesc: "{{ translations.guest_feedback_desc if translations else 'Ratings and feedback collected from embedded forms on your website.' }}",
             addCustomSourceModal: "{{ translations.add_custom_source_modal if translations else 'Add Custom Intelligence Source' }}",

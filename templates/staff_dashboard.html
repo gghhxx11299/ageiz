@@ -159,7 +159,7 @@
 
                 <!-- Free text observation -->
                 <div class="form-group">
-                    <label>{{ translations.get('free_text_observation', 'What did you observe today? Be specific.') }}</label>
+                    <label>{{ translations.free_text_observation if translations else 'What did you observe today? Be specific.' }}</label>
                     <textarea id="raw-input" rows="4" placeholder="e.g., Today there was little seafood supply but high demand. Several guests complained about slow WiFi. The conference room was fully booked. I noticed about 120 guests today, occupancy seems around 75%. Customer satisfaction was about 4/5."></textarea>
                 </div>
 
@@ -167,44 +167,44 @@
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; margin-bottom:24px;">
                     <!-- Customer Satisfaction -->
                     <div class="form-group">
-                        <label>{{ translations.get('customer_satisfaction', 'Customer Satisfaction (1-10)') }}</label>
+                        <label>{{ translations.customer_satisfaction if translations else 'Customer Satisfaction (1-10)' }}</label>
                         <input type="number" id="customer-satisfaction" min="1" max="10" value="7">
-                        <textarea id="reason-satisfaction" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                        <textarea id="reason-satisfaction" rows="2" placeholder="{{ translations.why_this_rating if translations else 'Why this rating?' }}" style="margin-top:8px;min-height:60px;"></textarea>
                     </div>
 
                     <!-- Occupancy Level -->
                     <div class="form-group">
-                        <label>{{ translations.get('occupancy_level', 'Estimated Occupancy Level (1-10)') }}</label>
+                        <label>{{ translations.occupancy_level if translations else 'Estimated Occupancy Level (1-10)' }}</label>
                         <input type="number" id="occupancy-pct" min="1" max="10" value="5">
-                        <textarea id="reason-occupancy" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                        <textarea id="reason-occupancy" rows="2" placeholder="{{ translations.why_this_rating if translations else 'Why this rating?' }}" style="margin-top:8px;min-height:60px;"></textarea>
                     </div>
 
                     <!-- Food & Beverage -->
                     <div class="form-group">
-                        <label>{{ translations.get('food_quality', 'Food & Beverage Quality (1-10)') }}</label>
+                        <label>{{ translations.food_quality if translations else 'Food & Beverage Quality (1-10)' }}</label>
                         <input type="number" id="food-quality" min="1" max="10" value="8">
-                        <textarea id="reason-food" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                        <textarea id="reason-food" rows="2" placeholder="{{ translations.why_this_rating if translations else 'Why this rating?' }}" style="margin-top:8px;min-height:60px;"></textarea>
                     </div>
 
                     <!-- Staff Morale -->
                     <div class="form-group">
-                        <label>{{ translations.get('staff_morale', 'Staff Morale (1-10)') }}</label>
+                        <label>{{ translations.staff_morale if translations else 'Staff Morale (1-10)' }}</label>
                         <input type="number" id="staff-morale" min="1" max="10" value="8">
-                        <textarea id="reason-morale" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                        <textarea id="reason-morale" rows="2" placeholder="{{ translations.why_this_rating if translations else 'Why this rating?' }}" style="margin-top:8px;min-height:60px;"></textarea>
                     </div>
 
                     <!-- Maintenance -->
                     <div class="form-group">
-                        <label>{{ translations.get('maintenance_status', 'Maintenance & Cleanliness (1-10)') }}</label>
+                        <label>{{ translations.maintenance_status if translations else 'Maintenance & Cleanliness (1-10)' }}</label>
                         <input type="number" id="maintenance-status" min="1" max="10" value="8">
-                        <textarea id="reason-maintenance" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                        <textarea id="reason-maintenance" rows="2" placeholder="{{ translations.why_this_rating if translations else 'Why this rating?' }}" style="margin-top:8px;min-height:60px;"></textarea>
                     </div>
 
                     <!-- Guest Count -->
                     <div class="form-group">
-                        <label>{{ translations.get('guest_count', 'Estimated Guest Count') }}</label>
+                        <label>{{ translations.guest_count if translations else 'Estimated Guest Count' }}</label>
                         <input type="number" id="guest-count" min="0" max="1000" value="50">
-                        <textarea id="reason-guest-count" rows="2" placeholder="{{ translations.get('guest_notes', 'Notes on guest demographics/behavior?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                        <textarea id="reason-guest-count" rows="2" placeholder="{{ translations.guest_notes if translations else 'Notes on guest demographics/behavior?' }}" style="margin-top:8px;min-height:60px;"></textarea>
                     </div>
                 </div>
 
@@ -217,14 +217,14 @@
                 </div>
 
                 <button type="submit" class="submit-btn" id="submit-btn">
-                    {{ translations.get('submit', 'Submit Report') }}
+                    {{ translations.submit if translations else 'Submit Report' }}
                 </button>
             </form>
         </div>
 
         <!-- Report History -->
         <div class="glass-card">
-            <h3>📋 {{ translations.get('recent_reports', 'Recent Reports') }}</h3>
+            <h3>📋 {{ translations.recent_reports if translations else 'Recent Reports' }}</h3>
             <div id="report-history">
                 {% if reports %}
                     {% for report in reports %}
@@ -245,14 +245,14 @@
                     </div>
                     {% endfor %}
                 {% else %}
-                    <div class="empty-state">{{ translations.get('no_reports_yet', 'No reports submitted yet. Start with your first observation above.') }}</div>
+                    <div class="empty-state">{{ translations.no_reports_yet if translations else 'No reports submitted yet. Start with your first observation above.' }}</div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Leaderboard -->
         <div class="glass-card">
-            <h3>🏆 {{ translations.get('staff_leaderboard', 'Staff Leaderboard') }}</h3>
+            <h3>🏆 {{ translations.staff_leaderboard if translations else 'Staff Leaderboard' }}</h3>
             <div id="leaderboard-container">
                 <p style="text-align:center;color:var(--text-dim);font-size:0.85rem;">Loading...</p>
             </div>
