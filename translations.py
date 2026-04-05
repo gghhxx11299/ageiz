@@ -633,6 +633,217 @@ TRANSLATIONS = {
             "tigrinya": "ርግጸኛነት",
             "chinese": "置信度"
         },
+        # Onboarding Page
+        "onboarding_subtitle": {
+            "english": "Property Intelligence Onboarding",
+            "amharic": "የንብረት ዘላቂ ማሰማራት",
+            "oromoo": "Qorannoo Qabeenyaa",
+            "tigrinya": "ናይ ብሕቲ ምምሕያሽ",
+            "chinese": "物业情报入驻"
+        },
+        "back_to_home": {
+            "english": "Back to Home",
+            "amharic": "ወደ መነሻ ተመለስ",
+            "oromoo": "Gara Man'aatti Deebi'i",
+            "tigrinya": "ናብ መበገሲ ተመለስ",
+            "chinese": "返回首页"
+        },
+        "neural_property_scan": {
+            "english": "Neural Property Scan",
+            "amharic": "የነርቭ ንብረት ስካን",
+            "oromoo": "Sakatta'insa Qabeenyaa Narvii",
+            "tigrinya": "ናይ ነርቭ ብሕቲ ስካን",
+            "chinese": "神经物业扫描"
+        },
+        "scan_desc": {
+            "english": "Provide your property's public URL. Our intelligence engine will parse your brand positioning, inventory categories, and market tier to calibrate your custom dashboard.",
+            "amharic": "የንብረትዎን የህዝብ URL ያቅርቡ። የእኛ የማስተዋል ሞተር የብራንድ ቦታዎን ይተነትናል።",
+            "oromoo": "URL hawaasaa qabeenyaa keessanii kennaa. Engine keenya beekumsaa sadarkaa gabaa keessan xiinxala.",
+            "tigrinya": "ናይ ብሕቲ ህዝባዊ URL ኣቅርቡ። ኢንጂን ምስትውዓልና ብራንድ ኣቀማምጣ የተንትን።",
+            "chinese": "提供您物业的公共URL。我们的智能引擎将解析品牌定位、库存类别和市场等级，以校准您的定制仪表板。"
+        },
+        "website_url_placeholder": {
+            "english": "https://www.your-resort.com",
+            "amharic": "https://www.your-resort.com",
+            "oromoo": "https://www.your-resort.com",
+            "tigrinya": "https://www.your-resort.com",
+            "chinese": "https://www.your-resort.com"
+        },
+        "initialize_scan": {
+            "english": "Initialize Scan",
+            "amharic": "ስካን ጀምር",
+            "oromoo": "Sakatta'insa Jalqabi",
+            "tigrinya": "ስካን ጀምር",
+            "chinese": "初始化扫描"
+        },
+        "scanning_text": {
+            "english": "Scanning market presence... establishing yield parameters...",
+            "amharic": "የገበያ መኖርን ማጣራት... የውጤት መለኪያዎችን ማዋቀር...",
+            "oromoo": "Argama gabaa sakatta'aa... jallannaa bu'aa hundeeffamaa...",
+            "tigrinya": "ናይ ገበያ ምህላው ምርግጋጽ... መለክዒ ውጽኢት ምድላው...",
+            "chinese": "扫描市场存在... 建立收益参数..."
+        },
+        "calibration_audit": {
+            "english": "Calibration Audit",
+            "amharic": "የማስተካከያ ኦዲት",
+            "oromoo": "Gilgaala Haaromsiisaa",
+            "tigrinya": "ናይ ምትዕርራይ ኦዲት",
+            "chinese": "校准审计"
+        },
+        "calibration_desc": {
+            "english": "Verify the extracted intelligence profile. These parameters define how the strategy AI interprets global market signals for your specific property.",
+            "amharic": "የተወሰደውን የማስተዋል መገለጫ ያረጋግጡ።",
+            "oromoo": "Profaayilii beekumsaa ba'e mirkaneessi.",
+            "tigrinya": "ዝተወስደ መግለጺ ምስትውዓል ኣረጋግጽ።",
+            "chinese": "验证提取的情报档案。这些参数定义了战略AI如何为您的特定物业解读全球市场信号。"
+        },
+        "official_property_identity": {
+            "english": "Official Property Identity *",
+            "amharic": "ይፋዊ የንብረት መታወቂያ *",
+            "oromoo": "Eenyummaa Qabeenyaa Moo'aa *",
+            "tigrinya": "ናይ ብሕቲ መፍለጺ *",
+            "chinese": "官方物业名称 *"
+        },
+        "validated_url": {
+            "english": "Validated Digital Asset URL",
+            "amharic": "የተረጋገጠ ዲጂታል ንብረት URL",
+            "oromoo": "URL Qabeenyaa Dijitaaloo Mirkanaa'e",
+            "tigrinya": "ዝተረጋገጸ URL ዲጂታል ብሕቲ",
+            "chinese": "已验证的数字资产URL"
+        },
+        "operational_locations": {
+            "english": "Operational Locations * (comma separated)",
+            "amharic": "የሥራ ቦታዎች * (በኮማ የተነጣጠሉ)",
+            "oromoo": "Bakkeewwan Hojii * (koomaan adda ba'e)",
+            "tigrinya": "ናይ ስራሕ ቦታታት * (ብኮማ ዝተፈላለየ)",
+            "chinese": "运营地点 *（逗号分隔）"
+        },
+        "locations_placeholder": {
+            "english": "e.g. Bishoftu, Entoto",
+            "amharic": "ለምሳሌ ቢሾፍቱ, እንጦጦ",
+            "oromoo": "fak. Bishooftuu, Entotoo",
+            "tigrinya": "ንኣብ. ቢሾፍቱ, እንጦጦ",
+            "chinese": "例如 比绍夫图, 恩托托"
+        },
+        "inventory_classes": {
+            "english": "Inventory Classes",
+            "amharic": "የክምችት ክፍሎች",
+            "oromoo": "Saawwan Kuusaa",
+            "tigrinya": "ክፍልታት ኢንቨንቶሪ",
+            "chinese": "库存类别"
+        },
+        "room_types_placeholder": {
+            "english": "Standard, Suite, Villa",
+            "amharic": "ስታንዳርድ, ስዊት, ቪላ",
+            "oromoo": "Standar, Suwiit, Viilaa",
+            "tigrinya": "ስታንዳርድ, ስዊት, ቪላ",
+            "chinese": "标准房, 套房, 别墅"
+        },
+        "market_tier": {
+            "english": "Market Tier *",
+            "amharic": "የገበያ ደረጃ *",
+            "oromoo": "Sadarkaa Gabaa *",
+            "tigrinya": "ደረጃ ገበያ *",
+            "chinese": "市场等级 *"
+        },
+        "select_tier": {
+            "english": "Select Tier",
+            "amharic": "ደረጃ ይምረጡ",
+            "oromoo": "Sadarkaa Filadhu",
+            "tigrinya": "ደረጃ ምረጽ",
+            "chinese": "选择等级"
+        },
+        "tier_value": {
+            "english": "Value",
+            "amharic": "ዋጋ",
+            "oromoo": "Gatii",
+            "tigrinya": "ዋጋ",
+            "chinese": "经济型"
+        },
+        "tier_mid_market": {
+            "english": "Mid-Market",
+            "amharic": "መካከለኛ ገበያ",
+            "oromoo": "Gabaa Giddu Galeessaa",
+            "tigrinya": "ገበያ ማእከላይ",
+            "chinese": "中端市场"
+        },
+        "tier_premium": {
+            "english": "Premium Boutique",
+            "amharic": "ፕሪሚየም ቡቲክ",
+            "oromoo": "Buutiik Premiyamii",
+            "tigrinya": "ፕሪሚየም ቡቲክ",
+            "chinese": "高端精品"
+        },
+        "tier_luxury": {
+            "english": "Luxury Elite",
+            "amharic": "ቅኑጥ ዘመናዊ",
+            "oromoo": "Luksarii Elitii",
+            "tigrinya": "ሉክሪ ኤሊት",
+            "chinese": "豪华顶级"
+        },
+        "core_amenities": {
+            "english": "Core Amenities & Facilities (comma separated)",
+            "amharic": "ዋና ዋና ምቾቶች እና ተቋማት (በኮማ የተነጣጠሉ)",
+            "oromoo": "Meeshalee fi Dhaabbilee Bu'uuraa (koomaan adda ba'e)",
+            "tigrinya": "ናይ ምቾት መሳርሒታትን ተቋማትን (ብኮማ ዝተፈላለየ)",
+            "chinese": "核心设施与设备（逗号分隔）"
+        },
+        "amenities_placeholder": {
+            "english": "e.g. Infinity Pool, Indoor Spa, Horse Riding, Conference Center, Wine Cellar",
+            "amharic": "ለምሳሌ ኢንፊኒቲ ፑል, ኢንዶር ስፓ, ፈረስ ጉት, ጉባኤ ማዕከል",
+            "oromoo": "fak. Bu'ee Infiiniti, Spaa Keessaa, Fardaa, Wiirtuu Walga'ii",
+            "tigrinya": "ንኣብ. ኢንፊኒቲ ፑል, ውሽጣዊ ስፓ, ፈረስ, ማእከል ዋዕላ",
+            "chinese": "例如 无边泳池, 室内水疗, 骑马, 会议中心, 酒窖"
+        },
+        "brand_value_proposition": {
+            "english": "Brand Value Proposition",
+            "amharic": "የብራንድ ዋጋ ሀሳብ",
+            "oromoo": "Yaada Gatii Brandii",
+            "tigrinya": "ናይ ብራንድ ዋጋ ሓሳብ",
+            "chinese": "品牌价值主张"
+        },
+        "brand_positioning_placeholder": {
+            "english": "How does your property position itself in the market?",
+            "amharic": "ንብረትዎ ራሱን በገበያ ውስጥ እንዴት ያስቀምጣል?",
+            "oromoo": "Qabeenyi keessan gabaa keessatti akkamitti of kenna?",
+            "tigrinya": "ብሕትኻ ኣብ ገበያ ንባዕሉ ከመይ የቀምጦ?",
+            "chinese": "您的物业在市场中如何定位？"
+        },
+        "yield_objectives": {
+            "english": "Yield Objectives",
+            "amharic": "የውጤት ግቦች",
+            "oromoo": "Kaayyoo Bu'aa",
+            "tigrinya": "ናይ ውጽኢት ዕላማታት",
+            "chinese": "收益目标"
+        },
+        "business_objectives_placeholder": {
+            "english": "What are your primary revenue goals?",
+            "amharic": "ዋና የገቢ ግቦችዎ ምንድን ናቸው?",
+            "oromoo": "Kaayyoo galii keessan maalii?",
+            "tigrinya": "ቀንዲ ዕላማታት ኣታዊኹም እንታይ እዩ?",
+            "chinese": "您的主要收入目标是什么？"
+        },
+        "establish_dashboard": {
+            "english": "Establish Dashboard",
+            "amharic": "ዳሽቦርድ ይመስርቱ",
+            "oromoo": "Daashboordii Hundeeffadhu",
+            "tigrinya": "ዳሽቦርድ ምስራት",
+            "chinese": "建立仪表板"
+        },
+        "scan_successful": {
+            "english": "Scan Successful. Parameters calibrated.",
+            "amharic": "ስካን ከንቱ። መለኪያዎች ተስተካክለዋል።",
+            "oromoo": "Sakatta'insi Milkaa'e. Jallannaan haarome.",
+            "tigrinya": "ስካን ዓወት። መለክዒታት ተተዓራርዮም።",
+            "chinese": "扫描成功。参数已校准。"
+        },
+        "scan_failed": {
+            "english": "Scan Failed. Manual override required.",
+            "amharic": "ስካን ወድቋል። እጅ ማስተካከያ ያስፈልጋል።",
+            "oromoo": "Sakatta'insi Kufa. To'annoo harka barbaachisa.",
+            "tigrinya": "ስካን ፈሺሉ። ብኢድ ምትዕርራይ የድሊ።",
+            "chinese": "扫描失败。需要手动覆盖。"
+        },
         # Staff Portal
         "staff_portal": {
             "english": "Staff Intelligence Portal",

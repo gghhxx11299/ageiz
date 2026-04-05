@@ -396,10 +396,10 @@
         <header>
             <a href="/" class="back-link" title="Back to Home">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                Back to Home
+                {{ translations.back_to_home if translations else 'Back to Home' }}
             </a>
             <h1 class="logo">Agéiz</h1>
-            <p class="subtitle">Property Intelligence Onboarding</p>
+            <p class="subtitle">{{ translations.onboarding_subtitle if translations else 'Property Intelligence Onboarding' }}</p>
         </header>
 
         <div class="lang-selector-wrapper">
@@ -413,12 +413,11 @@
         </div>
 
         <script>
-            // Set current language from cookie/session on page load
+            // Set current language from server on page load
             (function() {
-                // Try to get current language from cookie or default to english
-                var currentLang = document.cookie.match(/(?:^|;\s*)lang=([^;]*)/);
+                var currentLang = "{{ user_language }}";
                 if (currentLang) {
-                    document.getElementById('language-selector').value = currentLang[1];
+                    document.getElementById('language-selector').value = currentLang;
                 }
             })();
         </script>
@@ -428,18 +427,18 @@
             <div class="glass-card">
                 <div class="step-header">
                     <div class="step-num">1</div>
-                    <h2 class="step-title">Neural Property Scan</h2>
+                    <h2 class="step-title">{{ translations.neural_property_scan if translations else 'Neural Property Scan' }}</h2>
                 </div>
-                <p class="desc">Provide your property's public URL. Our intelligence engine will parse your brand positioning, inventory categories, and market tier to calibrate your custom dashboard.</p>
+                <p class="desc">{{ translations.scan_desc if translations else "Provide your property's public URL. Our intelligence engine will parse your brand positioning, inventory categories, and market tier to calibrate your custom dashboard." }}</p>
 
                 <div class="url-group">
-                    <input type="url" id="website-url" class="url-input" placeholder="https://www.your-resort.com" required>
-                    <button type="button" class="scan-btn" id="analyze-btn">Initialize Scan</button>
+                    <input type="url" id="website-url" class="url-input" placeholder="{{ translations.website_url_placeholder if translations else 'https://www.your-resort.com' }}" required>
+                    <button type="button" class="scan-btn" id="analyze-btn">{{ translations.initialize_scan if translations else 'Initialize Scan' }}</button>
                 </div>
 
                 <div class="loading-msg" id="loading-spinner">
                     <div class="spinner"></div>
-                    <span>Scanning market presence... establishing yield parameters...</span>
+                    <span>{{ translations.scanning_text if translations else 'Scanning market presence... establishing yield parameters...' }}</span>
                 </div>
                 <div id="scrape-message"></div>
             </div>
@@ -448,55 +447,55 @@
             <div class="glass-card">
                 <div class="step-header">
                     <div class="step-num">2</div>
-                    <h2 class="step-title">Calibration Audit</h2>
+                    <h2 class="step-title">{{ translations.calibration_audit if translations else 'Calibration Audit' }}</h2>
                 </div>
-                <p class="desc">Verify the extracted intelligence profile. These parameters define how the strategy AI interprets global market signals for your specific property.</p>
+                <p class="desc">{{ translations.calibration_desc if translations else "Verify the extracted intelligence profile. These parameters define how the strategy AI interprets global market signals for your specific property." }}</p>
 
                 <div class="form-grid">
                     <div class="full-width">
-                        <label class="field-label">Official Property Identity *</label>
+                        <label class="field-label">{{ translations.official_property_identity if translations else 'Official Property Identity *' }}</label>
                         <input type="text" id="hotel_name" name="hotel_name" required>
                     </div>
 
                     <div class="full-width">
-                        <label class="field-label">Validated Digital Asset URL</label>
+                        <label class="field-label">{{ translations.validated_url if translations else 'Validated Digital Asset URL' }}</label>
                         <input type="url" id="website_url_form" name="website_url">
                     </div>
 
                     <div class="full-width">
-                        <label class="field-label">Operational Locations * (comma separated)</label>
-                        <input type="text" id="locations" name="locations" required placeholder="e.g. Bishoftu, Entoto">
+                        <label class="field-label">{{ translations.operational_locations if translations else 'Operational Locations * (comma separated)' }}</label>
+                        <input type="text" id="locations" name="locations" required placeholder="{{ translations.locations_placeholder if translations else 'e.g. Bishoftu, Entoto' }}">
                     </div>
 
                     <div>
-                        <label class="field-label">Inventory Classes</label>
-                        <input type="text" id="room_types" name="room_types" placeholder="Standard, Suite, Villa">
+                        <label class="field-label">{{ translations.inventory_classes if translations else 'Inventory Classes' }}</label>
+                        <input type="text" id="room_types" name="room_types" placeholder="{{ translations.room_types_placeholder if translations else 'Standard, Suite, Villa' }}">
                     </div>
 
                     <div>
-                        <label class="field-label">Market Tier *</label>
+                        <label class="field-label">{{ translations.market_tier if translations else 'Market Tier *' }}</label>
                         <select id="price_range" name="price_range" required>
-                            <option value="">Select Tier</option>
-                            <option value="budget">Value</option>
-                            <option value="mid-range">Mid-Market</option>
-                            <option value="premium">Premium Boutique</option>
-                            <option value="luxury">Luxury Elite</option>
+                            <option value="">{{ translations.select_tier if translations else 'Select Tier' }}</option>
+                            <option value="budget">{{ translations.tier_value if translations else 'Value' }}</option>
+                            <option value="mid-range">{{ translations.tier_mid_market if translations else 'Mid-Market' }}</option>
+                            <option value="premium">{{ translations.tier_premium if translations else 'Premium Boutique' }}</option>
+                            <option value="luxury">{{ translations.tier_luxury if translations else 'Luxury Elite' }}</option>
                         </select>
                     </div>
 
                     <div class="full-width">
-                        <label class="field-label">Core Amenities & Facilities (comma separated)</label>
-                        <textarea id="amenities" name="amenities" placeholder="e.g. Infinity Pool, Indoor Spa, Horse Riding, Conference Center, Wine Cellar"></textarea>
+                        <label class="field-label">{{ translations.core_amenities if translations else 'Core Amenities & Facilities (comma separated)' }}</label>
+                        <textarea id="amenities" name="amenities" placeholder="{{ translations.amenities_placeholder if translations else 'e.g. Infinity Pool, Indoor Spa, Horse Riding, Conference Center, Wine Cellar' }}"></textarea>
                     </div>
 
                     <div class="full-width">
-                        <label class="field-label">Brand Value Proposition</label>
-                        <textarea id="brand_positioning" name="brand_positioning" placeholder="How does your property position itself in the market?"></textarea>
+                        <label class="field-label">{{ translations.brand_value_proposition if translations else 'Brand Value Proposition' }}</label>
+                        <textarea id="brand_positioning" name="brand_positioning" placeholder="{{ translations.brand_positioning_placeholder if translations else 'How does your property position itself in the market?' }}"></textarea>
                     </div>
 
                     <div class="full-width">
-                        <label class="field-label">Yield Objectives</label>
-                        <textarea id="business_objectives" name="business_objectives" placeholder="What are your primary revenue goals?"></textarea>
+                        <label class="field-label">{{ translations.yield_objectives if translations else 'Yield Objectives' }}</label>
+                        <textarea id="business_objectives" name="business_objectives" placeholder="{{ translations.business_objectives_placeholder if translations else 'What are your primary revenue goals?' }}"></textarea>
                     </div>
 
                     <input type="hidden" id="raw_scraped_text" name="raw_scraped_text">
@@ -505,7 +504,7 @@
                 </div>
 
                 <button type="submit" class="submit-btn">
-                    Establish Dashboard
+                    {{ translations.establish_dashboard if translations else 'Establish Dashboard' }}
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
             </div>
@@ -571,14 +570,14 @@
                     }
 
                     loadingSpinner.style.display = 'none';
-                    scrapeMessage.innerHTML = '<div class="status-msg success">Scan Successful. Parameters calibrated.</div>';
+                    scrapeMessage.innerHTML = '<div class="status-msg success">{{ translations.scan_successful if translations else "Scan Successful. Parameters calibrated." }}</div>';
                 } else {
                     throw new Error("Scan incomplete");
                 }
             } catch (error) {
                 console.error("Scrape error", error);
                 loadingSpinner.style.display = 'none';
-                scrapeMessage.innerHTML = '<div class="status-msg error">Scan Failed. Manual override required.</div>';
+                scrapeMessage.innerHTML = '<div class="status-msg error">{{ translations.scan_failed if translations else "Scan Failed. Manual override required." }}</div>';
             } finally {
                 analyzeBtn.disabled = false;
             }

@@ -200,7 +200,44 @@ def logout_get():
 
 @app.get("/onboard", response_class=HTMLResponse)
 def onboard_page(request: Request, session: dict = Depends(require_session)):
-    return templates.TemplateResponse(request, "onboard.html", {"session": session})
+    user_language = session.get("language", "english")
+    translations = {
+        "onboarding_subtitle": get_translation("onboarding_subtitle", user_language),
+        "back_to_home": get_translation("back_to_home", user_language),
+        "neural_property_scan": get_translation("neural_property_scan", user_language),
+        "scan_desc": get_translation("scan_desc", user_language),
+        "website_url_placeholder": get_translation("website_url_placeholder", user_language),
+        "initialize_scan": get_translation("initialize_scan", user_language),
+        "scanning_text": get_translation("scanning_text", user_language),
+        "calibration_audit": get_translation("calibration_audit", user_language),
+        "calibration_desc": get_translation("calibration_desc", user_language),
+        "official_property_identity": get_translation("official_property_identity", user_language),
+        "validated_url": get_translation("validated_url", user_language),
+        "operational_locations": get_translation("operational_locations", user_language),
+        "locations_placeholder": get_translation("locations_placeholder", user_language),
+        "inventory_classes": get_translation("inventory_classes", user_language),
+        "room_types_placeholder": get_translation("room_types_placeholder", user_language),
+        "market_tier": get_translation("market_tier", user_language),
+        "select_tier": get_translation("select_tier", user_language),
+        "tier_value": get_translation("tier_value", user_language),
+        "tier_mid_market": get_translation("tier_mid_market", user_language),
+        "tier_premium": get_translation("tier_premium", user_language),
+        "tier_luxury": get_translation("tier_luxury", user_language),
+        "core_amenities": get_translation("core_amenities", user_language),
+        "amenities_placeholder": get_translation("amenities_placeholder", user_language),
+        "brand_value_proposition": get_translation("brand_value_proposition", user_language),
+        "brand_positioning_placeholder": get_translation("brand_positioning_placeholder", user_language),
+        "yield_objectives": get_translation("yield_objectives", user_language),
+        "business_objectives_placeholder": get_translation("business_objectives_placeholder", user_language),
+        "establish_dashboard": get_translation("establish_dashboard", user_language),
+        "scan_successful": get_translation("scan_successful", user_language),
+        "scan_failed": get_translation("scan_failed", user_language),
+    }
+    return templates.TemplateResponse(request, "onboard.html", {
+        "session": session,
+        "user_language": user_language,
+        "translations": translations
+    })
 
 @app.post("/onboard/scrape")
 async def scrape_hotel(request: Request, url: str = Form(...), session: dict = Depends(require_session)):
