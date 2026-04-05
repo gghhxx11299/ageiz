@@ -925,9 +925,37 @@ TRANSLATIONS = {
         "maintenance_issues": {
             "english": "Maintenance Issues",
             "amharic": "የጥገና ችግሮች",
-            "oromoo": "Rakkoo Tinfiilee",
-            "tigrinya": "ጸገም ምዕቃብ",
+            "oromoo": "Rakkina Suphaa",
+            "tigrinya": "ናይ ጽገና ፀገማት",
             "chinese": "维护问题"
+        },
+        "food_quality": {
+            "english": "Food & Beverage Quality (1-10)",
+            "amharic": "የምግብ እና የመጠጥ ጥራት (1-10)",
+            "oromoo": "Qulqullina Nyaataafi Dhugaatii (1-10)",
+            "tigrinya": "ናይ መግቢን መስተን ፅሬት (1-10)",
+            "chinese": "餐饮质量 (1-10)"
+        },
+        "staff_morale": {
+            "english": "Staff Morale (1-10)",
+            "amharic": "የሰራተኞች ሞራል (1-10)",
+            "oromoo": "Moodii Hojjettootaa (1-10)",
+            "tigrinya": "ናይ ሰራሕተኛታት ሞራል (1-10)",
+            "chinese": "员工士气 (1-10)"
+        },
+        "maintenance_status": {
+            "english": "Maintenance & Cleanliness (1-10)",
+            "amharic": "ጥገና እና ንፅህና (1-10)",
+            "oromoo": "Suphaafi Qulqullina (1-10)",
+            "tigrinya": "ፅገናን ፅሬትን (1-10)",
+            "chinese": "维护与清洁 (1-10)"
+        },
+        "occupancy_level": {
+            "english": "Estimated Occupancy Level (1-10)",
+            "amharic": "የተገመተው የክፍል መያዝ ደረጃ (1-10)",
+            "oromoo": "Sadarkaa Iddoo Qabachuu (1-10)",
+            "tigrinya": "ዝተገመተ ናይ ክፍሊ መሓዚ ደረጃ (1-10)",
+            "chinese": "预计入住水平 (1-10)"
         },
         "notes": {
             "english": "Additional Notes",
@@ -945,10 +973,38 @@ TRANSLATIONS = {
         },
         "submit": {
             "english": "Submit Report",
-            "amharic": "ሪፖርት ያስገቡ",
+            "amharic": "ሪፖርት ላክ",
             "oromoo": "Gabaasa Ergi",
-            "tigrinya": "ጸብጻብ ኣእቱ",
+            "tigrinya": "ሪፖርት ስደድ",
             "chinese": "提交报告"
+        },
+        "why_this_rating": {
+            "english": "Why this rating?",
+            "amharic": "ለምን ይህ ደረጃ ተሰጠ?",
+            "oromoo": "Maaliif sadarkaan kun kenname?",
+            "tigrinya": "ስለምንታይ እዚ ደረጃ ተዋሂቡ?",
+            "chinese": "为什么给出这个评分？"
+        },
+        "guest_notes": {
+            "english": "Notes on guest demographics/behavior?",
+            "amharic": "ስለ እንግዶች ባህሪ ማስታወሻ?",
+            "oromoo": "Amala keessummootaa irratti yaada?",
+            "tigrinya": "ብዛዕባ ኣጋይሽ ባህሪ መዘክር?",
+            "chinese": "关于客人特征/行为的笔记？"
+        },
+        "recent_reports": {
+            "english": "Recent Reports",
+            "amharic": "የቅርብ ጊዜ ሪፖርቶች",
+            "oromoo": "Gabaasota Dhihoo",
+            "tigrinya": "ናይ ቀረባ ግዜ ሪፖርታት",
+            "chinese": "最近报告"
+        },
+        "staff_leaderboard": {
+            "english": "Staff Leaderboard",
+            "amharic": "የሰራተኞች ደረጃ",
+            "oromoo": "Sadarkaa Hojjettootaa",
+            "tigrinya": "ናይ ሰራሕተኛታት ደረጃ",
+            "chinese": "员工排行榜"
         },
         "recent_reports": {
             "english": "Recent Reports",

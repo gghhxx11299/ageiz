@@ -125,15 +125,47 @@ def root(request: Request):
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    return templates.TemplateResponse(request, "login.html", {})
+    session = get_session(request)
+    lang = session.get("language", "english") if session else "english"
+    return templates.TemplateResponse(request, "login.html", {
+        "user_language": lang,
+        "translations": {
+            "subtitle": get_translation("subtitle", lang),
+            "sign_in": get_translation("sign_in", lang),
+            "register": get_translation("register", lang),
+            "enterprise_email": get_translation("enterprise_email", lang),
+            "security_key": get_translation("security_key", lang),
+            "launch_dashboard": get_translation("launch_dashboard", lang),
+            "corporate_email": get_translation("corporate_email", lang),
+            "create_password": get_translation("create_password", lang),
+            "initialize_neural_link": get_translation("initialize_neural_link", lang),
+            "footer_note": get_translation("footer_note", lang)
+        }
+    })
 
 @app.post("/auth/register")
 async def register(request: Request, email: str = Form(...), password: str = Form(...), role: str = Form("manager")):
+    session = get_session(request)
+    lang = session.get("language", "english") if session else "english"
+    
     existing = get_user_by_email(email)
     if existing:
         return templates.TemplateResponse(request, "login.html", {
             "error": "Email already registered",
-            "tab": "register"
+            "tab": "register",
+            "user_language": lang,
+            "translations": {
+                "subtitle": get_translation("subtitle", lang),
+                "sign_in": get_translation("sign_in", lang),
+                "register": get_translation("register", lang),
+                "enterprise_email": get_translation("enterprise_email", lang),
+                "security_key": get_translation("security_key", lang),
+                "launch_dashboard": get_translation("launch_dashboard", lang),
+                "corporate_email": get_translation("corporate_email", lang),
+                "create_password": get_translation("create_password", lang),
+                "initialize_neural_link": get_translation("initialize_neural_link", lang),
+                "footer_note": get_translation("footer_note", lang)
+            }
         })
 
     valid_roles = ["manager", "staff"]
@@ -153,17 +185,46 @@ async def register(request: Request, email: str = Form(...), password: str = For
 
 @app.post("/auth/login")
 async def login(request: Request, email: str = Form(...), password: str = Form(...), role: str = Form("manager")):
+    session = get_session(request)
+    lang = session.get("language", "english") if session else "english"
+
     user = get_user_by_email(email)
     if not user:
         return templates.TemplateResponse(request, "login.html", {
             "error": "Invalid email or password",
-            "tab": "login"
+            "tab": "login",
+            "user_language": lang,
+            "translations": {
+                "subtitle": get_translation("subtitle", lang),
+                "sign_in": get_translation("sign_in", lang),
+                "register": get_translation("register", lang),
+                "enterprise_email": get_translation("enterprise_email", lang),
+                "security_key": get_translation("security_key", lang),
+                "launch_dashboard": get_translation("launch_dashboard", lang),
+                "corporate_email": get_translation("corporate_email", lang),
+                "create_password": get_translation("create_password", lang),
+                "initialize_neural_link": get_translation("initialize_neural_link", lang),
+                "footer_note": get_translation("footer_note", lang)
+            }
         })
 
     if not bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
         return templates.TemplateResponse(request, "login.html", {
             "error": "Invalid email or password",
-            "tab": "login"
+            "tab": "login",
+            "user_language": lang,
+            "translations": {
+                "subtitle": get_translation("subtitle", lang),
+                "sign_in": get_translation("sign_in", lang),
+                "register": get_translation("register", lang),
+                "enterprise_email": get_translation("enterprise_email", lang),
+                "security_key": get_translation("security_key", lang),
+                "launch_dashboard": get_translation("launch_dashboard", lang),
+                "corporate_email": get_translation("corporate_email", lang),
+                "create_password": get_translation("create_password", lang),
+                "initialize_neural_link": get_translation("initialize_neural_link", lang),
+                "footer_note": get_translation("footer_note", lang)
+            }
         })
 
     user_role = user.get("role", "manager")
@@ -601,7 +662,15 @@ def staff_dashboard(request: Request, session: dict = Depends(require_staff_sess
         "competitor_activity": get_translation("competitor_activity", user_language),
         "events_booked": get_translation("events_booked", user_language),
         "maintenance_issues": get_translation("maintenance_issues", user_language),
+        "maintenance_status": get_translation("maintenance_status", user_language),
+        "food_quality": get_translation("food_quality", user_language),
+        "staff_morale": get_translation("staff_morale", user_language),
+        "occupancy_level": get_translation("occupancy_level", user_language),
         "notes": get_translation("notes", user_language),
+        "why_this_rating": get_translation("why_this_rating", user_language),
+        "guest_notes": get_translation("guest_notes", user_language),
+        "recent_reports": get_translation("recent_reports", user_language),
+        "staff_leaderboard": get_translation("staff_leaderboard", user_language),
         "free_text_observation": get_translation("free_text_observation", user_language),
         "submit": get_translation("submit", user_language),
         "recent_reports": get_translation("recent_reports", user_language),
@@ -817,17 +886,17 @@ def get_staff_intelligence_api(hotel_id: int, session: dict = Depends(require_se
 # ============================================================
 
 @app.get("/embed/{token}")
-def embed_form(token: str):
+def embed_form(token: str, request: Request):
     """Render the embeddable form as a standalone page."""
     from database import verify_embed_token
     embed = verify_embed_token(token)
     if not embed:
         return JSONResponse({"error": "Invalid embed token"}, status_code=404)
 
-    return templates.TemplateResponse(None, "embed.html", {
+    return templates.TemplateResponse(request, "embed.html", {
         "token": token,
         "label": embed["label"],
-        "api_url": request.base_url
+        "api_url": str(request.base_url)
     })
 
 @app.post("/api/embed/{token}")
@@ -1075,7 +1144,7 @@ async def telegram_unlink(user: dict = Depends(get_current_user)):
     return {"success": True}
 
 @app.post("/api/language")
-async def set_language(request: Request, session: dict = Depends(require_session)):
+async def set_language(request: Request, session: dict = Depends(get_session)):
     try:
         data = await request.json()
     except:
@@ -1086,16 +1155,17 @@ async def set_language(request: Request, session: dict = Depends(require_session
     if language not in valid_languages:
         return JSONResponse({"error": "Invalid language"}, status_code=400)
 
-    # Update in database
-    update_user_language(session["user_id"], language)
+    # Update in database if session exists
+    if session and session.get("user_id"):
+        update_user_language(session["user_id"], language)
+    
+    # Update or create session cookie
+    if not session:
+        session = {"language": language}
+    else:
+        session["language"] = language
 
-    # Update session cookie
-    token = serializer.dumps({
-        "user_id": session["user_id"],
-        "email": session["email"],
-        "hotel_id": session.get("hotel_id"),
-        "language": language
-    })
+    token = serializer.dumps(session)
     response = JSONResponse({"success": True, "language": language})
     response.set_cookie("session", token, httponly=True, max_age=86400, samesite="lax")
     return response

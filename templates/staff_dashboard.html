@@ -100,7 +100,14 @@
             <h1>Agéiz Staff Portal</h1>
             <div class="user-info">{{ session.get('email', '') }}</div>
         </div>
-        <div>
+        <div style="display:flex; align-items:center; gap:16px;">
+            <select id="language-selector" onchange="changeLanguage(this.value)" style="background: rgba(255,255,255,0.72); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer;">
+                <option value="english" {% if session.get('language') == 'english' %}selected{% endif %}>🇬🇧 English</option>
+                <option value="amharic" {% if session.get('language') == 'amharic' %}selected{% endif %}>🇪🇹 አማርኛ</option>
+                <option value="oromoo" {% if session.get('language') == 'oromoo' %}selected{% endif %}>🇪🇹 Afaan Oromoo</option>
+                <option value="tigrinya" {% if session.get('language') == 'tigrinya' %}selected{% endif %}>🇪🇭 ትግርኛ</option>
+                <option value="chinese" {% if session.get('language') == 'chinese' %}selected{% endif %}>🇨🇳 中文</option>
+            </select>
             {% if hotel %}
             <span style="font-size:0.8rem;color:var(--text-dim);">{{ hotel.get('hotel_name', '') }}</span>
             {% endif %}
@@ -156,29 +163,49 @@
                     <textarea id="raw-input" rows="4" placeholder="e.g., Today there was little seafood supply but high demand. Several guests complained about slow WiFi. The conference room was fully booked. I noticed about 120 guests today, occupancy seems around 75%. Customer satisfaction was about 4/5."></textarea>
                 </div>
 
-                <!-- Sliders -->
-                <div class="slider-group">
-                    <label>
-                        {{ translations.get('customer_satisfaction', 'Customer Satisfaction') }}
-                        <span class="slider-value" id="satisfaction-value">3 / 5</span>
-                    </label>
-                    <input type="range" id="customer-satisfaction" min="1" max="5" value="3" oninput="document.getElementById('satisfaction-value').textContent = this.value + ' / 5'">
-                </div>
+                <!-- Metrics Grid -->
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; margin-bottom:24px;">
+                    <!-- Customer Satisfaction -->
+                    <div class="form-group">
+                        <label>{{ translations.get('customer_satisfaction', 'Customer Satisfaction (1-10)') }}</label>
+                        <input type="number" id="customer-satisfaction" min="1" max="10" value="7">
+                        <textarea id="reason-satisfaction" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                    </div>
 
-                <div class="slider-group">
-                    <label>
-                        {{ translations.get('guest_count', 'Estimated Guest Count') }}
-                        <span class="slider-value" id="guest-count-value">50</span>
-                    </label>
-                    <input type="range" id="guest-count" min="0" max="500" value="50" step="5" oninput="document.getElementById('guest-count-value').textContent = this.value">
-                </div>
+                    <!-- Occupancy Level -->
+                    <div class="form-group">
+                        <label>{{ translations.get('occupancy_level', 'Estimated Occupancy Level (1-10)') }}</label>
+                        <input type="number" id="occupancy-pct" min="1" max="10" value="5">
+                        <textarea id="reason-occupancy" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                    </div>
 
-                <div class="slider-group">
-                    <label>
-                        {{ translations.get('occupancy', 'Estimated Occupancy %') }}
-                        <span class="slider-value" id="occupancy-value">50%</span>
-                    </label>
-                    <input type="range" id="occupancy-pct" min="0" max="100" value="50" oninput="document.getElementById('occupancy-value').textContent = this.value + '%'">
+                    <!-- Food & Beverage -->
+                    <div class="form-group">
+                        <label>{{ translations.get('food_quality', 'Food & Beverage Quality (1-10)') }}</label>
+                        <input type="number" id="food-quality" min="1" max="10" value="8">
+                        <textarea id="reason-food" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                    </div>
+
+                    <!-- Staff Morale -->
+                    <div class="form-group">
+                        <label>{{ translations.get('staff_morale', 'Staff Morale (1-10)') }}</label>
+                        <input type="number" id="staff-morale" min="1" max="10" value="8">
+                        <textarea id="reason-morale" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                    </div>
+
+                    <!-- Maintenance -->
+                    <div class="form-group">
+                        <label>{{ translations.get('maintenance_status', 'Maintenance & Cleanliness (1-10)') }}</label>
+                        <input type="number" id="maintenance-status" min="1" max="10" value="8">
+                        <textarea id="reason-maintenance" rows="2" placeholder="{{ translations.get('why_this_rating', 'Why this rating?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                    </div>
+
+                    <!-- Guest Count -->
+                    <div class="form-group">
+                        <label>{{ translations.get('guest_count', 'Estimated Guest Count') }}</label>
+                        <input type="number" id="guest-count" min="0" max="1000" value="50">
+                        <textarea id="reason-guest-count" rows="2" placeholder="{{ translations.get('guest_notes', 'Notes on guest demographics/behavior?') }}" style="margin-top:8px;min-height:60px;"></textarea>
+                    </div>
                 </div>
 
                 <!-- AI Preview -->
@@ -190,14 +217,14 @@
                 </div>
 
                 <button type="submit" class="submit-btn" id="submit-btn">
-                    Submit Report
+                    {{ translations.get('submit', 'Submit Report') }}
                 </button>
             </form>
         </div>
 
         <!-- Report History -->
         <div class="glass-card">
-            <h3>📋 Recent Reports</h3>
+            <h3>📋 {{ translations.get('recent_reports', 'Recent Reports') }}</h3>
             <div id="report-history">
                 {% if reports %}
                     {% for report in reports %}
@@ -218,14 +245,14 @@
                     </div>
                     {% endfor %}
                 {% else %}
-                    <div class="empty-state">No reports submitted yet. Start with your first observation above.</div>
+                    <div class="empty-state">{{ translations.get('no_reports_yet', 'No reports submitted yet. Start with your first observation above.') }}</div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Leaderboard -->
         <div class="glass-card">
-            <h3>🏆 Staff Leaderboard</h3>
+            <h3>🏆 {{ translations.get('staff_leaderboard', 'Staff Leaderboard') }}</h3>
             <div id="leaderboard-container">
                 <p style="text-align:center;color:var(--text-dim);font-size:0.85rem;">Loading...</p>
             </div>
@@ -256,6 +283,20 @@
             }
         });
 
+        async function changeLanguage(lang) {
+            try {
+                const response = await fetch('/api/language', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({language: lang})
+                });
+                const result = await response.json();
+                if (result.success) location.reload();
+            } catch (error) {
+                console.error('Language switch error:', error);
+            }
+        }
+
         async function structureReport(text) {
             const type = document.getElementById('report-type').value;
             try {
@@ -283,19 +324,10 @@
             document.getElementById('preview-summary').textContent = s.summary || 'N/A';
             document.getElementById('preview-insight').textContent = s.ai_insights || 'N/A';
 
-            // Sync sliders from AI
-            if (s.customer_satisfaction) {
-                document.getElementById('customer-satisfaction').value = s.customer_satisfaction;
-                document.getElementById('satisfaction-value').textContent = s.customer_satisfaction + ' / 5';
-            }
-            if (s.guest_count) {
-                document.getElementById('guest-count').value = s.guest_count;
-                document.getElementById('guest-count-value').textContent = s.guest_count;
-            }
-            if (s.occupancy_pct) {
-                document.getElementById('occupancy-pct').value = s.occupancy_pct;
-                document.getElementById('occupancy-value').textContent = Math.round(s.occupancy_pct) + '%';
-            }
+            // Sync fields from AI if they exist
+            if (s.customer_satisfaction) document.getElementById('customer-satisfaction').value = Math.min(10, Math.max(1, Math.round(s.customer_satisfaction * 2))); // mapping 1-5 to 1-10 roughly
+            if (s.guest_count) document.getElementById('guest-count').value = s.guest_count;
+            if (s.occupancy_pct) document.getElementById('occupancy-pct').value = Math.min(10, Math.max(1, Math.round(s.occupancy_pct / 10)));
         }
 
         // Form submit
@@ -308,15 +340,31 @@
             const report = {
                 report_type: document.getElementById('report-type').value,
                 raw_input: document.getElementById('raw-input').value,
-                structured: structuredData || {
-                    sentiment: 'neutral',
-                    customer_satisfaction: parseInt(document.getElementById('customer-satisfaction').value),
-                    guest_count: parseInt(document.getElementById('guest-count').value),
-                    occupancy_pct: parseFloat(document.getElementById('occupancy-pct').value),
-                    summary: document.getElementById('raw-input').value.substring(0, 200),
-                    ai_insights: ''
-                }
+                structured: structuredData || {}
             };
+
+            // Ensure manual fields are captured in structured data
+            report.structured.customer_satisfaction = parseInt(document.getElementById('customer-satisfaction').value);
+            report.structured.guest_count = parseInt(document.getElementById('guest-count').value);
+            report.structured.occupancy_pct = parseFloat(document.getElementById('occupancy-pct').value);
+            
+            // Add new fields and reasons
+            report.structured.food_quality = parseInt(document.getElementById('food-quality').value);
+            report.structured.staff_morale = parseInt(document.getElementById('staff-morale').value);
+            report.structured.maintenance_status = parseInt(document.getElementById('maintenance-status').value);
+            
+            report.structured.reasons = {
+                satisfaction: document.getElementById('reason-satisfaction').value,
+                occupancy: document.getElementById('reason-occupancy').value,
+                food: document.getElementById('reason-food').value,
+                morale: document.getElementById('reason-morale').value,
+                maintenance: document.getElementById('reason-maintenance').value,
+                guest_count: document.getElementById('reason-guest-count').value
+            };
+
+            if (!report.structured.summary) {
+                report.structured.summary = document.getElementById('raw-input').value.substring(0, 200);
+            }
 
             try {
                 const resp = await fetch('/api/staff/report', {
