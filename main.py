@@ -264,7 +264,7 @@ def onboard_page(request: Request, session: dict = Depends(require_session)):
     user_language = session.get("language", "english")
     translations = {
         "onboarding_subtitle": get_translation("onboarding_subtitle", user_language),
-        "back_to_home": get_translation("back_to_home", user_language),
+        "logout": get_translation("logout", user_language),
         "neural_property_scan": get_translation("neural_property_scan", user_language),
         "scan_desc": get_translation("scan_desc", user_language),
         "website_url_placeholder": get_translation("website_url_placeholder", user_language),
