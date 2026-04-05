@@ -960,39 +960,8 @@ def get_staff_intelligence_api(hotel_id: int, session: dict = Depends(require_se
 # EMBEDDABLE FORM / WIDGET
 # ============================================================
 
-@app.get("/embed/{token}")
-def embed_form(token: str, request: Request):
-    """Render the embeddable form as a standalone page."""
-    from database import verify_embed_token
-    embed = verify_embed_token(token)
-    if not embed:
-        return JSONResponse({"error": "Invalid embed token"}, status_code=404)
-
-    return templates.TemplateResponse(request, "embed.html", {
-        "token": token,
-        "label": embed["label"],
-        "api_url": str(request.base_url)
-    })
-
-@app.post("/api/embed/{token}")
-async def submit_embed_form(token: str, request: Request):
-    """Receive embedded form submission."""
-    from database import verify_embed_token, save_embedded_submission
-    embed = verify_embed_token(token)
-    if not embed:
-        return JSONResponse({"error": "Invalid embed token"}, status_code=404)
-
-    try:
-        data = await request.json()
-    except Exception:
-        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
-
-    submission_id = save_embedded_submission(
-        hotel_id=embed["hotel_id"],
-        token=token,
-        data=data
-    )
-    return JSONResponse({"success": True, "id": submission_id})
+# IMPORTANT: Specific API routes MUST be defined before parameterized routes
+# so FastAPI doesn't capture "create-token" as a {token} value
 
 @app.post("/api/embed/create-token")
 async def create_embed_token_api(request: Request, session: dict = Depends(require_session)):
@@ -1047,6 +1016,40 @@ def list_embed_submissions(session: dict = Depends(require_session)):
     submissions = get_embedded_submissions(hotel_id)
     stats = get_embedded_stats(hotel_id)
     return JSONResponse({"submissions": submissions, "stats": stats})
+
+@app.get("/embed/{token}")
+def embed_form(token: str, request: Request):
+    """Render the embeddable form as a standalone page."""
+    from database import verify_embed_token
+    embed = verify_embed_token(token)
+    if not embed:
+        return JSONResponse({"error": "Invalid embed token"}, status_code=404)
+
+    return templates.TemplateResponse(request, "embed.html", {
+        "token": token,
+        "label": embed["label"],
+        "api_url": str(request.base_url)
+    })
+
+@app.post("/api/embed/{token}")
+async def submit_embed_form(token: str, request: Request):
+    """Receive embedded form submission."""
+    from database import verify_embed_token, save_embedded_submission
+    embed = verify_embed_token(token)
+    if not embed:
+        return JSONResponse({"error": "Invalid embed token"}, status_code=404)
+
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+    submission_id = save_embedded_submission(
+        hotel_id=embed["hotel_id"],
+        token=token,
+        data=data
+    )
+    return JSONResponse({"success": True, "id": submission_id})
 
 
 # ============================================================
