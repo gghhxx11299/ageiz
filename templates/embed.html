@@ -17,9 +17,9 @@
         .stars{display:flex;gap:4px}
         .stars input{display:none}
         .stars label.star{font-size:1.6rem;color:#d1d5db;cursor:pointer;transition:color 0.15s}
-        .stars label.star:hover,.stars label.star.active{color:#f59e0b}
-        .stars input:checked ~ label.star{color:#d1d5db}
-        .stars label.star:has(~ input:checked){color:#f59e0b}
+        /* Highlight selected star and all before it */
+        .stars label.star:has(~ input:checked),
+        .stars label.star:has(+ input:checked){color:#f59e0b}
         .form-row{display:flex;gap:12px;margin-bottom:16px}
         .form-row .field{flex:1}
         .field{margin-bottom:16px}
@@ -122,11 +122,11 @@
             <div class="rating-group">
                 <label>Overall Experience</label>
                 <div class="stars" data-field="overall">
-                    <input type="radio" name="overall" id="overall-5" value="5"><label for="overall-5" class="star">★</label>
-                    <input type="radio" name="overall" id="overall-4" value="4"><label for="overall-4" class="star">★</label>
-                    <input type="radio" name="overall" id="overall-3" value="3"><label for="overall-3" class="star">★</label>
-                    <input type="radio" name="overall" id="overall-2" value="2"><label for="overall-2" class="star">★</label>
                     <input type="radio" name="overall" id="overall-1" value="1"><label for="overall-1" class="star">★</label>
+                    <input type="radio" name="overall" id="overall-2" value="2"><label for="overall-2" class="star">★</label>
+                    <input type="radio" name="overall" id="overall-3" value="3"><label for="overall-3" class="star">★</label>
+                    <input type="radio" name="overall" id="overall-4" value="4"><label for="overall-4" class="star">★</label>
+                    <input type="radio" name="overall" id="overall-5" value="5"><label for="overall-5" class="star">★</label>
                 </div>
             </div>
 
@@ -134,11 +134,11 @@
             <div class="rating-group">
                 <label>Cleanliness</label>
                 <div class="stars" data-field="cleanliness">
-                    <input type="radio" name="cleanliness" id="clean-5" value="5"><label for="clean-5" class="star">★</label>
-                    <input type="radio" name="cleanliness" id="clean-4" value="4"><label for="clean-4" class="star">★</label>
-                    <input type="radio" name="cleanliness" id="clean-3" value="3"><label for="clean-3" class="star">★</label>
-                    <input type="radio" name="cleanliness" id="clean-2" value="2"><label for="clean-2" class="star">★</label>
                     <input type="radio" name="cleanliness" id="clean-1" value="1"><label for="clean-1" class="star">★</label>
+                    <input type="radio" name="cleanliness" id="clean-2" value="2"><label for="clean-2" class="star">★</label>
+                    <input type="radio" name="cleanliness" id="clean-3" value="3"><label for="clean-3" class="star">★</label>
+                    <input type="radio" name="cleanliness" id="clean-4" value="4"><label for="clean-4" class="star">★</label>
+                    <input type="radio" name="cleanliness" id="clean-5" value="5"><label for="clean-5" class="star">★</label>
                 </div>
             </div>
 
@@ -146,11 +146,11 @@
             <div class="rating-group">
                 <label>Staff Friendliness</label>
                 <div class="stars" data-field="staff">
-                    <input type="radio" name="staff" id="staff-5" value="5"><label for="staff-5" class="star">★</label>
-                    <input type="radio" name="staff" id="staff-4" value="4"><label for="staff-4" class="star">★</label>
-                    <input type="radio" name="staff" id="staff-3" value="3"><label for="staff-3" class="star">★</label>
-                    <input type="radio" name="staff" id="staff-2" value="2"><label for="staff-2" class="star">★</label>
                     <input type="radio" name="staff" id="staff-1" value="1"><label for="staff-1" class="star">★</label>
+                    <input type="radio" name="staff" id="staff-2" value="2"><label for="staff-2" class="star">★</label>
+                    <input type="radio" name="staff" id="staff-3" value="3"><label for="staff-3" class="star">★</label>
+                    <input type="radio" name="staff" id="staff-4" value="4"><label for="staff-4" class="star">★</label>
+                    <input type="radio" name="staff" id="staff-5" value="5"><label for="staff-5" class="star">★</label>
                 </div>
             </div>
 
@@ -158,11 +158,11 @@
             <div class="rating-group">
                 <label>Value for Money</label>
                 <div class="stars" data-field="value">
-                    <input type="radio" name="value" id="value-5" value="5"><label for="value-5" class="star">★</label>
-                    <input type="radio" name="value" id="value-4" value="4"><label for="value-4" class="star">★</label>
-                    <input type="radio" name="value" id="value-3" value="3"><label for="value-3" class="star">★</label>
-                    <input type="radio" name="value" id="value-2" value="2"><label for="value-2" class="star">★</label>
                     <input type="radio" name="value" id="value-1" value="1"><label for="value-1" class="star">★</label>
+                    <input type="radio" name="value" id="value-2" value="2"><label for="value-2" class="star">★</label>
+                    <input type="radio" name="value" id="value-3" value="3"><label for="value-3" class="star">★</label>
+                    <input type="radio" name="value" id="value-4" value="4"><label for="value-4" class="star">★</label>
+                    <input type="radio" name="value" id="value-5" value="5"><label for="value-5" class="star">★</label>
                 </div>
             </div>
 
@@ -170,11 +170,11 @@
             <div class="rating-group">
                 <label>Food &amp; Beverage</label>
                 <div class="stars" data-field="food">
-                    <input type="radio" name="food" id="food-5" value="5"><label for="food-5" class="star">★</label>
-                    <input type="radio" name="food" id="food-4" value="4"><label for="food-4" class="star">★</label>
-                    <input type="radio" name="food" id="food-3" value="3"><label for="food-3" class="star">★</label>
-                    <input type="radio" name="food" id="food-2" value="2"><label for="food-2" class="star">★</label>
                     <input type="radio" name="food" id="food-1" value="1"><label for="food-1" class="star">★</label>
+                    <input type="radio" name="food" id="food-2" value="2"><label for="food-2" class="star">★</label>
+                    <input type="radio" name="food" id="food-3" value="3"><label for="food-3" class="star">★</label>
+                    <input type="radio" name="food" id="food-4" value="4"><label for="food-4" class="star">★</label>
+                    <input type="radio" name="food" id="food-5" value="5"><label for="food-5" class="star">★</label>
                 </div>
             </div>
 
@@ -186,7 +186,7 @@
             <div class="recommend-row">
                 <label>Would you recommend us?</label>
                 <div class="toggle">
-                    <input type="checkbox" id="recommend" checked>
+                    <input type="checkbox" id="recommend">
                     <span class="slider"></span>
                 </div>
             </div>
@@ -303,15 +303,16 @@
             return checked ? parseInt(checked.value) : null;
         }
 
-        // Star hover effects
+        // Star click with deselect support
         document.querySelectorAll('.stars').forEach(group => {
-            const labels = group.querySelectorAll('.star');
-            const inputs = group.querySelectorAll('input');
-            inputs.forEach((input, idx) => {
-                input.addEventListener('change', () => {
-                    labels.forEach((l, i) => {
-                        l.classList.toggle('active', i >= inputs.length - 1 - idx);
-                    });
+            group.querySelectorAll('input').forEach(input => {
+                input.addEventListener('click', function(e) {
+                    const checked = group.querySelector('input:checked');
+                    if (checked && checked.value === this.value) {
+                        // Deselect: uncheck all
+                        group.querySelectorAll('input').forEach(i => i.checked = false);
+                        e.preventDefault();
+                    }
                 });
             });
         });

@@ -73,10 +73,9 @@ def _fetch_amadeus_inspiration() -> Dict[str, Any]:
 def _fetch_opensky_arrivals() -> Dict[str, Any]:
     username = os.getenv("OPENSKY_USERNAME", "")
     password = os.getenv("OPENSKY_PASSWORD", "")
-    
+
     try:
         now = datetime.utcnow()
-        # OpenSky has a strict 7-day limit (604800 seconds). 
         interval = OPENSKY_SAFETY_INTERVAL
         seven_days_ago = now - interval
         fourteen_days_ago = seven_days_ago - interval
@@ -88,21 +87,39 @@ def _fetch_opensky_arrivals() -> Dict[str, Any]:
         }
 
         headers = {"User-Agent": "Ageiz/1.0 (Ethiopian Resort Pricing Intelligence)"}
-        
-        # Add auth if credentials available
+
         auth = None
         if username and password:
             auth = (username, password)
 
-        response_this_week = httpx.get(
-            OPENSKY_URL,
-            params=params_this_week,
-            headers=headers,
-            auth=auth,
-            timeout=20
-        )
-        response_this_week.raise_for_status()
-        this_week_flights = response_this_week.json()
+        # Retry up to 3 times with increasing timeouts
+        this_week_flights = None
+        for attempt in range(3):
+            try:
+                timeout = 20 + (attempt * 15)  # 20s, 35s, 50s
+                response_this_week = httpx.get(
+                    OPENSKY_URL,
+                    params=params_this_week,
+                    headers=headers,
+                    auth=auth,
+                    timeout=timeout
+                )
+                response_this_week.raise_for_status()
+                this_week_flights = response_this_week.json()
+                break
+            except (httpx.ReadTimeout, httpx.ConnectTimeout):
+                print(f"[flights] OpenSky timeout attempt {attempt + 1}/3, retrying...")
+                if attempt < 2:
+                    time.sleep(5 * (attempt + 1))
+                continue
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 401 or e.response.status_code == 403:
+                    return {"error": "OpenSky authentication failed. Get free credentials at https://opensky-network.org", "source": "opensky"}
+                raise
+
+        if this_week_flights is None:
+            return {"error": "OpenSky timeout after 3 retries", "source": "opensky"}
+
         this_week_count = len(this_week_flights) if isinstance(this_week_flights, list) else 0
 
         time.sleep(RATE_LIMIT_DELAY_SECONDS)
@@ -113,15 +130,33 @@ def _fetch_opensky_arrivals() -> Dict[str, Any]:
             "end": int(seven_days_ago.timestamp())
         }
 
-        response_last_week = httpx.get(
-            OPENSKY_URL,
-            params=params_last_week,
-            headers=headers,
-            auth=auth,
-            timeout=20
-        )
-        response_last_week.raise_for_status()
-        last_week_flights = response_last_week.json()
+        last_week_flights = None
+        for attempt in range(3):
+            try:
+                timeout = 20 + (attempt * 15)
+                response_last_week = httpx.get(
+                    OPENSKY_URL,
+                    params=params_last_week,
+                    headers=headers,
+                    auth=auth,
+                    timeout=timeout
+                )
+                response_last_week.raise_for_status()
+                last_week_flights = response_last_week.json()
+                break
+            except (httpx.ReadTimeout, httpx.ConnectTimeout):
+                print(f"[flights] OpenSky timeout attempt {attempt + 1}/3, retrying...")
+                if attempt < 2:
+                    time.sleep(5 * (attempt + 1))
+                continue
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 401 or e.response.status_code == 403:
+                    return {"error": "OpenSky authentication failed. Get free credentials at https://opensky-network.org", "source": "opensky"}
+                raise
+
+        if last_week_flights is None:
+            return {"error": "OpenSky timeout after 3 retries", "source": "opensky"}
+
         last_week_count = len(last_week_flights) if isinstance(last_week_flights, list) else 0
 
         if last_week_count > 0:
