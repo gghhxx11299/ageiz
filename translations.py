@@ -1423,11 +1423,11 @@ TRANSLATIONS = {
             "chinese": "已禁用"
         },
         "no_custom_sources": {
-            "english": "No custom sources configured. Click \"Add Custom Source\" to get started.",
-            "amharic": "ምንም ብጁ ምንጮች አልተዋቀሩም። ለመጀመር \"ብጁ ምንጭ ያክሉ\" ይጫኑ።",
-            "oromoo": "Maddi dabalataa hin jiru. \"Madda Dabalataa\" tuqi jalqabuuf.",
-            "tigrinya": "ናይ ብሕቲ ምንጪ ኣይተዳለወን። ንምጅማር \"ምንጪ ብሕቲ ኣእትው\" ጠውቑ።",
-            "chinese": "未配置自定义来源。点击\"添加自定义来源\"开始。"
+            "english": "No custom sources configured. Click 'Add Custom Source' to get started.",
+            "amharic": "ምንም ብጁ ምንጮች አልተዋቀሩም። ለመጀመር 'ብጁ ምንጭ ያክሉ' ይጫኑ።",
+            "oromoo": "Maddi dabalataa hin jiru. 'Madda Dabalataa' tuqi jalqabuuf.",
+            "tigrinya": "ናይ ብሕቲ ምንጪ ኣይተዳለወን። ንምጅማር 'ምንጪ ብሕቲ ኣእትው' ጠውቑ።",
+            "chinese": "未配置自定义来源。点击'添加自定义来源'开始。"
         },
         "failed_load_custom_sources": {
             "english": "Failed to load custom sources.",
@@ -1614,11 +1614,11 @@ TRANSLATIONS = {
             "chinese": "此信号的原始数据不可用。"
         },
         "no_data_for_signal": {
-            "english": "No data available for \"{name}\" at this location.",
-            "amharic": "ለ\"{name}\" በዚህ ቦታ ውሂብ አይገኝም።",
-            "oromoo": "Daataan \"{name}\" bakka kanaa hin jiru.",
-            "tigrinya": "ዳታ ን \"{name}\" ኣብዚ ቦታ የለን።",
-            "chinese": "此位置没有\"{name}\"的数据。"
+            "english": "No data available for '{name}' at this location.",
+            "amharic": "ለ'{name}' በዚህ ቦታ ውሂብ አይገኝም።",
+            "oromoo": "Daataan '{name}' bakka kanaa hin jiru.",
+            "tigrinya": "ዳታ ን '{name}' ኣብዚ ቦታ የለን።",
+            "chinese": "此位置没有'{name}'的数据。"
         },
         # Embed stats
         "avg_overall": {
