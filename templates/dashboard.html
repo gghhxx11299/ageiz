@@ -265,11 +265,12 @@
             top: 0;
             flex-shrink: 0;
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: 100;
         }
 
         .chat-sidebar.expanded {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 900px; height: 80vh; z-index: 2000;
+            width: 900px; height: 80vh; z-index: 2100;
             border-radius: 32px; border: 1px solid var(--accent);
             box-shadow: 0 50px 100px rgba(0,0,0,0.6);
         }
@@ -277,7 +278,11 @@
         .chat-overlay-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            z-index: 1999; display: none;
+            z-index: 2050; display: none;
+        }
+
+        #sidebar-overlay-bg {
+            z-index: 1400;
         }
 
         .chat-header { padding: 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
@@ -508,17 +513,37 @@
             .mobile-menu-btn {
                 display: block !important;
             }
+            .mobile-chat-btn {
+                display: block !important;
+            }
+            .chat-sidebar {
+                position: fixed;
+                right: -400px;
+                top: 0;
+                height: 100vh;
+                z-index: 2500;
+                transition: right 0.3s ease;
+                width: 340px;
+            }
+            .chat-sidebar.mobile-open {
+                right: 0;
+            }
             .top-bar {
                 padding: 16px 20px;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 gap: 12px;
+                justify-content: space-between;
             }
             .top-bar-left {
-                flex-wrap: wrap;
-                gap: 12px;
+                flex-wrap: nowrap;
+                gap: 8px;
+                min-width: 0;
             }
             .view-title {
-                font-size: 1.3rem;
+                font-size: 1.1rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .refresh-btn {
                 min-width: auto;
@@ -674,8 +699,8 @@
             
             <div class="top-bar">
                 <div class="top-bar-left">
-                    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display:none; background:none; border:none; color:var(--text); cursor:pointer; padding:8px; margin-right:8px;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display:none; background:var(--primary); border:none; color:#FFF; cursor:pointer; padding:8px; border-radius:8px; margin-right:8px; box-shadow:0 4px 10px var(--primary-glow);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </button>
                     <h1 class="view-title">{{ location }}</h1>
                     <select id="language-selector-top" class="language-selector-top" onchange="changeLanguage(this.value)">
@@ -686,9 +711,14 @@
                         <option value="chinese" {% if user_language == 'chinese' %}selected{% endif %}>🇨🇳 中文</option>
                     </select>
                 </div>
-                <button class="refresh-btn" onclick="triggerRefresh('{{ hotel.id }}', this)">
-                    <span>{{ translations.update_intelligence if translations else 'Update Intelligence' }}</span>
-                </button>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="mobile-chat-btn" onclick="toggleChat()" style="display:none; background:var(--accent); border:none; color:#FFF; cursor:pointer; padding:8px; border-radius:8px; box-shadow:0 4px 10px var(--staff-glow);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </button>
+                    <button class="refresh-btn" onclick="triggerRefresh('{{ hotel.id }}', this)">
+                        <span>{{ translations.update_intelligence if translations else 'Update Intelligence' }}</span>
+                    </button>
+                </div>
             </div>
 
             <div class="content-body">
@@ -1328,6 +1358,19 @@
             const isOpen = sidebar.classList.toggle('mobile-open');
             overlay.style.display = isOpen ? 'block' : 'none';
         }
+
+        function toggleChat() {
+            const chat = document.getElementById('chat-sidebar');
+            const overlay = document.getElementById('chat-overlay-bg');
+            const isOpen = chat.classList.toggle('mobile-open');
+            overlay.style.display = isOpen ? 'block' : 'none';
+        }
+
+        // Close panels when clicking overlay
+        document.getElementById('chat-overlay-bg').addEventListener('click', () => {
+            document.getElementById('chat-sidebar').classList.remove('mobile-open');
+            document.getElementById('chat-overlay-bg').style.display = 'none';
+        });
 
         // Close sidebar when clicking a nav link on mobile
         tabs.forEach(tab => {
