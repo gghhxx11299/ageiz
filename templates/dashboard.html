@@ -690,7 +690,7 @@
             </button>
             <button class="nav-link" id="staff-intel-tab">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 12px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                Staff Intelligence
+                {{ translations.staff_intelligence if translations else 'Staff Intelligence' }}
             </button>
         </div>
 
@@ -709,7 +709,7 @@
                     <button onclick="generateTelegramOTP()" id="tg-otp-btn" style="width: 100%; padding: 8px; background: var(--primary); color: #FFF; border: none; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">{{ translations.generate_code if translations else 'Generate Code' }}</button>
                     <div id="tg-otp-display" style="display: none; margin-top: 12px; text-align: center;">
                         <span style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.2rem; font-weight: 700; color: var(--accent); letter-spacing: 4px;" id="tg-otp-code">----</span>
-                        <p style="font-size: 0.6rem; color: var(--text-dim); margin-top: 4px;">Valid for 5 mins</p>
+                        <p style="font-size: 0.6rem; color: var(--text-dim); margin-top: 4px;">{{ translations.valid_for_5_mins if translations else 'Valid for 5 mins' }}</p>
                     </div>
                 </div>
                 <div id="tg-status-linked" style="display: none; text-align: center;">
@@ -929,13 +929,13 @@
 
                 <!-- Custom Intelligence Sources -->
                 <div class="hero-card" style="margin-top: 32px;">
-                    <span class="sector-name">Custom Intelligence Sources</span>
+                    <span class="sector-name">{{ translations.custom_intelligence_sources_title if translations else 'Custom Intelligence Sources' }}</span>
                     <p style="color: var(--text-dim); margin-bottom: 24px; font-size: 0.85rem;">
-                        Add external APIs, RSS feeds, or data endpoints. The AI will interpret them during each market scan.
+                        {{ translations.custom_sources_desc if translations else 'Add external APIs, RSS feeds, or data endpoints. The AI will interpret them during each market scan.' }}
                     </p>
 
                     <button onclick="showCustomSignalForm()" style="padding: 12px 24px; background: var(--primary); border: none; color: #FFF; border-radius: 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
-                        + Add Custom Source
+                        {{ translations.add_custom_source if translations else '+ Add Custom Source' }}
                     </button>
 
                     <div id="custom-sources-list" style="margin-top: 24px;">
@@ -945,40 +945,40 @@
 
                 <!-- Employee Management -->
                 <div class="hero-card" style="margin-top: 32px;">
-                    <span class="sector-name">👥 Employee Management</span>
+                    <span class="sector-name">{{ translations.employee_management if translations else '👥 Employee Management' }}</span>
                     <p style="color: var(--text-dim); margin-bottom: 24px; font-size: 0.85rem;">
-                        Create staff accounts linked to your hotel. Staff can submit daily intelligence reports.
+                        {{ translations.employee_management_desc if translations else 'Create staff accounts linked to your hotel. Staff can submit daily intelligence reports.' }}
                     </p>
 
                     <!-- Add Employee Form -->
                     <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px;">
-                        <input type="email" id="emp-email" placeholder="Employee email" style="flex:2;min-width:200px;">
-                        <input type="text" id="emp-password" placeholder="Password (min 4 chars)" style="flex:1;min-width:150px;">
+                        <input type="email" id="emp-email" placeholder="{{ translations.employee_email_placeholder if translations else 'Employee email' }}" style="flex:2;min-width:200px;">
+                        <input type="text" id="emp-password" placeholder="{{ translations.password_placeholder if translations else 'Password (min 4 chars)' }}" style="flex:1;min-width:150px;">
                         <select id="emp-role" style="flex:1;min-width:120px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px;font-size:0.85rem;">
-                            <option value="staff">Staff</option>
-                            <option value="manager">Manager</option>
+                            <option value="staff">{{ translations.role_staff if translations else 'Staff' }}</option>
+                            <option value="manager">{{ translations.role_manager if translations else 'Manager' }}</option>
                         </select>
-                        <button onclick="createEmployee()" id="emp-add-btn" style="padding:12px 24px;background:var(--primary);border:none;color:#FFF;border-radius:12px;font-size:0.8rem;font-weight:700;cursor:pointer;">+ Add Employee</button>
+                        <button onclick="createEmployee()" id="emp-add-btn" style="padding:12px 24px;background:var(--primary);border:none;color:#FFF;border-radius:12px;font-size:0.8rem;font-weight:700;cursor:pointer;">{{ translations.add_employee_btn if translations else '+ Add Employee' }}</button>
                     </div>
                     <div id="emp-msg" style="font-size:0.85rem;margin-bottom:16px;"></div>
 
                     <!-- Employee List -->
                     <div id="employee-list" style="margin-top:16px;">
-                        <h4 style="font-size:0.85rem;color:var(--text-dim);margin-bottom:12px;">Current Employees</h4>
+                        <h4 style="font-size:0.85rem;color:var(--text-dim);margin-bottom:12px;">{{ translations.current_employees if translations else 'Current Employees' }}</h4>
                         <div id="emp-list-container"><!-- Populated by JS --></div>
                     </div>
                 </div>
 
                 <!-- Embeddable Guest Feedback Form -->
                 <div class="hero-card" style="margin-top: 32px;">
-                    <span class="sector-name">🌐 Embeddable Guest Feedback Form</span>
+                    <span class="sector-name">{{ translations.embed_feedback_title if translations else '🌐 Embeddable Guest Feedback Form' }}</span>
                     <p style="color: var(--text-dim); margin-bottom: 24px; font-size: 0.85rem;">
-                        Generate a link to embed a branded feedback form on your website or share directly with guests.
+                        {{ translations.embed_feedback_desc if translations else 'Generate a link to embed a branded feedback form on your website or share directly with guests.' }}
                     </p>
 
                     <div style="display:flex; gap:12px; margin-bottom:20px;">
-                        <input type="text" id="embed-label" placeholder="Widget label (e.g. 'Grand Hotel Feedback')" style="flex:2;min-width:200px;">
-                        <button onclick="createEmbedToken()" id="embed-create-btn" style="padding:12px 24px;background:var(--primary);border:none;color:#FFF;border-radius:12px;font-size:0.8rem;font-weight:700;cursor:pointer;">+ Generate Link</button>
+                        <input type="text" id="embed-label" placeholder="{{ translations.embed_label_placeholder if translations else 'Widget label (e.g. \'Grand Hotel Feedback\')' }}" style="flex:2;min-width:200px;">
+                        <button onclick="createEmbedToken()" id="embed-create-btn" style="padding:12px 24px;background:var(--primary);border:none;color:#FFF;border-radius:12px;font-size:0.8rem;font-weight:700;cursor:pointer;">{{ translations.generate_link if translations else '+ Generate Link' }}</button>
                     </div>
                     <div id="embed-msg" style="font-size:0.85rem;margin-bottom:16px;"></div>
 
@@ -989,9 +989,9 @@
 
                 <!-- Embedded Submissions Viewer -->
                 <div class="hero-card" style="margin-top: 32px;">
-                    <span class="sector-name">📊 Guest Feedback Submissions</span>
+                    <span class="sector-name">{{ translations.guest_feedback_submissions if translations else '📊 Guest Feedback Submissions' }}</span>
                     <p style="color: var(--text-dim); margin-bottom: 20px; font-size: 0.85rem;">
-                        Ratings and feedback collected from embedded forms on your website.
+                        {{ translations.guest_feedback_desc if translations else 'Ratings and feedback collected from embedded forms on your website.' }}
                     </p>
                     <div id="embed-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;"></div>
                     <div id="embed-submissions-list">
@@ -1069,58 +1069,58 @@
     <div id="custom-signal-modal" class="modal-overlay" style="display: none;">
         <div class="modal-card" style="max-width: 700px;">
             <button class="close-modal" onclick="closeCustomSignalForm()">&times;</button>
-            <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.5rem; color: #FFF; margin-bottom: 32px;">Add Custom Intelligence Source</h2>
+            <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.5rem; color: #FFF; margin-bottom: 32px;">{{ translations.add_custom_source_modal if translations else 'Add Custom Intelligence Source' }}</h2>
 
             <form id="custom-signal-form" onsubmit="saveCustomSignal(event)">
                 <div style="margin-bottom: 20px;">
-                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Source Name *</label>
-                    <input type="text" id="cs-name" required placeholder="e.g., Competitor Rates API" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: #FFF; font-size: 0.9rem;">
+                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">{{ translations.source_name_label if translations else 'Source Name *' }}</label>
+                    <input type="text" id="cs-name" required placeholder="{{ translations.source_name_placeholder if translations else 'e.g., Competitor Rates API' }}" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: #FFF; font-size: 0.9rem;">
                 </div>
 
                 <div style="margin-bottom: 20px;">
-                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">What this source tracks *</label>
-                    <textarea id="cs-description" required placeholder="e.g., Daily room rates for 3 competing resorts in Bishoftu. Higher prices mean competitors are raising rates." rows="3" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: #FFF; font-size: 0.9rem; resize: vertical;"></textarea>
+                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">{{ translations.source_desc_label if translations else 'What this source tracks *' }}</label>
+                    <textarea id="cs-description" required placeholder="{{ translations.source_desc_placeholder if translations else 'e.g., Daily room rates for 3 competing resorts in Bishoftu. Higher prices mean competitors are raising rates.' }}" rows="3" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: #FFF; font-size: 0.9rem; resize: vertical;"></textarea>
                 </div>
 
                 <div style="margin-bottom: 20px;">
-                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">API URL</label>
+                    <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">{{ translations.api_url_label if translations else 'API URL' }}</label>
                     <input type="url" id="cs-url" placeholder="https://api.example.com/data" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; color: #FFF; font-size: 0.9rem;">
                 </div>
 
                 <details style="margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
-                    <summary style="font-size: 0.8rem; font-weight: 700; color: var(--accent); cursor: pointer;">Advanced Configuration</summary>
+                    <summary style="font-size: 0.8rem; font-weight: 700; color: var(--accent); cursor: pointer;">{{ translations.advanced_config if translations else 'Advanced Configuration' }}</summary>
 
                     <div style="margin-top: 16px;">
-                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">API Key</label>
-                        <input type="password" id="cs-api-key" placeholder="Leave blank if not needed" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
+                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">{{ translations.api_key_label if translations else 'API Key' }}</label>
+                        <input type="password" id="cs-api-key" placeholder="{{ translations.api_key_label_placeholder if translations else 'Leave blank if not needed' }}" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
                     </div>
 
                     <div style="margin-top: 12px;">
-                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">API Key Label / Header Name</label>
+                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">{{ translations.api_key_header_label if translations else 'API Key Label / Header Name' }}</label>
                         <input type="text" id="cs-api-key-label" value="Authorization" placeholder="Authorization" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
                     </div>
 
                     <div style="margin-top: 12px;">
-                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">Custom Headers (JSON)</label>
+                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">{{ translations.custom_headers_label if translations else 'Custom Headers (JSON)' }}</label>
                         <textarea id="cs-headers" placeholder='{"X-Custom-Header": "value"}' rows="2" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem; font-family: monospace;"></textarea>
                     </div>
 
                     <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
-                            <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">Method</label>
+                            <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">{{ translations.method_label if translations else 'Method' }}</label>
                             <select id="cs-method" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
                                 <option value="GET">GET</option>
                                 <option value="POST">POST</option>
                             </select>
                         </div>
                         <div>
-                            <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">Response Path</label>
+                            <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">{{ translations.response_path_label if translations else 'Response Path' }}</label>
                             <input type="text" id="cs-response-path" placeholder="data.results[0]" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem;">
                         </div>
                     </div>
 
                     <div style="margin-top: 12px;">
-                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">Request Body (JSON, for POST)</label>
+                        <label style="font-size: 0.7rem; color: var(--text-dim); display: block; margin-bottom: 4px;">{{ translations.request_body_label if translations else 'Request Body (JSON, for POST)' }}</label>
                         <textarea id="cs-body" placeholder='{"query": "value"}' rows="2" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; color: #FFF; font-size: 0.85rem; font-family: monospace;"></textarea>
                     </div>
                 </details>
@@ -1129,10 +1129,10 @@
 
                 <div style="display: flex; gap: 12px; margin-top: 24px;">
                     <button type="button" onclick="testCustomSignal()" style="flex: 1; padding: 12px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--accent); border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
-                        Test Connection
+                        {{ translations.test_connection_btn if translations else 'Test Connection' }}
                     </button>
                     <button type="submit" style="flex: 2; padding: 12px; background: var(--primary); border: none; color: #FFF; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
-                        Save Source
+                        {{ translations.save_source_btn if translations else 'Save Source' }}
                     </button>
                 </div>
             </form>
@@ -1183,6 +1183,75 @@
             terminateMobileConfirm: "{{ translations.terminate_mobile_confirm if translations else 'Terminate mobile session?' }}",
             neuralLinkEstablishedLoc: "{{ translations.neural_link_established if translations else 'Neural link established' }}",
             awaitingStrategicQueryLoc: "{{ translations.awaiting_strategic_query if translations else 'Awaiting strategic query.' }}",
+            // New translations
+            staffIntelligence: "{{ translations.staff_intelligence if translations else 'Staff Intelligence' }}",
+            customIntelligenceSources: "{{ translations.custom_intelligence_sources_title if translations else 'Custom Intelligence Sources' }}",
+            addCustomSource: "{{ translations.add_custom_source if translations else '+ Add Custom Source' }}",
+            employeeManagement: "{{ translations.employee_management if translations else 'Employee Management' }}",
+            employeeManagementDesc: "{{ translations.employee_management_desc if translations else 'Create staff accounts linked to your hotel. Staff can submit daily intelligence reports.' }}",
+            employeeEmailPlaceholder: "{{ translations.employee_email_placeholder if translations else 'Employee email' }}",
+            passwordPlaceholder: "{{ translations.password_placeholder if translations else 'Password (min 4 chars)' }}",
+            roleStaff: "{{ translations.role_staff if translations else 'Staff' }}",
+            roleManager: "{{ translations.role_manager if translations else 'Manager' }}",
+            addEmployeeBtn: "{{ translations.add_employee_btn if translations else '+ Add Employee' }}",
+            currentEmployees: "{{ translations.current_employees if translations else 'Current Employees' }}",
+            embedFeedbackTitle: "{{ translations.embed_feedback_title if translations else 'Embeddable Guest Feedback Form' }}",
+            embedFeedbackDesc: "{{ translations.embed_feedback_desc if translations else 'Generate a link to embed a branded feedback form on your website or share directly with guests.' }}",
+            generateLink: "{{ translations.generate_link if translations else '+ Generate Link' }}",
+            embedLabelPlaceholder: "{{ translations.embed_label_placeholder if translations else 'Widget label (e.g. \\'Grand Hotel Feedback\\')' }}",
+            guestFeedbackSubmissions: "{{ translations.guest_feedback_submissions if translations else 'Guest Feedback Submissions' }}",
+            guestFeedbackDesc: "{{ translations.guest_feedback_desc if translations else 'Ratings and feedback collected from embedded forms on your website.' }}",
+            addCustomSourceModal: "{{ translations.add_custom_source_modal if translations else 'Add Custom Intelligence Source' }}",
+            sourceNameLabel: "{{ translations.source_name_label if translations else 'Source Name *' }}",
+            sourceNamePlaceholder: "{{ translations.source_name_placeholder if translations else 'e.g., Competitor Rates API' }}",
+            sourceDescLabel: "{{ translations.source_desc_label if translations else 'What this source tracks *' }}",
+            sourceDescPlaceholder: "{{ translations.source_desc_placeholder if translations else 'e.g., Daily room rates for 3 competing resorts in Bishoftu.' }}",
+            advancedConfig: "{{ translations.advanced_config if translations else 'Advanced Configuration' }}",
+            apiKeyLabel: "{{ translations.api_key_label if translations else 'API Key' }}",
+            apiKeyLabelPlaceholder: "{{ translations.api_key_label_placeholder if translations else 'Leave blank if not needed' }}",
+            customHeadersLabel: "{{ translations.custom_headers_label if translations else 'Custom Headers (JSON)' }}",
+            methodLabel: "{{ translations.method_label if translations else 'Method' }}",
+            responsePathLabel: "{{ translations.response_path_label if translations else 'Response Path' }}",
+            requestBodyLabel: "{{ translations.request_body_label if translations else 'Request Body (JSON, for POST)' }}",
+            testConnectionBtn: "{{ translations.test_connection_btn if translations else 'Test Connection' }}",
+            saveSourceBtn: "{{ translations.save_source_btn if translations else 'Save Source' }}",
+            statusActive: "{{ translations.status_active if translations else 'Active' }}",
+            statusDisabled: "{{ translations.status_disabled if translations else 'Disabled' }}",
+            noCustomSources: "{{ translations.no_custom_sources if translations else 'No custom sources configured.' }}",
+            failedLoadCustomSources: "{{ translations.failed_load_custom_sources if translations else 'Failed to load custom sources.' }}",
+            deleteCustomSourceConfirm: "{{ translations.delete_custom_source_confirm if translations else 'Delete this custom source?' }}",
+            noEmployeesYet: "{{ translations.no_employees_yet if translations else 'No employees linked to this hotel yet.' }}",
+            creating: "{{ translations.creating if translations else 'Creating...' }}",
+            noEmbedLinks: "{{ translations.no_embed_links if translations else 'No embed links created yet.' }}",
+            noGuestFeedback: "{{ translations.no_guest_feedback if translations else 'No guest feedback collected via embed forms.' }}",
+            staffIntelligenceFeed: "{{ translations.staff_intelligence_feed if translations else 'Staff Intelligence Feed' }}",
+            topContributors: "{{ translations.top_contributors if translations else 'Top Contributors' }}",
+            loadingReports: "{{ translations.loading_reports if translations else 'Loading reports...' }}",
+            noReportsStaff: "{{ translations.no_reports_staff if translations else 'No staff reports submitted yet.' }}",
+            failedLoadStaff: "{{ translations.failed_load_staff if translations else 'Failed to load staff intelligence.' }}",
+            noLeaderboard: "{{ translations.no_leaderboard if translations else 'No staff contributions yet.' }}",
+            copyLink: "{{ translations.copy_link if translations else 'Copy Link' }}",
+            copied: "{{ translations.copied if translations else 'Copied!' }}",
+            delete: "{{ translations.delete if translations else 'Delete' }}",
+            deleteEmbedConfirm: "{{ translations.delete_embed_confirm if translations else 'Delete this embed link? Submissions will be preserved.' }}",
+            resetPassword: "{{ translations.reset_password if translations else 'Reset PW' }}",
+            removeEmployee: "{{ translations.remove_employee if translations else 'Remove' }}",
+            removeEmployeeConfirm: "{{ translations.remove_employee_confirm if translations else 'Remove this employee? They will no longer be able to login.' }}",
+            passwordResetSuccess: "{{ translations.password_reset_success if translations else 'Password reset successfully.' }}",
+            passwordMinLength: "{{ translations.password_min_length if translations else 'Password must be at least 4 characters.' }}",
+            networkError: "{{ translations.network_error if translations else 'Network error.' }}",
+            emailPasswordRequired: "{{ translations.email_password_required if translations else 'Email and password required.' }}",
+            neuralCycle: "{{ translations.neural_cycle if translations else 'Neural Cycle' }}",
+            signalError: "{{ translations.signal_error if translations else 'Signal Error' }}",
+            rawDataNotAvailable: "{{ translations.raw_data_not_available if translations else 'Raw data not available for this signal.' }}",
+            noDataForSignal: "{{ translations.no_data_for_signal if translations else 'No data available for this signal.' }}",
+            avgOverall: "{{ translations.avg_overall if translations else 'Avg Overall' }}",
+            recommend: "{{ translations.recommend if translations else 'Recommend' }}",
+            submissions: "{{ translations.submissions if translations else 'Submissions' }}",
+            positiveLabel: "{{ translations.positive_label if translations else 'Positive' }}",
+            negativeLabel: "{{ translations.negative_label if translations else 'Negative' }}",
+            neutralLabel: "{{ translations.neutral_label if translations else 'Neutral' }}",
+            totalReportsLabel: "{{ translations.total_reports_label if translations else 'Total Reports' }}",
         };
 
         // --- Chart Management ---
@@ -1441,7 +1510,7 @@
                 if (data.history && data.history.length > 0) {
                     scroller.innerHTML = data.history.map(m => `
                         <div class="msg ${m.role === 'user' ? 'msg-user' : 'msg-ai'}">
-                            <div class="msg-label">${m.role === 'user' ? 'Operator' : 'Agéiz Intelligence'}</div>
+                            <div class="msg-label">${m.role === 'user' ? T.operator : T.ageizIntelligence}</div>
                             <div class="msg-body">${m.content}</div>
                         </div>
                     `).join('');
@@ -1650,7 +1719,7 @@
                 const raw = data.raw_data ? data.raw_data[name] : null;
 
                 if (!interp) {
-                    target.innerHTML = `<p style="color: var(--text-dim);">No data available for "${name}" at this location.</p>`;
+                    target.innerHTML = `<p style="color: var(--text-dim);">${T.noDataForSignal.replace('{name}', name)}</p>`;
                     return;
                 }
 
@@ -1671,7 +1740,7 @@
 
                 const errorBanner = isError ? `
                     <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--neg); text-transform: uppercase;">⚠ Signal Error</span>
+                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--neg); text-transform: uppercase;">⚠ ${T.signalError}</span>
                         <p style="font-size: 0.85rem; color: var(--neg); margin-top: 8px; line-height: 1.5;">${interp.interpretation}</p>
                         ${raw && raw.raw_data && raw.raw_data.error ? `<pre style="font-size: 0.7rem; color: var(--neg); margin-top: 8px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; overflow-x: auto;">${JSON.stringify(raw.raw_data, null, 2)}</pre>` : ''}
                     </div>
@@ -1683,7 +1752,7 @@
                            <pre>${JSON.stringify(raw.raw_data, null, 2)}</pre>
                        </div>`
                     : `<div class="metric-label">${T.rawTelemetryData}</div>
-                       <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 8px;">Raw data not available for this signal.</p>`;
+                       <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 8px;">${T.rawDataNotAvailable}</p>`;
 
                 target.innerHTML = `
                     <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 40px;">${name.toUpperCase()}</h2>
@@ -1953,14 +2022,14 @@
                 const data = await res.json();
 
                 if (!data.signals || data.signals.length === 0) {
-                    list.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-dim);">No custom sources configured. Click "Add Custom Source" to get started.</p>`;
+                    list.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-dim);">${T.noCustomSources}</p>`;
                     return;
                 }
 
                 list.innerHTML = data.signals.map(s => {
                     const statusBadge = s.enabled
-                        ? '<span style="font-size: 0.6rem; padding: 2px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; background: rgba(16,185,129,0.1); color: var(--pos);">Active</span>'
-                        : '<span style="font-size: 0.6rem; padding: 2px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; background: rgba(255,255,255,0.05); color: var(--text-dim);">Disabled</span>';
+                        ? `<span style="font-size: 0.6rem; padding: 2px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; background: rgba(16,185,129,0.1); color: var(--pos);">${T.statusActive}</span>`
+                        : `<span style="font-size: 0.6rem; padding: 2px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; background: rgba(255,255,255,0.05); color: var(--text-dim);">${T.statusDisabled}</span>`;
 
                     const errorDetail = (s.last_status === 'error' && s.last_error)
                         ? `<details style="margin-top: 8px; font-size: 0.7rem; color: var(--neg); cursor: pointer;">
@@ -1988,7 +2057,7 @@
                     </div>`;
                 }).join('');
             } catch (e) {
-                list.innerHTML = `<p style="color: var(--neg);">Failed to load custom sources.</p>`;
+                list.innerHTML = `<p style="color: var(--neg);">${T.failedLoadCustomSources}</p>`;
             }
         }
 
@@ -2060,7 +2129,7 @@
                     loadCustomSignals();
                 }
             } catch (e) {
-                alert('Failed to save custom source.');
+                alert(T.networkError);
             }
         }
 
@@ -2098,7 +2167,7 @@
                 }
             } catch (e) {
                 result.style.background = 'rgba(239, 68, 68, 0.1)';
-                result.innerHTML = `<span style="color: var(--neg);">❌ Connection failed</span>`;
+                result.innerHTML = `<span style="color: var(--neg);">❌ ${T.networkError}</span>`;
             }
         }
 
@@ -2108,7 +2177,7 @@
         }
 
         async function deleteCustomSignal(id) {
-            if (!confirm('Delete this custom source?')) return;
+            if (!confirm(T.deleteCustomSourceConfirm)) return;
             await fetch(`/api/custom-signals/${id}`, {method: 'DELETE'});
             loadCustomSignals();
         }
@@ -2141,7 +2210,7 @@
                 loadStaffLeaderboard();
 
                 if (!data.reports || data.reports.length === 0) {
-                    container.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:40px;">No staff reports submitted yet.</p>';
+                    container.innerHTML = `<p style="text-align:center;color:var(--text-dim);padding:40px;">${T.noReportsStaff}</p>`;
                     return;
                 }
 
@@ -2152,19 +2221,19 @@
                     html += `<div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
                         <div style="flex:1;min-width:100px;padding:16px;background:rgba(34,197,94,0.1);border-radius:12px;text-align:center;">
                             <div style="font-size:1.5rem;font-weight:700;color:#22C55E;">${sb.positive || 0}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);">Positive</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">${T.positiveLabel}</div>
                         </div>
                         <div style="flex:1;min-width:100px;padding:16px;background:rgba(239,68,68,0.1);border-radius:12px;text-align:center;">
                             <div style="font-size:1.5rem;font-weight:700;color:#BA9240;">${sb.negative || 0}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);">Negative</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">${T.negativeLabel}</div>
                         </div>
                         <div style="flex:1;min-width:100px;padding:16px;background:rgba(234,179,8,0.1);border-radius:12px;text-align:center;">
                             <div style="font-size:1.5rem;font-weight:700;color:#EAB308;">${sb.neutral || 0}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);">Neutral</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">${T.neutralLabel}</div>
                         </div>
                         <div style="flex:1;min-width:100px;padding:16px;background:rgba(99,102,241,0.1);border-radius:12px;text-align:center;">
                             <div style="font-size:1.5rem;font-weight:700;color:var(--primary);">${data.summary.total_reports}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);">Total Reports</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">${T.totalReportsLabel}</div>
                         </div>
                     </div>`;
                 }
@@ -2189,7 +2258,7 @@
 
                 container.innerHTML = html;
             } catch (e) {
-                document.getElementById('staff-intel-content').innerHTML = '<p style="text-align:center;color:var(--neg);">Failed to load staff intelligence.</p>';
+                document.getElementById('staff-intel-content').innerHTML = `<p style="text-align:center;color:var(--neg);">${T.failedLoadStaff}</p>`;
             }
         }
 
@@ -2200,7 +2269,7 @@
                 const container = document.getElementById('staff-leaderboard-container');
 
                 if (!data.leaderboard || data.leaderboard.length === 0) {
-                    container.innerHTML = '<p style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:12px;">No staff contributions yet.</p>';
+                    container.innerHTML = `<p style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:12px;">${T.noLeaderboard}</p>`;
                     return;
                 }
 
@@ -2220,7 +2289,7 @@
                     </div>`;
                 }).join('');
             } catch (e) {
-                console.error('Leaderboard load error:', e);
+                console.error(`${T.failedLoadStaff}`, e);
             }
         }
     </script>
@@ -2229,15 +2298,15 @@
     <div id="staff-intel-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto;position:relative;">
             <button onclick="closeStaffIntel()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1.2rem;">✕</button>
-            <h2 style="font-family:'Playfair Display', Georgia, serif;font-size:1.3rem;color:var(--primary);margin-bottom:20px;">👥 Staff Intelligence Feed</h2>
+            <h2 style="font-family:'Playfair Display', Georgia, serif;font-size:1.3rem;color:var(--primary);margin-bottom:20px;">{{ translations.staff_intelligence_feed if translations else '👥 Staff Intelligence Feed' }}</h2>
 
             <!-- Top 3 Leaderboard -->
             <div id="staff-leaderboard-section" style="margin-bottom:24px;">
-                <h3 style="font-size:1rem;color:#FBBF24;margin-bottom:12px;">🏆 Top Contributors</h3>
-                <div id="staff-leaderboard-container"><p style="text-align:center;color:var(--text-dim);">Loading...</p></div>
+                <h3 style="font-size:1rem;color:#FBBF24;margin-bottom:12px;">🏆 {{ translations.top_contributors if translations else 'Top Contributors' }}</h3>
+                <div id="staff-leaderboard-container"><p style="text-align:center;color:var(--text-dim);">{{ translations.loading_reports if translations else 'Loading...' }}</p></div>
             </div>
 
-            <div id="staff-intel-content"><p style="text-align:center;color:var(--text-dim);">Loading reports...</p></div>
+            <div id="staff-intel-content"><p style="text-align:center;color:var(--text-dim);">{{ translations.loading_reports if translations else 'Loading reports...' }}</p></div>
         </div>
     </div>
     <style>
@@ -2253,14 +2322,14 @@
             const msgEl = document.getElementById('emp-msg');
 
             if (!email || !password) {
-                msgEl.innerHTML = '<span style="color:var(--neg);">Email and password required.</span>';
+                msgEl.innerHTML = `<span style="color:var(--neg);">${T.emailPasswordRequired}</span>`;
                 return;
             }
 
             const btn = document.getElementById('emp-add-btn');
             btn.disabled = true;
-            btn.textContent = 'Creating...';
-            msgEl.innerHTML = '<span style="color:var(--text-dim);">Creating account...</span>';
+            btn.textContent = T.creating;
+            msgEl.innerHTML = `<span style="color:var(--text-dim);">${T.creating}</span>`;
 
             try {
                 const resp = await fetch('/api/employee/create', {
@@ -2278,10 +2347,10 @@
                     msgEl.innerHTML = `<span style="color:var(--neg);">❌ ${data.error}</span>`;
                 }
             } catch (e) {
-                msgEl.innerHTML = `<span style="color:var(--neg);">❌ Network error.</span>`;
+                msgEl.innerHTML = `<span style="color:var(--neg);">❌ ${T.networkError}</span>`;
             }
             btn.disabled = false;
-            btn.textContent = '+ Add Employee';
+            btn.textContent = T.addEmployeeBtn;
         }
 
         async function loadEmployees() {
@@ -2291,12 +2360,12 @@
                 const container = document.getElementById('emp-list-container');
 
                 if (!data.employees || data.employees.length === 0) {
-                    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:20px;">No employees linked to this hotel yet.</p>';
+                    container.innerHTML = `<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:20px;">${T.noEmployeesYet}</p>`;
                     return;
                 }
 
                 container.innerHTML = data.employees.map(emp => {
-                    const roleBadge = emp.role === 'manager' ? '📊 MGR' : '📝 STAFF';
+                    const roleBadge = emp.role === 'manager' ? `📊 ${T.roleManager}` : `📝 ${T.roleStaff}`;
                     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
                         <div>
                             <span style="font-size:0.75rem;background:rgba(99,102,241,0.15);color:var(--primary);padding:2px 8px;border-radius:6px;font-weight:700;">${roleBadge}</span>
@@ -2304,18 +2373,18 @@
                             <span style="font-size:0.7rem;color:var(--text-dim);margin-left:8px;">${emp.language || 'en'}</span>
                         </div>
                         <div style="display:flex;gap:8px;">
-                            <button onclick="resetEmpPassword(${emp.id})" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Reset PW</button>
-                            <button onclick="deleteEmployee(${emp.id})" style="background:none;border:1px solid rgba(239,68,68,0.3);color:var(--neg);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Remove</button>
+                            <button onclick="resetEmpPassword(${emp.id})" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">${T.resetPassword}</button>
+                            <button onclick="deleteEmployee(${emp.id})" style="background:none;border:1px solid rgba(239,68,68,0.3);color:var(--neg);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">${T.removeEmployee}</button>
                         </div>
                     </div>`;
                 }).join('');
             } catch (e) {
-                console.error('Failed to load employees:', e);
+                console.error(`${T.failedLoadCustomSources}`, e);
             }
         }
 
         async function deleteEmployee(id) {
-            if (!confirm('Remove this employee? They will no longer be able to login.')) return;
+            if (!confirm(T.removeEmployeeConfirm)) return;
             try {
                 const resp = await fetch(`/api/employee/${id}`, {method: 'DELETE'});
                 const data = await resp.json();
@@ -2324,8 +2393,8 @@
         }
 
         async function resetEmpPassword(id) {
-            const newPw = prompt('Enter new password (min 4 chars):');
-            if (!newPw || newPw.length < 4) { alert('Password must be at least 4 characters.'); return; }
+            const newPw = prompt(T.passwordPlaceholder);
+            if (!newPw || newPw.length < 4) { alert(T.passwordMinLength); return; }
             try {
                 const resp = await fetch(`/api/employee/${id}/reset-password`, {
                     method: 'POST',
@@ -2333,8 +2402,8 @@
                     body: JSON.stringify({new_password: newPw})
                 });
                 const data = await resp.json();
-                if (data.success) alert('Password reset successfully.');
-            } catch (e) { console.error(e); }
+                if (data.success) alert(T.passwordResetSuccess);
+            } catch (e) { console.error(`${T.networkError}`, e); }
         }
 
         // Load employees on page load
@@ -2346,9 +2415,9 @@
 
         // --- Embeddable Form Management ---
         async function createEmbedToken() {
-            const label = document.getElementById('embed-label').value.trim() || 'Guest Feedback Widget';
+            const label = document.getElementById('embed-label').value.trim() || T.embedFeedbackTitle;
             const msgEl = document.getElementById('embed-msg');
-            msgEl.innerHTML = '<span style="color:var(--text-dim);">Generating...</span>';
+            msgEl.innerHTML = `<span style="color:var(--text-dim);">${T.creating}</span>`;
 
             try {
                 const resp = await fetch('/api/embed/create-token', {
@@ -2366,7 +2435,7 @@
                     msgEl.innerHTML = `<span style="color:var(--neg);">❌ ${data.error}</span>`;
                 }
             } catch (e) {
-                msgEl.innerHTML = `<span style="color:var(--neg);">❌ Network error.</span>`;
+                msgEl.innerHTML = `<span style="color:var(--neg);">❌ ${T.networkError}</span>`;
             }
         }
 
@@ -2377,7 +2446,7 @@
                 const container = document.getElementById('embed-token-list');
 
                 if (!data.tokens || data.tokens.length === 0) {
-                    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:16px;">No embed links created yet.</p>';
+                    container.innerHTML = `<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:16px;">${T.noEmbedLinks}</p>`;
                     return;
                 }
 
@@ -2391,9 +2460,9 @@
                                 <span style="font-size:0.7rem;color:var(--text-dim);margin-left:8px;">${t.created_at ? t.created_at.substring(0,10) : ''}</span>
                             </div>
                             <div style="display:flex;gap:8px;">
-                                <button onclick="navigator.clipboard.writeText('${formUrl}');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Link',1500)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Copy Link</button>
-                                <button onclick="navigator.clipboard.writeText(\`${iframeCode.replace(/`/g, '\\`')}\`);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy iframe',1500)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Copy iframe</button>
-                                <button onclick="deleteEmbedToken(${t.id})" style="background:none;border:1px solid rgba(239,68,68,0.3);color:var(--neg);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Delete</button>
+                                <button onclick="navigator.clipboard.writeText('${formUrl}');this.textContent='${T.copied}';setTimeout(()=>this.textContent='${T.copyLink}',1500)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">${T.copyLink}</button>
+                                <button onclick="navigator.clipboard.writeText(\`${iframeCode.replace(/`/g, '\\`')}\`);this.textContent='${T.copied}';setTimeout(()=>this.textContent='Copy iframe',1500)" style="background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">Copy iframe</button>
+                                <button onclick="deleteEmbedToken(${t.id})" style="background:none;border:1px solid rgba(239,68,68,0.3);color:var(--neg);padding:4px 10px;border-radius:6px;font-size:0.7rem;cursor:pointer;">${T.delete}</button>
                             </div>
                         </div>
                         <div style="font-size:0.65rem;color:var(--text-dim);margin-top:6px;word-break:break-all;font-family:monospace;">${formUrl}</div>
@@ -2403,11 +2472,11 @@
         }
 
         async function deleteEmbedToken(id) {
-            if (!confirm('Delete this embed link? Submissions will be preserved.')) return;
+            if (!confirm(T.deleteEmbedConfirm)) return;
             try {
                 const resp = await fetch(`/api/embed/token/${id}`, {method: 'DELETE'});
                 if ((await resp.json()).success) loadEmbedTokens();
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error(`${T.networkError}`, e); }
         }
 
         async function loadEmbedSubmissions() {
@@ -2422,24 +2491,24 @@
                     statsEl.innerHTML = `
                         <div style="flex:1;min-width:100px;padding:14px;background:rgba(251,191,36,0.1);border-radius:12px;text-align:center;">
                             <div style="font-size:1.3rem;font-weight:700;color:#FBBF24;">${s.avg_overall || '—'}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);">Avg Overall</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">${T.avgOverall}</div>
                         </div>
                         <div style="flex:1;min-width:100px;padding:14px;background:rgba(34,197,94,0.1);border-radius:12px;text-align:center;">
                             <div style="font-size:1.3rem;font-weight:700;color:#22C55E;">${s.recommend_pct || '—'}%</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);">Recommend</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">${T.recommend}</div>
                         </div>
                         <div style="flex:1;min-width:100px;padding:14px;background:rgba(99,102,241,0.1);border-radius:12px;text-align:center;">
                             <div style="font-size:1.3rem;font-weight:700;color:var(--primary);">${s.total}</div>
-                            <div style="font-size:0.7rem;color:var(--text-dim);">Submissions</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);">${T.submissions}</div>
                         </div>`;
                 } else {
-                    statsEl.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem;padding:8px;">No submissions yet.</p>';
+                    statsEl.innerHTML = `<p style="color:var(--text-dim);font-size:0.8rem;padding:8px;">${T.noDataYet}</p>`;
                 }
 
                 // Submissions list
                 const listEl = document.getElementById('embed-submissions-list');
                 if (!data.submissions || data.submissions.length === 0) {
-                    listEl.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:16px;">No guest feedback collected via embed forms.</p>';
+                    listEl.innerHTML = `<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:16px;">${T.noGuestFeedback}</p>`;
                     return;
                 }
 
@@ -2460,7 +2529,7 @@
                         ${sub.feedback_text ? `<div style="font-size:0.8rem;color:var(--text);font-style:italic;margin-top:6px;">"${sub.feedback_text.substring(0,200)}"</div>` : ''}
                     </div>`;
                 }).join('');
-            } catch (e) { console.error('Failed to load embed submissions:', e); }
+            } catch (e) { console.error(`${T.failedLoadStaff}`, e); }
         }
     </script>
 </body>

@@ -1062,6 +1062,615 @@ TRANSLATIONS = {
             "tigrinya": "ጸብጻብ ኣትዩ!",
             "chinese": "报告已提交！"
         },
+        "custom_intelligence_sources": {
+            "english": "Custom Intelligence Sources",
+            "amharic": "ብጁ የኢንተለጀንስ ምንጮች",
+            "oromoo": "Madda Beekumsa Dabalataa",
+            "tigrinya": "ናይ ብሕቲ ምንጪታት ኢንተለጀንስ",
+            "chinese": "自定义智能来源"
+        },
+        "custom_sources_desc": {
+            "english": "Add external APIs, RSS feeds, or data endpoints. The AI will interpret them during each market scan.",
+            "amharic": "ውጫዊ ኤፒአይዎችን፣ RSS ፊዶችን ወይም የውሂብ መጨረሻ ነጥቦችን ያክሉ።",
+            "oromoo": "API alaa, RSS fi kkf dabaladhaa. AI xiinxalee isinii kenna.",
+            "tigrinya": "ናይ ወፃኢ ኤፒአይ፣ RSS ወይ ዳታ መዛዘሚ ኣእትዉ። AI ድማ ተንቲኑ የቕርብ።",
+            "chinese": "添加外部 API、RSS 提要或数据端点。AI 将在每次市场扫描期间解释它们。"
+        },
+        "add_custom_source": {
+            "english": "+ Add Custom Source",
+            "amharic": "+ ብጁ ምንጭ ያክሉ",
+            "oromoo": "+ Madda Dabalataa",
+            "tigrinya": "+ ምንጪ ብሕቲ ኣእትው",
+            "chinese": "+ 添加自定义来源"
+        },
+        "employee_management": {
+            "english": "Employee Management",
+            "amharic": "የሰራተኞች አስተዳደር",
+            "oromoo": "Bulchiinsa Hojjettootaa",
+            "tigrinya": "ምምሕዳር ሰራሕተኛታት",
+            "chinese": "员工管理"
+        },
+        "employee_management_desc": {
+            "english": "Create staff accounts linked to your hotel. Staff can submit daily intelligence reports.",
+            "amharic": "ከሆቴልዎ ጋር የተገናኙ የሰራተኛ መለያዎችን ይፍጠሩ።",
+            "oromoo": "Herrega hojjettootaa uumaa. Hojjettoonni gabaasa guyyaa erguu danda'u.",
+            "tigrinya": "ምስ ሆቴልኩም ዝተሓሓዝ ኣካውንት ሰራሕተኛ ፍጠሩ።",
+            "chinese": "创建链接到您酒店的员工账户。员工可以提交每日智能报告。"
+        },
+        "add_employee": {
+            "english": "+ Add Employee",
+            "amharic": "+ ሰራተኛ ያክሉ",
+            "oromoo": "+ Hojjetaa Dabaladhaa",
+            "tigrinya": "+ ሰራሕተኛ ኣእትው",
+            "chinese": "+ 添加员工"
+        },
+        "current_employees": {
+            "english": "Current Employees",
+            "amharic": "ነባር ሰራተኞች",
+            "oromoo": "Hojjettoota Ammaa",
+            "tigrinya": "ናይ ሕጂ ሰራሕተኛታት",
+            "chinese": "当前员工"
+        },
+        "embed_feedback_title": {
+            "english": "Embeddable Guest Feedback Form",
+            "amharic": "ሊካተት የሚችል የእንግዳ አስተያየት ቅጽ",
+            "oromoo": "Unka Yaada Keessummaa",
+            "tigrinya": "ቅጥዒ ርእይቶ ኣጋይሽ",
+            "chinese": "可嵌入的客人反馈表"
+        },
+        "embed_feedback_desc": {
+            "english": "Generate a link to embed a branded feedback form on your website or share directly with guests.",
+            "amharic": "በድር ጣቢያዎ ላይ አስተያየት ቅጽ ለማካተት ሊንክ ይፍጠሩ።",
+            "oromoo": "Linnkii unka yaadaa marsariitii keessan irratti galchuu danda'amu uumaa.",
+            "tigrinya": "ኣብ መርበብ ሓበሬታኹም ርእይቶ ንምእታው ሊንክ ፍጠሩ።",
+            "chinese": "生成一个链接，以便在您的网站上嵌入品牌反馈表或直接与客人分享。"
+        },
+        "generate_link": {
+            "english": "Generate Link",
+            "amharic": "ሊንክ ፍጠር",
+            "oromoo": "Liinkii Uumi",
+            "tigrinya": "ሊንክ ፍጠር",
+            "chinese": "生成链接"
+        },
+        "guest_feedback_submissions": {
+            "english": "Guest Feedback Submissions",
+            "amharic": "የእንግዳ አስተያየት ማስገቢያዎች",
+            "oromoo": "Yaada Keessummaa Ergame",
+            "tigrinya": "ርእይቶ ኣጋይሽ",
+            "chinese": "客人反馈提交"
+        },
+        "guest_feedback_desc": {
+            "english": "Ratings and feedback collected from embedded forms on your website.",
+            "amharic": "ከድር ጣቢያዎ የተሰበሰቡ ደረጃዎች እና አስተያየቶች።",
+            "oromoo": "Marsariitii keessan irratti yaadaafi sadarkaa sassaabame.",
+            "tigrinya": "ካብ መርበብ ሓበሬታኹም ዝተኣከቡ ደረጃታትን ርእይቶታትን።",
+            "chinese": "从您网站上的嵌入式表格收集的评分和反馈。"
+        },
+        "no_submissions_yet": {
+            "english": "No submissions yet.",
+            "amharic": "እስካሁን ምንም ገቢ የለም።",
+            "oromoo": "Hamma yoonaatti wanti ergame hin jiru.",
+            "tigrinya": "ክሳብ ሕጂ ዝኣተወ የለን።",
+            "chinese": "尚未提交。"
+        },
+        "security_alert": {
+            "english": "Security Alert",
+            "amharic": "የደህንነት ማስጠንቀቂያ",
+            "oromoo": "Akeekkachiisa Nageenyaa",
+            "tigrinya": "ጠንቀቕታ ድሕነት",
+            "chinese": "安全警告"
+        },
+        # Dashboard - Settings & Account
+        "staff_intelligence": {
+            "english": "Staff Intelligence",
+            "amharic": "የሰራተኛ ኢንተለጀንስ",
+            "oromoo": "Beekumsa Hojjettootaa",
+            "tigrinya": "ኢንተለጀንስ ሰራሕተኛ",
+            "chinese": "员工智能"
+        },
+        "valid_for_5_mins": {
+            "english": "Valid for 5 mins",
+            "amharic": "ለ 5 ደቂቃ ትክክል",
+            "oromoo": "Daqiiqaa 5f valid",
+            "tigrinya": "ን 5 ደቒቕ ቅኑዕ",
+            "chinese": "有效期5分钟"
+        },
+        "custom_intelligence_sources_title": {
+            "english": "Custom Intelligence Sources",
+            "amharic": "ብጁ የኢንተለጀንስ ምንጮች",
+            "oromoo": "Madda Beekumsa Dabalataa",
+            "tigrinya": "ናይ ብሕቲ ምንጪታት ኢንተለጀንስ",
+            "chinese": "自定义智能来源"
+        },
+        "custom_sources_desc": {
+            "english": "Add external APIs, RSS feeds, or data endpoints. The AI will interpret them during each market scan.",
+            "amharic": "ውጫዊ ኤፒአይዎችን፣ RSS ፊዶችን ወይም የውሂብ መጨረሻ ነጥቦችን ያክሉ። AI በእያንዳንዱ ገበያ ስካን ይተረጉማቸዋል።",
+            "oromoo": "API alaa, RSS fi kkf dabaladhaa. AI xiinxalee isinii kenna.",
+            "tigrinya": "ናይ ወፃኢ ኤፒአይ፣ RSS ወይ ዳታ መዛዘሚ ኣእትዉ። AI ድማ ተንቲኑ የቕርብ።",
+            "chinese": "添加外部API、RSS提要或数据端点。AI将在每次市场扫描期间解释它们。"
+        },
+        "add_custom_source": {
+            "english": "+ Add Custom Source",
+            "amharic": "+ ብጁ ምንጭ ያክሉ",
+            "oromoo": "+ Madda Dabalataa",
+            "tigrinya": "+ ምንጪ ብሕቲ ኣእትው",
+            "chinese": "+ 添加自定义来源"
+        },
+        "employee_management": {
+            "english": "Employee Management",
+            "amharic": "የሰራተኞች አስተዳደር",
+            "oromoo": "Bulchiinsa Hojjettootaa",
+            "tigrinya": "ምምሕዳር ሰራሕተኛታት",
+            "chinese": "员工管理"
+        },
+        "employee_management_desc": {
+            "english": "Create staff accounts linked to your hotel. Staff can submit daily intelligence reports.",
+            "amharic": "ከሆቴልዎ ጋር የተገናኙ የሰራተኛ መለያዎችን ይፍጠሩ። ሰራተኞች ዕለታዊ ሪፖርቶችን ማስገባት ይችላሉ።",
+            "oromoo": "Herrega hojjettootaa uumaa. Hojjettoonni gabaasa guyyaa erguu danda'u.",
+            "tigrinya": "ምስ ሆቴልኩም ዝተሓሓዝ ኣካውንት ሰራሕተኛ ፍጠሩ። ሰራሕተኛታት ጸብጻብ መዓልቲ ከእትዉ ይኽእሉ።",
+            "chinese": "创建链接到您酒店的员工账户。员工可以提交每日智能报告。"
+        },
+        "employee_email_placeholder": {
+            "english": "Employee email",
+            "amharic": "የሰራተኛ ኢሜይል",
+            "oromoo": "Imeelii hojjetaa",
+            "tigrinya": "ኢመይል ሰራሕተኛ",
+            "chinese": "员工邮箱"
+        },
+        "password_placeholder": {
+            "english": "Password (min 4 chars)",
+            "amharic": "የይለፍ ቃል (ቢያንስ 4 ፊደላት)",
+            "oromoo": "Jecha darbii (xiqqaate 4)",
+            "tigrinya": "ናይ ምሕላፍ ቃል (ወሓዱ 4)",
+            "chinese": "密码（至少4个字符）"
+        },
+        "role_staff": {
+            "english": "Staff",
+            "amharic": "ሰራተኛ",
+            "oromoo": "Hojjetaa",
+            "tigrinya": "ሰራሕተኛ",
+            "chinese": "员工"
+        },
+        "role_manager": {
+            "english": "Manager",
+            "amharic": "ማኔጀር",
+            "oromoo": "Bulchaa",
+            "tigrinya": "ማኔጀር",
+            "chinese": "经理"
+        },
+        "add_employee_btn": {
+            "english": "+ Add Employee",
+            "amharic": "+ ሰራተኛ ያክሉ",
+            "oromoo": "+ Hojjetaa Dabaladhaa",
+            "tigrinya": "+ ሰራሕተኛ ኣእትው",
+            "chinese": "+ 添加员工"
+        },
+        "current_employees": {
+            "english": "Current Employees",
+            "amharic": "ነባር ሰራተኞች",
+            "oromoo": "Hojjettoota Ammaa",
+            "tigrinya": "ናይ ሕጂ ሰራሕተኛታት",
+            "chinese": "当前员工"
+        },
+        "embed_feedback_title": {
+            "english": "Embeddable Guest Feedback Form",
+            "amharic": "ሊካተት የሚችል የእንግዳ አስተያየት ቅጽ",
+            "oromoo": "Unka Yaada Keessummaa",
+            "tigrinya": "ቅጥዒ ርእይቶ ኣጋይሽ",
+            "chinese": "可嵌入的客人反馈表"
+        },
+        "embed_feedback_desc": {
+            "english": "Generate a link to embed a branded feedback form on your website or share directly with guests.",
+            "amharic": "በድር ጣቢያዎ ላይ አስተያየት ቅጽ ለማካተት ሊንክ ይፍጠሩ።",
+            "oromoo": "Liinkii unka yaadaa marsariitii keessan irratti galchuu danda'amu uumaa.",
+            "tigrinya": "ኣብ መርበብ ሓበሬታኹም ርእይቶ ንምእታው ሊንክ ፍጠሩ።",
+            "chinese": "生成一个链接，以便在您的网站上嵌入品牌反馈表或直接与客人分享。"
+        },
+        "generate_link": {
+            "english": "+ Generate Link",
+            "amharic": "+ ሊንክ ፍጠር",
+            "oromoo": "+ Liinkii Uumi",
+            "tigrinya": "+ ሊንክ ፍጠር",
+            "chinese": "+ 生成链接"
+        },
+        "embed_label_placeholder": {
+            "english": "Widget label (e.g. 'Grand Hotel Feedback')",
+            "amharic": "የዊጄት ስም (ለምሳሌ 'Grand Hotel Feedback')",
+            "oromoo": "Maqaa wijetii (fak. 'Grand Hotel Feedback')",
+            "tigrinya": "ስም ዊጀት (ንኣብ. 'Grand Hotel Feedback')",
+            "chinese": "小部件标签（例如'Grand Hotel Feedback'）"
+        },
+        "guest_feedback_submissions": {
+            "english": "Guest Feedback Submissions",
+            "amharic": "የእንግዳ አስተያየት ማስገቢያዎች",
+            "oromoo": "Yaada Keessummaa Ergame",
+            "tigrinya": "ርእይቶ ኣጋይሽ",
+            "chinese": "客人反馈提交"
+        },
+        "guest_feedback_desc": {
+            "english": "Ratings and feedback collected from embedded forms on your website.",
+            "amharic": "ከድር ጣቢያዎ የተሰበሰቡ ደረጃዎች እና አስተያየቶች።",
+            "oromoo": "Marsariitii keessan irratti yaadaafi sadarkaa sassaabame.",
+            "tigrinya": "ካብ መርበብ ሓበሬታኹም ዝተኣከቡ ደረጃታትን ርእይቶታትን።",
+            "chinese": "从您网站上的嵌入式表格收集的评分和反馈。"
+        },
+        # Modal & Form strings
+        "add_custom_source_modal": {
+            "english": "Add Custom Intelligence Source",
+            "amharic": "ብጁ የኢንተለጀንስ ምንጭ ያክሉ",
+            "oromoo": "Madda Beekumsa Dabalataa Dabaluu",
+            "tigrinya": "ናይ ብሕቲ ምንጪ ኢንተለጀንስ ኣእትው",
+            "chinese": "添加自定义智能来源"
+        },
+        "source_name_label": {
+            "english": "Source Name *",
+            "amharic": "የምንጭ ስም *",
+            "oromoo": "Maqaa Maddaa *",
+            "tigrinya": "ስም ምንጪ *",
+            "chinese": "来源名称 *"
+        },
+        "source_name_placeholder": {
+            "english": "e.g., Competitor Rates API",
+            "amharic": "ለምሳሌ፣ Competitor Rates API",
+            "oromoo": "fak. API Dorgomaa",
+            "tigrinya": "ንኣብ. ኤፒአይ ውድድር",
+            "chinese": "例如：竞争对手房价API"
+        },
+        "source_desc_label": {
+            "english": "What this source tracks *",
+            "amharic": "ይህ ምንጭ ምን ይከታተላል *",
+            "oromoo": "Maddi kun maal hordafa *",
+            "tigrinya": "እዚ ምንጪ እንታይ ይከታተል *",
+            "chinese": "此来源跟踪的内容 *"
+        },
+        "source_desc_placeholder": {
+            "english": "e.g., Daily room rates for 3 competing resorts in Bishoftu. Higher prices mean competitors are raising rates.",
+            "amharic": "ለምሳሌ፣ በቢሾፍቱ ውስጥ ለ 3 ተወዳዳሪ ሪዞርቶች ዕለታዊ የክፍያ ዋጋ።",
+            "oromoo": "fak. Gatii guyyaa 3 resortii dorgomaa Bishooftu. Gatii olaanaan dorgomtoonni dabalu jechuudha.",
+            "tigrinya": "ንኣብ. ዕለታዊ ዋጋ ክፍሊ ን 3 ዝወዳደሩ ሪዞርት ኣብ ቢሾፍቱ።",
+            "chinese": "例如：比绍夫图3家竞争度假村的每日房价。"
+        },
+        "api_url_label": {
+            "english": "API URL",
+            "amharic": "API URL",
+            "oromoo": "URL API",
+            "tigrinya": "URL ኤፒአይ",
+            "chinese": "API URL"
+        },
+        "advanced_config": {
+            "english": "Advanced Configuration",
+            "amharic": "የላቀ ቅንብር",
+            "oromoo": "Qindaa'ina Olaanaa",
+            "tigrinya": "ቅዳሴታት ዝተሓላለኸ",
+            "chinese": "高级配置"
+        },
+        "api_key_label": {
+            "english": "API Key",
+            "amharic": "API ቁልፍ",
+            "oromoo": "Furtuu API",
+            "tigrinya": "ቁልፊ ኤፒአይ",
+            "chinese": "API密钥"
+        },
+        "api_key_label_placeholder": {
+            "english": "Leave blank if not needed",
+            "amharic": "ካልስ ኣያስፈልግም ከተዉት",
+            "oromoo": "Barbaachisaa yoo hin taane dhiisaa",
+            "tigrinya": "እንተዘየድሊ ግደፍዎ",
+            "chinese": "如果不需要请留空"
+        },
+        "api_key_header_label": {
+            "english": "API Key Label / Header Name",
+            "amharic": "የAPI ቁልፍ ስም / የራስጌ ስም",
+            "oromoo": "Maqaa Furtuu API / Maqaa Mataa",
+            "tigrinya": "ስም ቁልፊ ኤፒአይ / ስም ርእሲ",
+            "chinese": "API密钥标签/头部名称"
+        },
+        "custom_headers_label": {
+            "english": "Custom Headers (JSON)",
+            "amharic": "ብጁ ራስጌዎች (JSON)",
+            "oromoo": "Mataa Dabalataa (JSON)",
+            "tigrinya": "ናይ ብሕቲ ርእስታት (JSON)",
+            "chinese": "自定义头部 (JSON)"
+        },
+        "method_label": {
+            "english": "Method",
+            "amharic": "ዘዴ",
+            "oromoo": "Mala",
+            "tigrinya": "ኣገባብ",
+            "chinese": "方法"
+        },
+        "response_path_label": {
+            "english": "Response Path",
+            "amharic": "የምላሽ መንገድ",
+            "oromoo": "Karaa Deebii",
+            "tigrinya": "መንገዲ ምላሽ",
+            "chinese": "响应路径"
+        },
+        "request_body_label": {
+            "english": "Request Body (JSON, for POST)",
+            "amharic": "የጥያቄ አካል (JSON, ለ POST)",
+            "oromoo": "Caffaa Gaaffii (JSON, POSTf)",
+            "tigrinya": "ሰነድ ጠለባ (JSON, ን POST)",
+            "chinese": "请求体 (JSON, 用于POST)"
+        },
+        "test_connection_btn": {
+            "english": "Test Connection",
+            "amharic": "ግንኙነት ይሞክሩ",
+            "oromoo": "Walqabinaa Qoradhu",
+            "tigrinya": "ምትእስሳር ፈትን",
+            "chinese": "测试连接"
+        },
+        "save_source_btn": {
+            "english": "Save Source",
+            "amharic": "ምንጭ አስቀምጥ",
+            "oromoo": "Maddaa Olkaa'i",
+            "tigrinya": "ምንጪ ዓቅብ",
+            "chinese": "保存来源"
+        },
+        # Status strings
+        "status_active": {
+            "english": "Active",
+            "amharic": "ንቁ",
+            "oromoo": "Aktiivii",
+            "tigrinya": "ንጡፍ",
+            "chinese": "活跃"
+        },
+        "status_disabled": {
+            "english": "Disabled",
+            "amharic": "ያበረከተ",
+            "oromoo": "Hojii irraa ari'atame",
+            "tigrinya": "ዝተዓጽወ",
+            "chinese": "已禁用"
+        },
+        "no_custom_sources": {
+            "english": "No custom sources configured. Click \"Add Custom Source\" to get started.",
+            "amharic": "ምንም ብጁ ምንጮች አልተዋቀሩም። ለመጀመር \"ብጁ ምንጭ ያክሉ\" ይጫኑ።",
+            "oromoo": "Maddi dabalataa hin jiru. \"Madda Dabalataa\" tuqi jalqabuuf.",
+            "tigrinya": "ናይ ብሕቲ ምንጪ ኣይተዳለወን። ንምጅማር \"ምንጪ ብሕቲ ኣእትው\" ጠውቑ።",
+            "chinese": "未配置自定义来源。点击\"添加自定义来源\"开始。"
+        },
+        "failed_load_custom_sources": {
+            "english": "Failed to load custom sources.",
+            "amharic": "ብጁ ምንጮችን መጫን አልተሳካም።",
+            "oromoo": "Madda dabalataa fe'uu hin dandeenye.",
+            "tigrinya": "ምንጪታት ብሕቲ ክጽዓን ኣይተኻእለን።",
+            "chinese": "加载自定义来源失败。"
+        },
+        "delete_custom_source_confirm": {
+            "english": "Delete this custom source?",
+            "amharic": "ይህን ብጁ ምንጭ ይሰርዙ?",
+            "oromoo": "Madda dabalataa kana haquu?",
+            "tigrinya": "ነዚ ናይ ብሕቲ ምንጪ ክትስርዞ?",
+            "chinese": "删除此自定义来源？"
+        },
+        "no_employees_yet": {
+            "english": "No employees linked to this hotel yet.",
+            "amharic": "እስካሁን ከዚህ ሆቴል ጋር የተገናኙ ሰራተኞች የሉም።",
+            "oromoo": "Hojjettoonni hanga ammaa hoteela kana waliin hin walqabanne.",
+            "tigrinya": "ክሳብ ሕጂ ምስዚ ሆቴል ዝተሓሓዙ ሰራሕተኛታት የለዉን።",
+            "chinese": "尚未有员工链接到此酒店。"
+        },
+        "creating": {
+            "english": "Creating...",
+            "amharic": "በመፍጠር ላይ...",
+            "oromoo": "Uumamaa jira...",
+            "tigrinya": "ይፈጠር ኣሎ...",
+            "chinese": "创建中..."
+        },
+        "no_embed_links": {
+            "english": "No embed links created yet.",
+            "amharic": "እስካሁን ምንም የማካተት ሊንኮች አልተፈጠሩም።",
+            "oromoo": "Liinkii嵌入 hin uumamne.",
+            "tigrinya": "ክሳብ ሕጂ ሊንክ ኣእታዊ ኣይተፈጥረን።",
+            "chinese": "尚未创建嵌入链接。"
+        },
+        "no_guest_feedback": {
+            "english": "No guest feedback collected via embed forms.",
+            "amharic": "በማካተት ቅጾች አማካኝነት ምንም የእንግዳ አስተያየት አልተሰበሰበም።",
+            "oromoo": "Yaadni keessummaa unka嵌入 irratti hin sassaabamne.",
+            "tigrinya": "ብቅጥዒ ኣእታዊ ዝተኣከበ ርእይቶ ኣጋይሽ የለን።",
+            "chinese": "尚未通过嵌入表格收集客人反馈。"
+        },
+        "staff_intelligence_feed": {
+            "english": "Staff Intelligence Feed",
+            "amharic": "የሰራተኛ ኢንተለጀንስ ፊድ",
+            "oromoo": "Cabeeffannoo Beekumsa Hojjettootaa",
+            "tigrinya": "ናይ ሰራሕተኛታት ኢንተለጀንስ ፊድ",
+            "chinese": "员工智能动态"
+        },
+        "top_contributors": {
+            "english": "Top Contributors",
+            "amharic": "ምርጥ አስተዋጽኦ አድራጊዎች",
+            "oromoo": "Gumaastoota Olaanoo",
+            "tigrinya": "ዝለዓለ ኣበርከቲ",
+            "chinese": "最佳贡献者"
+        },
+        "loading_reports": {
+            "english": "Loading reports...",
+            "amharic": "ሪፖርቶችን በመጫን ላይ...",
+            "oromoo": "Gabaasota fe'aa jira...",
+            "tigrinya": "ጸብጻባት ይጽዓኑ ኣለዉ...",
+            "chinese": "加载报告中..."
+        },
+        "no_reports_staff": {
+            "english": "No staff reports submitted yet.",
+            "amharic": "እስካሁን ምንም የሰራተኛ ሪፖርት አልቀረበም።",
+            "oromoo": "Gabaasi hojjettootaa hanga ammaa hin ergamne.",
+            "tigrinya": "ክሳብ ሕጂ ጸብጻብ ሰራሕተኛታት ኣይኣተወን።",
+            "chinese": "尚未提交员工报告。"
+        },
+        "failed_load_staff": {
+            "english": "Failed to load staff intelligence.",
+            "amharic": "የሰራተኛ ኢንተለጀንስ መጫን አልተሳካም።",
+            "oromoo": "Beekumsa hojjettootaa fe'uu hin dandeenye.",
+            "tigrinya": "ኢንተለጀንስ ሰራሕተኛታት ክጽዓን ኣይተኻእለን።",
+            "chinese": "加载员工智能失败。"
+        },
+        "no_leaderboard": {
+            "english": "No staff contributions yet.",
+            "amharic": "እስካሁን ምንም የሰራተኛ አስተዋጽኦ የለም።",
+            "oromoo": "Gumaansi hojjettootaa hin jiru.",
+            "tigrinya": "ክሳብ ሕጂ ኣበርክቶ ሰራሕተኛታት የለን።",
+            "chinese": "尚未有员工贡献。"
+        },
+        "copy_link": {
+            "english": "Copy Link",
+            "amharic": "ሊንክ ኮፒ",
+            "oromoo": "Liinkii Koppii",
+            "tigrinya": "ሊንክ ኮፒ",
+            "chinese": "复制链接"
+        },
+        "copied": {
+            "english": "Copied!",
+            "amharic": "ተቀድቷል!",
+            "oromoo": "Koppiifame!",
+            "tigrinya": "ተቐዲሑ!",
+            "chinese": "已复制！"
+        },
+        "delete": {
+            "english": "Delete",
+            "amharic": "ሰርዝ",
+            "oromoo": "Haqi",
+            "tigrinya": "ሰርዝ",
+            "chinese": "删除"
+        },
+        "delete_embed_confirm": {
+            "english": "Delete this embed link? Submissions will be preserved.",
+            "amharic": "ይህን የማካተት ሊንክ ይሰርዙ? ማስገቢያዎች ይጠበቃሉ።",
+            "oromoo": "Liinkii kana haquu? Ergamni eegama.",
+            "tigrinya": "ነዚ ሊንክ ኣእታዊ ክትስርዞ? ዝኣተወ ይዕቀብ።",
+            "chinese": "删除此嵌入链接？提交将被保留。"
+        },
+        "reset_password": {
+            "english": "Reset PW",
+            "amharic": "PW ዳግም ያስገቡ",
+            "oromoo": "Darbii Haaromsi",
+            "tigrinya": "ናይ ምሕላፍ ቃል ዳግማይ ምድላው",
+            "chinese": "重置密码"
+        },
+        "remove_employee": {
+            "english": "Remove",
+            "amharic": "አስወግድ",
+            "oromoo": "Kaasi",
+            "tigrinya": "ኣውግድ",
+            "chinese": "移除"
+        },
+        "remove_employee_confirm": {
+            "english": "Remove this employee? They will no longer be able to login.",
+            "amharic": "ይህን ሰራተኛ ያስወግዱ? መግባት አይችሉም።",
+            "oromoo": "Hojjetaa kana kaasi? Hin seenan.",
+            "tigrinya": "ነዚ ሰራሕተኛ ከተውጽእ? ኣይክኣቱን እዮም።",
+            "chinese": "移除此员工？他们将无法再登录。"
+        },
+        "password_reset_success": {
+            "english": "Password reset successfully.",
+            "amharic": "የይለፍ ቃል በተሳካ ሁኔታ ተደግሟል።",
+            "oromoo": "Jechi darbii milkaa'inaan haarome.",
+            "tigrinya": "ናይ ምሕላፍ ቃል ብዓወት ተሓዲሱ።",
+            "chinese": "密码重置成功。"
+        },
+        "password_min_length": {
+            "english": "Password must be at least 4 characters.",
+            "amharic": "የይለፍ ቃል ቢያንስ 4 ፊደላት ሊኖሩት ይገባል።",
+            "oromoo": "Jechi darbii xiqqaate arfii 4 qabaachuu qaba.",
+            "tigrinya": "ናይ ምሕላፍ ቃል ወሓዱ 4 ኣርፍቲ ክህልውዎ ኣለዎ።",
+            "chinese": "密码必须至少4个字符。"
+        },
+        "network_error": {
+            "english": "Network error.",
+            "amharic": "የኔትወርክ ስህተት።",
+            "oromoo": "Dogoggaara networkii.",
+            "tigrinya": "ስሕተት ኔትወርክ።",
+            "chinese": "网络错误。"
+        },
+        "email_password_required": {
+            "english": "Email and password required.",
+            "amharic": "ኢሜይል እና የይለፍ ቃል ያስፈልጋል።",
+            "oromoo": "Imeelii fi jechi darbii barbaachisaa.",
+            "tigrinya": "ኢመይልን ናይ ምሕላፍ ቃል የድሊ።",
+            "chinese": "需要邮箱和密码。"
+        },
+        # Neural Cycle (chat)
+        "neural_cycle": {
+            "english": "Neural Cycle",
+            "amharic": "የነርቭ ዑደት",
+            "oromoo": "Marsaa Narvii",
+            "tigrinya": "ዑደት ነርቭ",
+            "chinese": "神经周期"
+        },
+        # Signal status
+        "signal_error": {
+            "english": "Signal Error",
+            "amharic": "የሲግናል ስህተት",
+            "oromoo": "Dogoggaara Sagnaalii",
+            "tigrinya": "ስሕተት ሲግናል",
+            "chinese": "信号错误"
+        },
+        "raw_data_not_available": {
+            "english": "Raw data not available for this signal.",
+            "amharic": "ለዚህ ሲግናል ጥሬ ውሂብ አይገኝም።",
+            "oromoo": "Daataan qulqulluu sagnaalii kanaaf hin jiru.",
+            "tigrinya": "ጥረ ዳታ ንዚ ሲግናል የለን።",
+            "chinese": "此信号的原始数据不可用。"
+        },
+        "no_data_for_signal": {
+            "english": "No data available for \"{name}\" at this location.",
+            "amharic": "ለ\"{name}\" በዚህ ቦታ ውሂብ አይገኝም።",
+            "oromoo": "Daataan \"{name}\" bakka kanaa hin jiru.",
+            "tigrinya": "ዳታ ን \"{name}\" ኣብዚ ቦታ የለን።",
+            "chinese": "此位置没有\"{name}\"的数据。"
+        },
+        # Embed stats
+        "avg_overall": {
+            "english": "Avg Overall",
+            "amharic": "አማካይ አጠቃላይ",
+            "oromoo": "Aveeraa Waliigalaa",
+            "tigrinya": "ማእከላይ ጠቕላላ",
+            "chinese": "平均总体"
+        },
+        "recommend": {
+            "english": "Recommend",
+            "amharic": "ይመከራል",
+            "oromoo": "Gorsuu",
+            "tigrinya": "ምኽሪ",
+            "chinese": "推荐"
+        },
+        "submissions": {
+            "english": "Submissions",
+            "amharic": "ማስገቢያዎች",
+            "oromoo": "Ergama",
+            "tigrinya": "ዝኣተወ",
+            "chinese": "提交"
+        },
+        # Positive/Negative/Neutral in staff reports
+        "positive_label": {
+            "english": "Positive",
+            "amharic": "አወንታዊ",
+            "oromoo": "Gaarii",
+            "tigrinya": "ኣወንታዊ",
+            "chinese": "积极"
+        },
+        "negative_label": {
+            "english": "Negative",
+            "amharic": "አሉታዊ",
+            "oromoo": "Hamaa",
+            "tigrinya": "ኣሉታዊ",
+            "chinese": "消极"
+        },
+        "neutral_label": {
+            "english": "Neutral",
+            "amharic": "ገለልተኛ",
+            "oromoo": "Giddu Galeessa",
+            "tigrinya": "ገለልተኛ",
+            "chinese": "中立"
+        },
+        "total_reports_label": {
+            "english": "Total Reports",
+            "amharic": "ጠቅላላ ሪፖርቶች",
+            "oromoo": "Gabaasa Waliigalaa",
+            "tigrinya": "ጠቕላላ ጸብጻባት",
+            "chinese": "报告总数"
+        },
     }
 }
 
