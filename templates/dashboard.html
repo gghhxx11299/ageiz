@@ -270,15 +270,46 @@
 
         .chat-sidebar.expanded {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 900px; height: 80vh; z-index: 2100;
+            width: 900px; max-width: 95vw; height: 80vh; max-height: 90vh; z-index: 2100;
             border-radius: 32px; border: 1px solid var(--accent);
             box-shadow: 0 50px 100px rgba(0,0,0,0.6);
+        }
+
+        @media (max-width: 768px) {
+            .chat-sidebar.expanded {
+                width: 100vw;
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                top: 0;
+                left: 0;
+                transform: none;
+            }
         }
 
         .chat-overlay-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
             z-index: 2050; display: none;
+        }
+
+        /* Dashboard Input Styles */
+        .location-section input[type="text"], 
+        .location-section input[type="email"], 
+        .location-section input[type="password"],
+        .location-section select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .location-section input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         #sidebar-overlay-bg {
@@ -860,8 +891,20 @@
         <!-- Settings View -->
         <div class="location-section" id="view-settings">
             <div class="top-bar">
-                <h1 class="view-title">{{ translations.account_settings if translations else 'Account Settings' }}</h1>
-            </div>
+                <div class="top-bar-left">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display:none; background:var(--primary); border:none; color:#FFF; cursor:pointer; padding:8px; border-radius:8px; margin-right:8px; box-shadow:0 4px 10px var(--primary-glow);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+                    <h1 class="view-title">{{ translations.account_settings if translations else 'Account Settings' }}</h1>
+                    <select id="language-selector-settings" class="language-selector-top" onchange="changeLanguage(this.value)">
+                        <option value="english" {% if user_language == 'english' %}selected{% endif %}>🇬🇧 English</option>
+                        <option value="amharic" {% if user_language == 'amharic' %}selected{% endif %}>🇪🇹 አማርኛ</option>
+                        <option value="oromoo" {% if user_language == 'oromoo' %}selected{% endif %}>🇪🇹 Afaan Oromoo</option>
+                        <option value="tigrinya" {% if user_language == 'tigrinya' %}selected{% endif %}>🇪🇷 ትግርኛ</option>
+                        <option value="chinese" {% if user_language == 'chinese' %}selected{% endif %}>🇨🇳 中文</option>
+                    </select>
+                    </div>
+                    </div>
             <div class="content-body">
                 <div class="hero-card">
                     <span class="sector-name">{{ translations.security_sessions if translations else 'Security & Sessions' }}</span>
@@ -1344,6 +1387,13 @@
         expandBtn.addEventListener('click', () => {
             const isExpanded = chatSidebar.classList.toggle('expanded');
             overlayBg.style.display = isExpanded ? 'block' : 'none';
+            
+            // Toggle icon
+            if (isExpanded) {
+                expandBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>`;
+            } else {
+                expandBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>`;
+            }
         });
 
         overlayBg.addEventListener('click', () => {
@@ -1708,9 +1758,7 @@
             try {
                 const res = await fetch('/api/telegram/status', { credentials: 'include' });
 
-                // If session expired or invalid, show unlinked state instead of hanging
                 if (res.status === 401) {
-                    console.warn("[telegram] Session expired, showing unlinked state");
                     loading.style.display = 'none';
                     unlinked.style.display = 'block';
                     linked.style.display = 'none';
@@ -1745,95 +1793,83 @@
                         settingsStatus.style.color = "var(--text-dim)";
                         settingsActions.innerHTML = `
                             <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px;">${T.linkTelegramDesc}</p>
-                            <button onclick="generateTelegramOTP()" style="padding: 12px 24px; background: var(--primary); border: none; color: #FFF; border-radius: 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-transform: uppercase;">${T.initializeMobileLink}</button>
+                            <div id="settings-otp-container">
+                                <button onclick="generateTelegramOTP(this)" style="padding: 12px 24px; background: var(--primary); border: none; color: #FFF; border-radius: 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-transform: uppercase;">${T.initializeMobileLink}</button>
+                            </div>
                         `;
                     }
                 }
             } catch (e) {
-                console.error("TG status failed", e);
-                // On network error, show unlinked state
                 loading.style.display = 'none';
                 unlinked.style.display = 'block';
                 linked.style.display = 'none';
-                if (settingsStatus) {
-                    settingsStatus.textContent = T.statusNotLinked;
-                    settingsStatus.style.color = "var(--text-dim)";
-                }
             }
         }
 
-        async function generateTelegramOTP() {
-            const btn = document.getElementById('tg-otp-btn');
-            const display = document.getElementById('tg-otp-display');
-            const codeSpan = document.getElementById('tg-otp-code');
+        async function generateTelegramOTP(clickedBtn) {
+            const sidebarBtn = document.getElementById('tg-otp-btn');
+            const sidebarDisplay = document.getElementById('tg-otp-display');
+            const sidebarCodeSpan = document.getElementById('tg-otp-code');
+            const settingsOtpContainer = document.getElementById('settings-otp-container');
 
-            btn.disabled = true;
-            btn.textContent = T.generating;
+            if (clickedBtn) {
+                clickedBtn.disabled = true;
+                clickedBtn.textContent = T.generating;
+            }
+            if (sidebarBtn && sidebarBtn !== clickedBtn) {
+                sidebarBtn.disabled = true;
+                sidebarBtn.textContent = T.generating;
+            }
 
             try {
                 const res = await fetch('/api/telegram/generate-otp', { method: 'POST', credentials: 'include' });
                 const data = await res.json();
-                codeSpan.textContent = data.otp;
-                btn.style.display = 'none';
-                display.style.display = 'block';
+                
+                if (data.otp) {
+                    // Update Sidebar
+                    if (sidebarCodeSpan) sidebarCodeSpan.textContent = data.otp;
+                    if (sidebarBtn) sidebarBtn.style.display = 'none';
+                    if (sidebarDisplay) sidebarDisplay.style.display = 'block';
 
-                // Start polling for link status every 10 seconds
-                if (generateTelegramOTP._pollInterval) clearInterval(generateTelegramOTP._pollInterval);
-                generateTelegramOTP._pollInterval = setInterval(async () => {
-                    try {
-                        const statusRes = await fetch('/api/telegram/status', { credentials: 'include' });
-
-                        // Stop polling if session expired
-                        if (statusRes.status === 401) {
-                            console.warn("[telegram] Session expired during polling, stopping");
-                            clearInterval(generateTelegramOTP._pollInterval);
-                            generateTelegramOTP._pollInterval = null;
-                            return;
-                        }
-
-                        const statusData = await statusRes.json();
-
-                        if (statusData.linked) {
-                            clearInterval(generateTelegramOTP._pollInterval);
-                            generateTelegramOTP._pollInterval = null;
-
-                            // Update sidebar UI
-                            document.getElementById('tg-status-loading').style.display = 'none';
-                            document.getElementById('tg-status-unlinked').style.display = 'none';
-                            document.getElementById('tg-status-linked').style.display = 'block';
-                            btn.style.display = 'none';
-                            display.style.display = 'none';
-
-                            // Update settings section
-                            const settingsStatus = document.getElementById('settings-tg-status');
-                            const settingsActions = document.getElementById('settings-tg-actions');
-                            if (settingsStatus) {
-                                settingsStatus.textContent = T.statusActiveLinked;
-                                settingsStatus.style.color = "var(--pos)";
-                            }
-                            if (settingsActions) {
-                                settingsActions.innerHTML = `
-                                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px;">${T.accountLinkedDesc}</p>
-                                    <button onclick="unlinkTelegram()" style="padding: 12px 24px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--neg); border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-transform: uppercase;">${T.terminateMobileSession}</button>
-                                `;
-                            }
-                        }
-                    } catch (e) {
-                        // Keep polling even if one check fails
+                    // Update Settings View if exists
+                    if (settingsOtpContainer) {
+                        settingsOtpContainer.innerHTML = `
+                            <div style="text-align:center; padding: 20px; background: rgba(186, 146, 64, 0.05); border: 1px dashed var(--accent); border-radius: 12px; max-width: 300px;">
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--accent); letter-spacing: 4px; margin-bottom: 8px;">${data.otp}</div>
+                                <p style="font-size: 0.75rem; color: var(--text-dim);">Enter this code to @AgeizBot on Telegram.</p>
+                                <p style="font-size: 0.6rem; color: var(--text-dim); margin-top: 4px;">Expires in 5 minutes</p>
+                            </div>
+                        `;
                     }
-                }, 10000);
 
-                // Auto-stop polling after 5 minutes (OTP expiry)
-                setTimeout(() => {
-                    if (generateTelegramOTP._pollInterval) {
-                        clearInterval(generateTelegramOTP._pollInterval);
-                        generateTelegramOTP._pollInterval = null;
-                    }
-                }, 300000);
-
+                    // Start polling... (existing polling logic)
+                    if (generateTelegramOTP._pollInterval) clearInterval(generateTelegramOTP._pollInterval);
+                    generateTelegramOTP._pollInterval = setInterval(async () => {
+                        try {
+                            const statusRes = await fetch('/api/telegram/status', { credentials: 'include' });
+                            if (statusRes.status === 401) {
+                                clearInterval(generateTelegramOTP._pollInterval);
+                                generateTelegramOTP._pollInterval = null;
+                                return;
+                            }
+                            const statusData = await statusRes.json();
+                            if (statusData.linked) {
+                                clearInterval(generateTelegramOTP._pollInterval);
+                                generateTelegramOTP._pollInterval = null;
+                                checkTelegramStatus();
+                            }
+                        } catch (e) {}
+                    }, 10000);
+                }
             } catch (e) {
-                btn.disabled = false;
-                btn.textContent = "Retry";
+                if (clickedBtn) {
+                    clickedBtn.disabled = false;
+                    clickedBtn.textContent = "Retry";
+                }
+                if (sidebarBtn) {
+                    sidebarBtn.disabled = false;
+                    sidebarBtn.textContent = "Retry";
+                }
             }
         }
         generateTelegramOTP._pollInterval = null;
