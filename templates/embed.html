@@ -182,21 +182,15 @@
                 <textarea id="feedback" placeholder="Tell us about your experience..."></textarea>
             </div>
 
-            <div class="recommend-row">
-                <label style="cursor:pointer">Would you recommend us?</label>
-                <div class="toggle" style="cursor:pointer">
-                    <input type="checkbox" id="recommend" onclick="event.stopPropagation()">
-                    <span class="slider"></span>
-                </div>
+            <div class="recommend-row" id="recommend-row">
+                <label style="cursor:pointer;flex:1;display:flex;align-items:center;gap:12px;">
+                    <span>Would you recommend us?</span>
+                    <div class="toggle" id="recommend-toggle">
+                        <input type="checkbox" id="recommend">
+                        <span class="slider"></span>
+                    </div>
+                </label>
             </div>
-
-            <script>
-                // Make the toggle area clickable to flip the checkbox
-                document.querySelector('.toggle').addEventListener('click', function() {
-                    const cb = document.getElementById('recommend');
-                    cb.checked = !cb.checked;
-                });
-            </script>
 
             <button class="submit-btn" id="submit-btn" onclick="submitForm()">Submit Feedback</button>
         </div>
