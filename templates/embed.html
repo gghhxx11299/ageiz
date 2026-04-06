@@ -121,11 +121,11 @@
             <div class="rating-group">
                 <label>Overall Experience</label>
                 <div class="stars" data-field="overall">
-                    <input type="radio" name="overall" id="overall-5" value="5"><label for="overall-5" class="star">★</label>
-                    <input type="radio" name="overall" id="overall-4" value="4"><label for="overall-4" class="star">★</label>
-                    <input type="radio" name="overall" id="overall-3" value="3"><label for="overall-3" class="star">★</label>
-                    <input type="radio" name="overall" id="overall-2" value="2"><label for="overall-2" class="star">★</label>
-                    <input type="radio" name="overall" id="overall-1" value="1"><label for="overall-1" class="star">★</label>
+                    <span class="star" data-value="5">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="1">★</span>
                 </div>
             </div>
 
@@ -133,11 +133,11 @@
             <div class="rating-group">
                 <label>Cleanliness</label>
                 <div class="stars" data-field="cleanliness">
-                    <input type="radio" name="cleanliness" id="clean-5" value="5"><label for="clean-5" class="star">★</label>
-                    <input type="radio" name="cleanliness" id="clean-4" value="4"><label for="clean-4" class="star">★</label>
-                    <input type="radio" name="cleanliness" id="clean-3" value="3"><label for="clean-3" class="star">★</label>
-                    <input type="radio" name="cleanliness" id="clean-2" value="2"><label for="clean-2" class="star">★</label>
-                    <input type="radio" name="cleanliness" id="clean-1" value="1"><label for="clean-1" class="star">★</label>
+                    <span class="star" data-value="5">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="1">★</span>
                 </div>
             </div>
 
@@ -145,11 +145,11 @@
             <div class="rating-group">
                 <label>Staff Friendliness</label>
                 <div class="stars" data-field="staff">
-                    <input type="radio" name="staff" id="staff-5" value="5"><label for="staff-5" class="star">★</label>
-                    <input type="radio" name="staff" id="staff-4" value="4"><label for="staff-4" class="star">★</label>
-                    <input type="radio" name="staff" id="staff-3" value="3"><label for="staff-3" class="star">★</label>
-                    <input type="radio" name="staff" id="staff-2" value="2"><label for="staff-2" class="star">★</label>
-                    <input type="radio" name="staff" id="staff-1" value="1"><label for="staff-1" class="star">★</label>
+                    <span class="star" data-value="5">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="1">★</span>
                 </div>
             </div>
 
@@ -157,11 +157,11 @@
             <div class="rating-group">
                 <label>Value for Money</label>
                 <div class="stars" data-field="value">
-                    <input type="radio" name="value" id="value-5" value="5"><label for="value-5" class="star">★</label>
-                    <input type="radio" name="value" id="value-4" value="4"><label for="value-4" class="star">★</label>
-                    <input type="radio" name="value" id="value-3" value="3"><label for="value-3" class="star">★</label>
-                    <input type="radio" name="value" id="value-2" value="2"><label for="value-2" class="star">★</label>
-                    <input type="radio" name="value" id="value-1" value="1"><label for="value-1" class="star">★</label>
+                    <span class="star" data-value="5">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="1">★</span>
                 </div>
             </div>
 
@@ -169,11 +169,11 @@
             <div class="rating-group">
                 <label>Food &amp; Beverage</label>
                 <div class="stars" data-field="food">
-                    <input type="radio" name="food" id="food-5" value="5"><label for="food-5" class="star">★</label>
-                    <input type="radio" name="food" id="food-4" value="4"><label for="food-4" class="star">★</label>
-                    <input type="radio" name="food" id="food-3" value="3"><label for="food-3" class="star">★</label>
-                    <input type="radio" name="food" id="food-2" value="2"><label for="food-2" class="star">★</label>
-                    <input type="radio" name="food" id="food-1" value="1"><label for="food-1" class="star">★</label>
+                    <span class="star" data-value="5">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="1">★</span>
                 </div>
             </div>
 
@@ -297,57 +297,55 @@
             });
         }
 
-        function getStarRating(field) {
-            const checked = document.querySelector(`input[name="${field}"]:checked`);
-            return checked ? parseInt(checked.value) : null;
-        }
+        // Simple star rating with JS only - no browser interference
+        const starRatings = {};
 
-        // Star rating: click to select/deselect with visual feedback
         document.querySelectorAll('.stars').forEach(group => {
-            const labels = group.querySelectorAll('label.star');
-            // Get values from the label's "for" attribute (e.g., "overall-5" -> 5)
-            const values = Array.from(labels).map(l => parseInt(l.getAttribute('for').split('-').pop()));
+            const field = group.dataset.field;
+            const stars = group.querySelectorAll('.star');
 
-            labels.forEach((label, idx) => {
-                const val = values[idx];
+            starRatings[field] = null; // no selection
 
-                // Click handler
-                label.addEventListener('click', function() {
-                    const input = group.querySelector(`#${label.getAttribute('for')}`);
-                    // Toggle: uncheck if already selected
-                    if (input.checked) {
-                        input.checked = false;
+            stars.forEach((star, idx) => {
+                const value = parseInt(star.dataset.value);
+
+                star.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Toggle: unselect if already selected
+                    if (starRatings[field] === value) {
+                        starRatings[field] = null;
                     } else {
-                        input.checked = true;
+                        starRatings[field] = value;
                     }
-                    updateStarVisual(group);
+                    renderStars(group, starRatings[field]);
                 });
 
-                // Hover effect: highlight stars with value >= hovered value
-                label.addEventListener('mouseenter', function() {
-                    labels.forEach((l, i) => {
-                        l.classList.toggle('hover-active', values[i] >= val);
-                    });
+                star.addEventListener('mouseenter', function() {
+                    previewStars(group, value);
                 });
 
-                label.addEventListener('mouseleave', function() {
-                    labels.forEach(l => l.classList.remove('hover-active'));
+                star.addEventListener('mouseleave', function() {
+                    renderStars(group, starRatings[field]);
                 });
             });
 
-            updateStarVisual(group);
+            renderStars(group, null);
         });
 
-        function updateStarVisual(group) {
-            const labels = group.querySelectorAll('label.star');
-            // Find checked value
-            const checked = group.querySelector('input:checked');
-            const checkedVal = checked ? parseInt(checked.value) : 0;
-
-            labels.forEach(label => {
-                const val = parseInt(label.getAttribute('for').split('-').pop());
-                label.classList.toggle('active', val <= checkedVal);
+        function renderStars(group, value) {
+            group.querySelectorAll('.star').forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.value) >= value);
             });
+        }
+
+        function previewStars(group, hoverValue) {
+            group.querySelectorAll('.star').forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.value) >= hoverValue);
+            });
+        }
+
+        function getStarRating(field) {
+            return starRatings[field] || null;
         }
     </script>
 </body>
