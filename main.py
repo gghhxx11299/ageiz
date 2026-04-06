@@ -576,6 +576,12 @@ def dashboard(request: Request, session: dict = Depends(require_session)):
         "yield_food_beverage": get_translation("yield_food_beverage", user_language),
     }
 
+    # Translate AI-generated dashboard content (recommendations, interpretations, signals)
+    if user_language and user_language.lower() != "english":
+        from translator import translate_dict
+        dashboard_data = translate_dict(dashboard_data, user_language)
+        hotel = translate_dict(hotel, user_language)
+
     return templates.TemplateResponse(request, "dashboard.html", {
         "session": session,
         "hotel": hotel,
@@ -592,21 +598,37 @@ def get_recommendation(hotel_id: int, location: str, session: dict = Depends(req
     if session_hotel is not None and session_hotel != hotel_id:
         raise HTTPException(status_code=403, detail="Access denied")
 
+    user_language = session.get("language", "english")
     cached = get_cache(hotel_id, location, "latest_recommendation")
     if not cached:
         return JSONResponse({"error": "No recommendation available. Run the pipeline first."})
-    return JSONResponse(json.loads(cached))
+
+    data = json.loads(cached)
+    # Translate AI-generated recommendation
+    if user_language and user_language.lower() != "english":
+        from translator import translate_dict
+        data = translate_dict(data, user_language)
+
+    return JSONResponse(data)
 
 @app.get("/api/signals/{hotel_id}/{location}")
 def get_signals(hotel_id: int, location: str, session: dict = Depends(require_session)):
     session_hotel = session.get("hotel_id")
     if session_hotel is not None and session_hotel != hotel_id:
         raise HTTPException(status_code=403, detail="Access denied")
-    
+
+    user_language = session.get("language", "english")
     cached = get_cache(hotel_id, location, "today_signals")
     if not cached:
         return JSONResponse({"error": "No signals available. Run the pipeline first."})
-    return JSONResponse(json.loads(cached))
+
+    data = json.loads(cached)
+    # Translate AI-generated signal interpretations
+    if user_language and user_language.lower() != "english":
+        from translator import translate_dict
+        data = translate_dict(data, user_language)
+
+    return JSONResponse(data)
 
 @app.get("/api/history/{hotel_id}/{location}")
 def get_history(hotel_id: int, location: str, session: dict = Depends(require_session)):
@@ -759,6 +781,13 @@ def staff_dashboard(request: Request, session: dict = Depends(require_staff_sess
         "ai_processing": get_translation("ai_processing", user_language),
         "report_submitted": get_translation("report_submitted", user_language),
     }
+
+    # Translate AI-generated content (reports, summaries)
+    if user_language and user_language.lower() != "english":
+        from translator import translate_dict
+        reports = translate_dict(reports, user_language)
+        summary = translate_dict(summary, user_language)
+        hotel = translate_dict(hotel, user_language) if hotel else None
 
     return templates.TemplateResponse(request, "staff_dashboard.html", {
         "session": session,
@@ -946,9 +975,17 @@ def get_staff_intelligence_api(hotel_id: int, session: dict = Depends(require_se
     if session_hotel is not None and session_hotel != hotel_id:
         raise HTTPException(status_code=403, detail="Access denied")
 
+    user_language = session.get("language", "english")
+
     from database import get_staff_reports, get_staff_report_summary
     reports = get_staff_reports(hotel_id, limit=30)
     summary = get_staff_report_summary(hotel_id, days=7)
+
+    # Translate AI-generated staff intelligence
+    if user_language and user_language.lower() != "english":
+        from translator import translate_dict
+        reports = translate_dict(reports, user_language)
+        summary = translate_dict(summary, user_language)
 
     return JSONResponse({
         "reports": reports,
