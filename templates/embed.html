@@ -121,11 +121,11 @@
             <div class="rating-group">
                 <label>Overall Experience</label>
                 <div class="stars" data-field="overall">
-                    <span class="star" data-value="5">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="2">★</span>
                     <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
                 </div>
             </div>
 
@@ -133,11 +133,11 @@
             <div class="rating-group">
                 <label>Cleanliness</label>
                 <div class="stars" data-field="cleanliness">
-                    <span class="star" data-value="5">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="2">★</span>
                     <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
                 </div>
             </div>
 
@@ -145,11 +145,11 @@
             <div class="rating-group">
                 <label>Staff Friendliness</label>
                 <div class="stars" data-field="staff">
-                    <span class="star" data-value="5">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="2">★</span>
                     <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
                 </div>
             </div>
 
@@ -157,11 +157,11 @@
             <div class="rating-group">
                 <label>Value for Money</label>
                 <div class="stars" data-field="value">
-                    <span class="star" data-value="5">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="2">★</span>
                     <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
                 </div>
             </div>
 
@@ -169,11 +169,11 @@
             <div class="rating-group">
                 <label>Food &amp; Beverage</label>
                 <div class="stars" data-field="food">
-                    <span class="star" data-value="5">★</span>
-                    <span class="star" data-value="4">★</span>
-                    <span class="star" data-value="3">★</span>
-                    <span class="star" data-value="2">★</span>
                     <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
                 </div>
             </div>
 
@@ -183,12 +183,20 @@
             </div>
 
             <div class="recommend-row">
-                <label>Would you recommend us?</label>
-                <div class="toggle">
-                    <input type="checkbox" id="recommend">
+                <label style="cursor:pointer">Would you recommend us?</label>
+                <div class="toggle" style="cursor:pointer">
+                    <input type="checkbox" id="recommend" onclick="event.stopPropagation()">
                     <span class="slider"></span>
                 </div>
             </div>
+
+            <script>
+                // Make the toggle area clickable to flip the checkbox
+                document.querySelector('.toggle').addEventListener('click', function() {
+                    const cb = document.getElementById('recommend');
+                    cb.checked = !cb.checked;
+                });
+            </script>
 
             <button class="submit-btn" id="submit-btn" onclick="submitForm()">Submit Feedback</button>
         </div>
