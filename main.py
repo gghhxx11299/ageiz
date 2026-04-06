@@ -576,11 +576,9 @@ def dashboard(request: Request, session: dict = Depends(require_session)):
         "yield_food_beverage": get_translation("yield_food_beverage", user_language),
     }
 
-    # Translate AI-generated dashboard content (recommendations, interpretations, signals)
-    if user_language and user_language.lower() != "english":
-        from translator import translate_dict
-        dashboard_data = translate_dict(dashboard_data, user_language)
-        hotel = translate_dict(hotel, user_language)
+    # NOTE: AI-generated content (recommendations, signals, interpretations) is NOT
+    # translated on page render to avoid blocking. Instead, the dashboard JS calls
+    # /api/recommendation and /api/signals which handle translation asynchronously.
 
     return templates.TemplateResponse(request, "dashboard.html", {
         "session": session,
@@ -782,12 +780,8 @@ def staff_dashboard(request: Request, session: dict = Depends(require_staff_sess
         "report_submitted": get_translation("report_submitted", user_language),
     }
 
-    # Translate AI-generated content (reports, summaries)
-    if user_language and user_language.lower() != "english":
-        from translator import translate_dict
-        reports = translate_dict(reports, user_language)
-        summary = translate_dict(summary, user_language)
-        hotel = translate_dict(hotel, user_language) if hotel else None
+    # NOTE: AI-generated content (reports, summaries) is NOT translated on page render
+    # to avoid blocking. Translation happens on API endpoints called asynchronously.
 
     return templates.TemplateResponse(request, "staff_dashboard.html", {
         "session": session,
