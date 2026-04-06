@@ -19,11 +19,12 @@ GROQ_LIGHT_MODEL = "llama-3.1-8b-instant"
 OPENROUTER_MODEL = "meta-llama/llama-3-70b-instruct"
 
 # Constants for retry and fallback logic
-MAX_RETRIES = 3
-RETRY_DELAY_SECONDS = 20
-FALLBACK_DURATION_SECONDS = 300
-FAILURE_THRESHOLD = 3
-OPENROUTER_TIMEOUT_SECONDS = 60
+MAX_RETRIES = 2
+RETRY_DELAY_SECONDS = 5
+FALLBACK_DURATION_SECONDS = 180
+FAILURE_THRESHOLD = 2
+OPENROUTER_TIMEOUT_SECONDS = 30
+HARD_TIMEOUT_SECONDS = 45
 
 def _clean_json_response(text: str) -> str:
     text = text.strip()
@@ -66,13 +67,19 @@ def _call_openrouter(prompt: str) -> str:
 
 def call_ai(prompt: str, use_heavy_model: bool = False) -> str:
     global _consecutive_failures, _fallback_until
-    
+
+    start = time.time()
+
     if time.time() < _fallback_until:
         print(f"[ai_client] In fallback mode. Using OpenRouter.")
-        result = _call_openrouter(prompt)
-        return result
-    
+        return _call_openrouter(prompt)
+
     for attempt in range(MAX_RETRIES):
+        if time.time() - start > HARD_TIMEOUT_SECONDS:
+            print("[ai_client] Hard timeout reached. Switching to OpenRouter.")
+            _fallback_until = time.time() + FALLBACK_DURATION_SECONDS
+            return _call_openrouter(prompt)
+
         try:
             result = _call_groq(prompt, use_heavy_model)
             _consecutive_failures = 0
@@ -85,8 +92,10 @@ def call_ai(prompt: str, use_heavy_model: bool = False) -> str:
                 print(f"[ai_client] {FAILURE_THRESHOLD} consecutive Groq failures. Switching to OpenRouter for {FALLBACK_DURATION_SECONDS//60} minutes.")
                 return _call_openrouter(prompt)
             if attempt < MAX_RETRIES - 1:
-                time.sleep(RETRY_DELAY_SECONDS)
-    
+                wait = min(RETRY_DELAY_SECONDS, HARD_TIMEOUT_SECONDS - (time.time() - start))
+                if wait > 0:
+                    time.sleep(wait)
+
     print("[ai_client] All Groq retries failed. Switching to OpenRouter.")
     _fallback_until = time.time() + FALLBACK_DURATION_SECONDS
     return _call_openrouter(prompt)
