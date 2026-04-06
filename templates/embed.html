@@ -183,13 +183,13 @@
             </div>
 
             <div class="recommend-row" id="recommend-row">
-                <label style="cursor:pointer;flex:1;display:flex;align-items:center;gap:12px;">
-                    <span>Would you recommend us?</span>
-                    <div class="toggle" id="recommend-toggle">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="font-size:0.8rem;font-weight:600;color:#475569;cursor:pointer" onclick="toggleRecommend()">Would you recommend us?</span>
+                    <div class="toggle" id="recommend-toggle" onclick="toggleRecommend()">
                         <input type="checkbox" id="recommend">
                         <span class="slider"></span>
                     </div>
-                </label>
+                </div>
             </div>
 
             <button class="submit-btn" id="submit-btn" onclick="submitForm()">Submit Feedback</button>
@@ -348,6 +348,11 @@
 
         function getStarRating(field) {
             return starRatings[field] || null;
+        }
+
+        function toggleRecommend() {
+            var cb = document.getElementById('recommend');
+            cb.checked = !cb.checked;
         }
     </script>
 </body>
